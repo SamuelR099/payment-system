@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Timesheet, TimesheetSchema } from './schemas/timesheet.schema';
 import { TimesheetRepository } from './repositories/timesheet.repository';
 import { TimesheetsController } from './timesheets.controller';
+import { TimesheetDomainService } from '../domain/timesheet-domain.service';
 
 // Commands
 import { CreateTimesheetHandler } from '../application/commands/create-timesheet/create-timesheet.handler';
@@ -38,6 +39,7 @@ const QueryHandlers = [
   controllers: [TimesheetsController],
   providers: [
     TimesheetRepository,
+    TimesheetDomainService,
     ...CommandHandlers,
     ...QueryHandlers,
   ],
