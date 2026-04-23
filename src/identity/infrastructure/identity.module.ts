@@ -3,9 +3,11 @@ import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
+import { PassportModule } from '@nestjs/passport';
 
 import { HashService } from 'src/shared/hash';
 import { ClientRouteBuilder } from 'src/shared/utils';
+import { JwtStrategy } from 'src/shared/strategies/jwt.strategy';
 
 import { CreateUserHandler } from '../application/create-user/create-user.handler';
 import { SignInHandler } from '../application/sign-in/sign-in.handler';
@@ -23,6 +25,7 @@ import { UsersController } from './users.controller';
     ConfigModule,
     CqrsModule,
     JwtModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [UsersController],
@@ -30,10 +33,11 @@ import { UsersController } from './users.controller';
     AuthService,
     ClientRouteBuilder,
     HashService,
+    JwtStrategy,
     CreateUserHandler,
-  UserRepository,
-  SignInHandler,
-  GetUserProfileHandler,
+    UserRepository,
+    SignInHandler,
+    GetUserProfileHandler,
   ],
   exports: [UserRepository],
 })
