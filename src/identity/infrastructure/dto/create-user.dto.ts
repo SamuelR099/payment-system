@@ -1,4 +1,5 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, IsOptional, IsEnum, IsNumber, Min } from 'class-validator';
+import { UserRole } from 'src/shared/enums';
 
 export class CreateUserDto {
   @IsString()
@@ -16,4 +17,17 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   password: string;
+
+  @IsEnum(UserRole)
+  @IsOptional()
+  role?: UserRole;
+
+  @IsString()
+  @IsOptional()
+  wallet?: string;
+
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  hourlyRate?: number;
 }

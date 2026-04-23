@@ -4,6 +4,7 @@ import { DomainError } from 'src/shared/domain';
 import { HashService } from 'src/shared/hash';
 import { User } from 'src/identity/domain/user.model';
 import { UserRepository } from 'src/identity/infrastructure/repositories/user.repository';
+import { UserRole } from 'src/shared/enums';
 import { CreateUserCommand } from './create-user.command';
 
 @CommandHandler(CreateUserCommand)
@@ -39,6 +40,9 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
         firstName: data.firstName,
         lastName: data.lastName,
       },
+      role: data.role || UserRole.EMPLOYEE,
+      wallet: data.wallet,
+      hourlyRate: data.hourlyRate || 25.0,
     };
   }
 }

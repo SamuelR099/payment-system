@@ -16,8 +16,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClientRouteBuilder } from './shared/utils';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
+import { RolesGuard } from './shared/guards/roles.guard';
 import { MailModule } from './shared/mail';
 import { IdentityModule } from './identity/infrastructure/identity.module';
+import { TimesheetsModule } from './timesheets/infrastructure/timesheets.module';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
@@ -38,6 +40,7 @@ import { PassportModule } from '@nestjs/passport';
       useFactory: (config: ConfigService) => config.get('recaptcha'),
     }),
     IdentityModule,
+    TimesheetsModule,
     MailModule.forRootAsync({
       imports: [ConfigModule, HttpModule],
       inject: [ConfigService],
@@ -53,6 +56,7 @@ import { PassportModule } from '@nestjs/passport';
   providers: [
     AppService,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
     {
       provide: ClientRouteBuilder,
       inject: [ConfigService],

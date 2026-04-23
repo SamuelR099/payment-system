@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { Language } from 'src/shared/enums';
+import { UserRole } from 'src/shared/enums';
 
 @Schema({ _id: false })
 export class Address {}
@@ -42,6 +43,18 @@ export class User {
 
   @Prop({ default: Language.Spanish })
   language: Language;
+
+  @Prop({
+    enum: Object.values(UserRole),
+    default: UserRole.EMPLOYEE
+  })
+  role: UserRole;
+
+  @Prop()
+  wallet?: string;
+
+  @Prop({ default: 25.0 })
+  hourlyRate: number;
 }
 
 export type UserDocument = User & Document;
