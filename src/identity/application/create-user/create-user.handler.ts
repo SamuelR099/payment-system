@@ -3,6 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DomainError } from 'src/shared/domain';
 import { HashService } from 'src/shared/hash';
 import { User } from 'src/identity/domain/user.model';
+import { AuthService } from 'src/identity/infrastructure/auth.service';
 import { UserRepository } from 'src/identity/infrastructure/repositories/user.repository';
 import { UserRole } from 'src/shared/enums';
 import { CreateUserCommand } from './create-user.command';
@@ -12,14 +13,17 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
   constructor(
     private readonly hashService: HashService,
     private readonly userRepository: UserRepository,
+    private readonly authService: AuthService,
   ) {}
 
   async execute(command: CreateUserCommand) {
     const formattedUser = await this.formatUser(command.userData);
 
     try {
-      const user = await this.userRepository.create(formattedUser);
-      return User.fromModel(user);
+      const userDoc = await this.userRepository.create(formattedUser);
+      const user = User.fromModel(userDoc);
+      const token = await this.authService.generateToken({ userId: user.id });
+      return { token, user: user.getUserInfo() };
     } catch (e) {
       if (e.code === 11000) {
         throw new DomainError(

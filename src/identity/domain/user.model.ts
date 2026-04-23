@@ -78,6 +78,7 @@ export class User {
       id: this.id,
       email: this.email,
       phone: this.phone,
+      role: this.role,
       profile: {
         firstName: this.firstName,
         lastName: this.lastName,
