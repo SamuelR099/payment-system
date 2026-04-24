@@ -1,28 +1,78 @@
-import { TimesheetDocument } from '../infrastructure/schemas/timesheet.schema';
+import { TimesheetDocument as BaseTimesheetDocument } from '../infrastructure/schemas/timesheet.schema';
+import { DomainError } from 'src/shared/domain';
 
-type ExtendedTimesheetDocument = TimesheetDocument & {
-  createdAt?: Date;
-  updatedAt?: Date;
+export class TimesheetDate {
+  private constructor(public readonly value: Date) {}
+  static create(date: string | Date) {
+    if (!date) throw new DomainError('DATE_REQUIRED', 'La fecha es obligatoria.');
+    const dateObj = date instanceof Date ? date : new Date(date);
+    TimesheetDate.validateIsNotFuture(dateObj);
+    return new TimesheetDate(dateObj);
+  }
+  static validateIsNotFuture(date: Date) {
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    if (date > today) {
+      throw new DomainError('INVALID_DATE', 'No se permite una fecha futura para el timesheet');
+    }
+  }
+}
+export class TimesheetHours {
+  private constructor(public readonly value: number) {}
+  static create(hours: number) {
+    if (!hours || hours <= 0) throw new DomainError('HOURS_INVALID', 'Las horas deben ser mayores a 0.');
+    return new TimesheetHours(hours);
+  }
+}
+
+export type TimesheetDocument = BaseTimesheetDocument & {
+  createdAt: Date;
+  updatedAt: Date;
 };
-
 export class Timesheet {
+  static create(params: {
+    userId: string;
+    date: string | Date;
+    project: string;
+    description: string;
+    hours: number;
+    hourlyRate?: number;
+  }) {
+    if (!params.userId) throw new DomainError('USER_ID_REQUIRED', 'El usuario es obligatorio.');
+    if (!params.project) throw new DomainError('PROJECT_REQUIRED', 'El proyecto es obligatorio.');
+    if (!params.description) throw new DomainError('DESCRIPTION_REQUIRED', 'La descripción es obligatoria.');
+    const date = TimesheetDate.create(params.date);
+    const hours = TimesheetHours.create(params.hours);
+    return new Timesheet({
+      id: '',
+      userId: params.userId,
+      date,
+      project: params.project,
+      description: params.description,
+      hours,
+      hourlyRate: params.hourlyRate ?? 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+  }
+
   readonly id: string;
   readonly userId: string;
-  readonly date: Date;
+  readonly date: TimesheetDate;
   readonly project: string;
   readonly description: string;
-  readonly hours: number;
+  readonly hours: TimesheetHours;
   readonly hourlyRate: number;
-  readonly createdAt?: Date;
-  readonly updatedAt?: Date;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
 
   constructor(params: {
     id: string;
     userId: string;
-    date: Date;
+    date: TimesheetDate;
     project: string;
     description: string;
-    hours: number;
+    hours: TimesheetHours;
     hourlyRate: number;
     createdAt: Date;
     updatedAt: Date;
@@ -38,66 +88,52 @@ export class Timesheet {
     this.updatedAt = params.updatedAt;
   }
 
-  // Valida que la fecha no sea futura
-  static validateDateIsNotFuture(date: Date) {
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
-    if (date > today) {
-      throw new Error('No se permite una fecha futura para el timesheet');
-    }
-  }
-
-  // Actualiza los campos del timesheet (devuelve un nuevo Timesheet)
   update(data: Partial<Omit<Timesheet, 'id' | 'userId'>>) {
     return new Timesheet({
       id: this.id,
       userId: this.userId,
-      date: data.date ?? this.date,
+      date: data.date ? (data.date instanceof TimesheetDate ? data.date : TimesheetDate.create(data.date as any)) : this.date,
       project: data.project ?? this.project,
       description: data.description ?? this.description,
-      hours: data.hours ?? this.hours,
+      hours: data.hours ? (data.hours instanceof TimesheetHours ? data.hours : TimesheetHours.create(data.hours as any)) : this.hours,
       hourlyRate: data.hourlyRate ?? this.hourlyRate,
-      createdAt: this.createdAt!,
+      createdAt: this.createdAt,
       updatedAt: new Date(),
     });
   }
 
-  toPrimitives(omitUserId = false) {
-    const obj: any = {
-      date: this.date,
+  toPrimitives() {
+    return {
+      date: this.date.value,
       project: this.project,
       description: this.description,
-      hours: this.hours,
+      hours: this.hours.value,
       hourlyRate: this.hourlyRate,
+      userId: this.userId,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
     };
-    if (!omitUserId) {
-      obj.userId = this.userId;
-    }
-    return obj;
   }
 
-  static fromModel(document: ExtendedTimesheetDocument): Timesheet {
+  static fromModel(document: any) {
     return new Timesheet({
-      id: document._id.toString(),
-      userId: document.userId.toString(),
-      date: document.date,
+      id: document._id?.toString?.() ?? '',
+      userId: document.userId?.toString?.() ?? '',
+      date: TimesheetDate.create(document.date),
       project: document.project,
       description: document.description,
-      hours: document.hours,
+      hours: TimesheetHours.create(document.hours),
       hourlyRate: document.hourlyRate,
-      createdAt: document.createdAt,
-      updatedAt: document.updatedAt,
+      createdAt: document.createdAt ?? new Date(),
+      updatedAt: document.updatedAt ?? new Date(),
     });
   }
 
-  get formattedDate(): string {
-    return this.date.toISOString().split('T')[0];
-  }
 
-  get monthYear(): { month: number; year: number } {
+  get monthYear() {
     return {
-      month: this.date.getMonth() + 1,
-      year: this.date.getFullYear(),
+      month: this.date.value.getMonth() + 1,
+      year: this.date.value.getFullYear(),
     };
   }
 }

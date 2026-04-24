@@ -24,7 +24,7 @@ export class GetTimesheetsHandler implements IQueryHandler<GetTimesheetsQuery> {
       cursor,
       limit,
     });
-  const timesheets = data.map((timesheetDocument) => Timesheet.fromModel(timesheetDocument));
+  const timesheets = data.map((timesheetDocument) => Timesheet.fromModel(timesheetDocument as any));
     return {
       timesheets,
       nextCursor,

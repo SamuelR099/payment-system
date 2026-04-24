@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { TimesheetRepository } from '../infrastructure/repositories/timesheet.repository';
+
+import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { DomainError } from 'src/shared/domain';
 
 @Injectable()
@@ -12,20 +13,13 @@ export class TimesheetDomainService {
     date: Date;
     excludeTimesheetId?: string;
   }) {
-    const { userId, project, date, excludeTimesheetId } = params;
-    const { data: existingTimesheets } = await this.timesheetRepository.search({
-      userId,
-      limit: 100,
-      month: date.getMonth() + 1,
-      year: date.getFullYear(),
+    const exists = await this.timesheetRepository.existsDuplicateOnDate({
+      userId: params.userId,
+      project: params.project,
+      date: params.date,
+      excludeTimesheetId: params.excludeTimesheetId,
     });
-    const duplicateTimesheet = existingTimesheets.find(
-      (timesheet) =>
-        timesheet.project === project &&
-        timesheet.date.getTime() === date.getTime() &&
-        timesheet._id.toString() !== excludeTimesheetId,
-    );
-    if (duplicateTimesheet) {
+    if (exists) {
       throw new DomainError('DUPLICATE_TIMESHEET', 'Ya existe un timesheet para este proyecto en esa fecha.');
     }
   }

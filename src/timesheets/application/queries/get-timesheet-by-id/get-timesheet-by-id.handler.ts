@@ -31,6 +31,6 @@ export class GetTimesheetByIdHandler implements IQueryHandler<GetTimesheetByIdQu
       );
     }
 
-    return Timesheet.fromModel(timesheetDocument);
+  return Timesheet.fromModel(timesheetDocument as any);
   }
 }

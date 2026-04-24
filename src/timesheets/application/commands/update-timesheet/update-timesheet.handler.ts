@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { DomainError } from 'src/shared/domain';
-import { Timesheet } from 'src/timesheets/domain/timesheet.model';
+import { Timesheet, TimesheetDate, TimesheetHours } from 'src/timesheets/domain/timesheet.model';
 import { TimesheetDomainService } from 'src/timesheets/domain/timesheet-domain.service';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { UpdateTimesheetCommand } from './update-timesheet.command';
@@ -20,9 +20,9 @@ export class UpdateTimesheetHandler implements ICommandHandler<UpdateTimesheetCo
     if (!foundTimesheet) throw new DomainError('TIMESHEET_NOT_FOUND', 'No existe el timesheet.');
     if (foundTimesheet.userId.toString() !== userId) throw new DomainError('UNAUTHORIZED_TIMESHEET_ACCESS', 'No autorizado.');
     if (updateData.date) {
-      Timesheet.validateDateIsNotFuture(new Date(updateData.date));
+      TimesheetDate.validateIsNotFuture(new Date(updateData.date));
     }
-    const targetDate = updateData.date ? new Date(updateData.date) : foundTimesheet.date;
+    const targetDate = updateData.date ? new Date(updateData.date) : (foundTimesheet.date instanceof Date ? foundTimesheet.date : (foundTimesheet.date as any).value ?? foundTimesheet.date);
     const targetProject = updateData.project ?? foundTimesheet.project;
 
     if (
@@ -37,16 +37,18 @@ export class UpdateTimesheetHandler implements ICommandHandler<UpdateTimesheetCo
       });
     }
 
-    const updatedTimesheetDomain = Timesheet.fromModel(foundTimesheet).update({
+    const updatedTimesheetDomain = Timesheet.fromModel(foundTimesheet as any).update({
       ...updateData,
-      date: updateData.date ? new Date(updateData.date) : undefined,
+      date: updateData.date ? TimesheetDate.create(updateData.date) : undefined,
+      hours: updateData.hours !== undefined ? TimesheetHours.create(updateData.hours) : undefined,
     });
-    const updateDataPrimitives = updatedTimesheetDomain.toPrimitives(true); // omite userId
+    const timesheetPrimitives = updatedTimesheetDomain.toPrimitives();
+    const { userId: _omit, ...updatePrimitives } = timesheetPrimitives;
     const savedTimesheet = await this.timesheetRepository.updateById(
       timesheetId,
-      updateDataPrimitives,
+      updatePrimitives,
     );
     if (!savedTimesheet) throw new DomainError('TIMESHEET_UPDATE_FAILED', 'No se pudo actualizar el timesheet.');
-    return Timesheet.fromModel(savedTimesheet);
+  return Timesheet.fromModel(savedTimesheet as any);
   }
 }

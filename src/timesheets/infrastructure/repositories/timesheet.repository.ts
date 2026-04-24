@@ -65,6 +65,7 @@ export class TimesheetRepository {
     return !!result;
   }
 
+
   async countByUserId(userId: string) {
     return this.timesheetModel
       .countDocuments({ userId: new Types.ObjectId(userId) })
@@ -78,5 +79,23 @@ export class TimesheetRepository {
   ) {
     const { data } = await this.search({ userId, month, year, limit: 1000 });
     return data.reduce((total, timesheet) => total + timesheet.hours, 0);
+  }
+
+  async existsDuplicateOnDate(params: {
+    userId: string;
+    project: string;
+    date: Date;
+    excludeTimesheetId?: string;
+  }): Promise<boolean> {
+    const filter: any = {
+      userId: new Types.ObjectId(params.userId),
+      project: params.project,
+      date: params.date,
+    };
+    if (params.excludeTimesheetId) {
+      filter._id = { $ne: new Types.ObjectId(params.excludeTimesheetId) };
+    }
+    const count = await this.timesheetModel.countDocuments(filter).exec();
+    return count > 0;
   }
 }
