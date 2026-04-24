@@ -19,7 +19,7 @@ export class CreateTimesheetHandler
 
     const timesheetDomain = TimesheetModel.create({
       userId,
-      date: timesheetData.date,
+      date: timesheetData.date, // Ajustado para trabajar directamente con Date
       project: timesheetData.project,
       description: timesheetData.description,
       hours: timesheetData.hours,
@@ -29,7 +29,7 @@ export class CreateTimesheetHandler
     await this.timesheetDomainService.validateNoDuplicateOnDate({
       userId,
       project: timesheetDomain.project,
-      date: timesheetDomain.date.value,
+      date: timesheetDomain.date,
     });
 
     const createdTimesheet = await this.timesheetRepository.create(

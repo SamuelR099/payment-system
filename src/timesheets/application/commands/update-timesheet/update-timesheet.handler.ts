@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { DomainError } from 'src/shared/domain';
-import { TimesheetModel, TimesheetDate, TimesheetHours } from 'src/timesheets/domain/timesheet.model';
+import { TimesheetModel } from 'src/timesheets/domain/timesheet.model';
 import { TimesheetDomainService } from 'src/timesheets/domain/timesheet-domain.service';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { UpdateTimesheetCommand } from './update-timesheet.command';
@@ -24,20 +24,23 @@ export class UpdateTimesheetHandler
     if (foundTimesheet.userId.toString() !== userId)
       throw new DomainError('UNAUTHORIZED_TIMESHEET_ACCESS', 'No autorizado.');
 
-    const targetDate = new Date(updateData.date ?? foundTimesheet.date);
+    const targetDate = updateData.date
+      ? new Date(updateData.date)
+      : foundTimesheet.date;
+
     const targetProject = updateData.project ?? foundTimesheet.project;
 
     await this.timesheetDomainService.validateNoDuplicateOnDate({
       userId,
       project: targetProject,
-      date: targetDate,
+      date: new Date(targetDate),
       excludeTimesheetId: timesheetId,
     });
 
     const updatedTimesheetDomain = TimesheetModel.fromModel(foundTimesheet as any).update({
       ...updateData,
-      date: updateData.date ? TimesheetDate.create(updateData.date).value : undefined,
-      hours: updateData.hours ? TimesheetHours.create(updateData.hours).value : undefined,
+      date: targetDate,
+      hours: updateData.hours,
     });
 
     const updatedTimesheetData = updatedTimesheetDomain.getUserInfo();

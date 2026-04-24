@@ -1,34 +1,6 @@
 import { TimesheetDocument as BaseTimesheetDocument } from '../infrastructure/schemas/timesheet.schema';
 import { DomainError } from 'src/shared/domain';
 
-export class TimesheetDate {
-  private constructor(public readonly value: Date) {}
-  static create(date: string | Date) {
-    if (!date) throw new DomainError('DATE_REQUIRED', 'La fecha es obligatoria.');
-    const dateObj = date instanceof Date ? date : new Date(date);
-    TimesheetDate.validateIsNotFuture(dateObj);
-    return new TimesheetDate(dateObj);
-  }
-  static validateIsNotFuture(date: Date) {
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
-    if (date > today) {
-      throw new DomainError('INVALID_DATE', 'No se permite una fecha futura para el timesheet');
-    }
-  }
-}
-export class TimesheetHours {
-  private constructor(public readonly value: number) {}
-
-  static create(hours: number | null | undefined): TimesheetHours {
-    return new TimesheetHours(hours ?? 0); // Devuelve un valor predeterminado
-  }
-
-  static validate(hours: number | TimesheetHours | null | undefined): TimesheetHours {
-    return new TimesheetHours(hours instanceof TimesheetHours ? hours.value : hours ?? 0); // Simplifica la validación
-  }
-}
-
 export type TimesheetDocument = BaseTimesheetDocument & {
   createdAt: Date;
   updatedAt: Date;
@@ -56,15 +28,14 @@ export class TimesheetModel {
     if (!params.userId) throw new DomainError('USER_ID_REQUIRED', 'El usuario es obligatorio.');
     if (!params.project) throw new DomainError('PROJECT_REQUIRED', 'El proyecto es obligatorio.');
     if (!params.description) throw new DomainError('DESCRIPTION_REQUIRED', 'La descripción es obligatoria.');
-    const date = TimesheetDate.create(params.date);
-    const hours = TimesheetHours.create(params.hours);
+    const date = params.date instanceof Date ? params.date : new Date(params.date);
     return new TimesheetModel({
       id: '',
       userId: params.userId,
       date,
       project: params.project,
       description: params.description,
-      hours,
+      hours: params.hours,
       hourlyRate: params.hourlyRate ?? 0,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -73,10 +44,10 @@ export class TimesheetModel {
 
   readonly id: string;
   readonly userId: string;
-  readonly date: TimesheetDate;
+  readonly date: Date;
   readonly project: string;
   readonly description: string;
-  readonly hours: TimesheetHours;
+  readonly hours: number;
   readonly hourlyRate: number;
   readonly createdAt: Date;
   readonly updatedAt: Date;
@@ -84,10 +55,10 @@ export class TimesheetModel {
   constructor(params: {
     id: string;
     userId: string;
-    date: TimesheetDate;
+    date: Date;
     project: string;
     description: string;
-    hours: TimesheetHours;
+    hours: number;
     hourlyRate: number;
     createdAt: Date;
     updatedAt: Date;
@@ -107,10 +78,10 @@ export class TimesheetModel {
     return new TimesheetModel({
       id: this.id,
       userId: this.userId,
-      date: data.date ? (data.date instanceof TimesheetDate ? data.date : TimesheetDate.create(data.date as any)) : this.date,
+      date: data.date ? (data.date instanceof Date ? data.date : new Date(data.date)) : this.date,
       project: data.project ?? this.project,
       description: data.description ?? this.description,
-      hours: TimesheetHours.validate(data.hours) ?? this.hours,
+      hours: data.hours ?? this.hours,
       hourlyRate: data.hourlyRate ?? this.hourlyRate,
       createdAt: this.createdAt,
       updatedAt: new Date(),
@@ -121,10 +92,10 @@ export class TimesheetModel {
     return new TimesheetModel({
       id: document._id?.toString?.() ?? '',
       userId: document.userId?.toString?.() ?? '',
-      date: TimesheetDate.create(document.date),
+      date: document.date instanceof Date ? document.date : new Date(document.date),
       project: document.project,
       description: document.description,
-      hours: TimesheetHours.create(document.hours),
+      hours: document.hours,
       hourlyRate: document.hourlyRate,
       createdAt: document.createdAt ?? new Date(),
       updatedAt: document.updatedAt ?? new Date(),
@@ -134,8 +105,8 @@ export class TimesheetModel {
 
   get monthYear() {
     return {
-      month: this.date.value.getMonth() + 1,
-      year: this.date.value.getFullYear(),
+      month: this.date.getMonth() + 1,
+      year: this.date.getFullYear(),
     };
   }
 
@@ -143,11 +114,11 @@ export class TimesheetModel {
     return {
       id: this.id,
       userId: this.userId,
-      date: this.date.value,
+      date: this.date,
       project: this.project,
       description: this.description,
-      hours: this.hours?.value, // Ensure hours is not null
-      hourlyRate: this.hourlyRate ?? 0, // Ensure hourlyRate is not null
+      hours: this.hours,
+      hourlyRate: this.hourlyRate ?? 0,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };
