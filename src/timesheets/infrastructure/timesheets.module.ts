@@ -17,18 +17,6 @@ import { GetTimesheetsHandler } from '../application/queries/get-timesheets/get-
 import { GetTimesheetByIdHandler } from '../application/queries/get-timesheet-by-id/get-timesheet-by-id.handler';
 import { GetMonthlySummaryHandler } from '../application/queries/get-monthly-summary/get-monthly-summary.handler';
 
-const CommandHandlers = [
-  CreateTimesheetHandler,
-  UpdateTimesheetHandler,
-  DeleteTimesheetHandler,
-];
-
-const QueryHandlers = [
-  GetTimesheetsHandler,
-  GetTimesheetByIdHandler,
-  GetMonthlySummaryHandler,
-];
-
 @Module({
   imports: [
     CqrsModule,
@@ -40,8 +28,12 @@ const QueryHandlers = [
   providers: [
     TimesheetRepository,
     TimesheetDomainService,
-    ...CommandHandlers,
-    ...QueryHandlers,
+    CreateTimesheetHandler,
+    UpdateTimesheetHandler,
+    DeleteTimesheetHandler,
+    GetTimesheetsHandler,
+    GetTimesheetByIdHandler,
+    GetMonthlySummaryHandler,
   ],
   exports: [TimesheetRepository],
 })

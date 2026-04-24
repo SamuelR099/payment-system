@@ -11,20 +11,19 @@ import { UpdateProjectHandler } from '../application/commands/update-project/upd
 import { DeleteProjectHandler } from '../application/commands/delete-project/delete-project.handler';
 import { GetProjectsHandler } from '../application/queries/get-projects/get-projects.handler';
 
-const CommandHandlers = [
-  CreateProjectHandler,
-  UpdateProjectHandler,
-  DeleteProjectHandler,
-];
-const QueryHandlers = [GetProjectsHandler];
-
 @Module({
   imports: [
     CqrsModule,
     MongooseModule.forFeature([{ name: Project.name, schema: ProjectSchema }]),
   ],
   controllers: [ProjectsController],
-  providers: [ProjectRepository, ...CommandHandlers, ...QueryHandlers],
+  providers: [
+    ProjectRepository,
+    CreateProjectHandler,
+    UpdateProjectHandler,
+    DeleteProjectHandler,
+    GetProjectsHandler,
+  ],
   exports: [ProjectRepository],
 })
 export class ProjectsModule {}

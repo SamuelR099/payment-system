@@ -3,6 +3,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Timesheet, TimesheetDocument } from '../schemas/timesheet.schema';
 
+export class TimesheetDateRange {
+  private constructor(public readonly startDate: Date, public readonly endDate: Date) {}
+
+  static create(month: number, year: number): TimesheetDateRange {
+    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+    return new TimesheetDateRange(startDate, endDate);
+  }
+}
+
 @Injectable()
 export class TimesheetRepository {
   private readonly DEFAULT_PAGE_SIZE = 30;
@@ -21,9 +31,8 @@ export class TimesheetRepository {
     };
 
     if (month && year) {
-      const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
-      const endDate = new Date(year, month, 0, 23, 59, 59, 999);
-      filter.date = { $gte: startDate, $lte: endDate };
+      const dateRange = TimesheetDateRange.create(month, year);
+      filter.date = { $gte: dateRange.startDate, $lte: dateRange.endDate };
     }
 
     if (cursor) {
@@ -92,5 +101,16 @@ export class TimesheetRepository {
     }
     const count = await this.timesheetModel.countDocuments(filter).exec();
     return count > 0;
+  }
+
+  async findByDateRange(dateRange: TimesheetDateRange): Promise<TimesheetDocument[]> {
+    return this.timesheetModel.find({
+      date: { $gte: dateRange.startDate, $lte: dateRange.endDate },
+    }).lean().exec();
+  }
+
+  async findByMonthAndYear(month: number, year: number): Promise<TimesheetDocument[]> {
+    const dateRange = TimesheetDateRange.create(month, year);
+    return this.findByDateRange(dateRange);
   }
 }
