@@ -1,8 +1,10 @@
 export class UpdateProjectCommand {
-  constructor(
-    public readonly projectId: string,
-    public readonly userId: string,
-    public readonly name?: string,
-    public readonly description?: string,
-  ) {}
+  readonly projectId: string;
+  readonly userId: string;
+  readonly name?: string;
+  readonly description?: string;
+
+  constructor(data: UpdateProjectCommand) {
+    Object.assign(this, data);
+  }
 }

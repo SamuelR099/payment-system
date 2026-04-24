@@ -9,10 +9,10 @@ export class GetProjectsHandler implements IQueryHandler<GetProjectsQuery> {
   async execute(query: GetProjectsQuery) {
     const projects = await this.projectRepository.findAllByUser(query.userId);
 
-    return projects.map(p => ({
-      id: String(p._id),
-      name: p.name,
-      description: p.description,
+    return projects.map(project => ({
+      id: String(project._id),
+      name: project.name,
+      description: project.description,
     }));
   }
 }

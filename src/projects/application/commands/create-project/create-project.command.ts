@@ -1,7 +1,9 @@
 export class CreateProjectCommand {
-  constructor(
-    public readonly userId: string,
-    public readonly name: string,
-    public readonly description: string,
-  ) {}
+  readonly userId: string;
+  readonly name: string;
+  readonly description?: string;
+
+  constructor(data: CreateProjectCommand) {
+    Object.assign(this, data);
+  }
 }

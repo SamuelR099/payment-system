@@ -33,11 +33,11 @@ export class ProjectsController {
   @Post('/')
   createProject(@Req() req: any, @Body() body: CreateProjectDto) {
     return this.commandBus.execute(
-      new CreateProjectCommand(
-        req.user.userId,
-        body.name,
-        body.description ?? '',
-      ),
+      new CreateProjectCommand({
+        userId: req.user.userId,
+        name: body.name,
+        description: body.description ?? '',
+      })
     );
   }
 
@@ -48,19 +48,22 @@ export class ProjectsController {
     @Body() body: UpdateProjectDto,
   ) {
     return this.commandBus.execute(
-      new UpdateProjectCommand(
-        id,
-        req.user.userId,
-        body.name,
-        body.description,
-      ),
+      new UpdateProjectCommand({
+        projectId: id,
+        userId: req.user.userId,
+        name: body.name,
+        description: body.description,
+      })
     );
   }
 
   @Delete('/:id')
   deleteProject(@Req() req: any, @Param('id') id: string) {
     return this.commandBus.execute(
-      new DeleteProjectCommand(id, req.user.userId),
+      new DeleteProjectCommand({
+        projectId: id,
+        userId: req.user.userId
+      })
     );
   }
 }

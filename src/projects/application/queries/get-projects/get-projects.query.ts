@@ -1,3 +1,3 @@
 export class GetProjectsQuery {
-  constructor(public readonly userId: string) {}
+  constructor(readonly userId: string) {}
 }

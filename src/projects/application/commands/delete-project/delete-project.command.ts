@@ -1,6 +1,8 @@
 export class DeleteProjectCommand {
-  constructor(
-    public readonly projectId: string,
-    public readonly userId: string,
-  ) {}
+  readonly projectId: string;
+  readonly userId: string;
+
+  constructor(data: DeleteProjectCommand) {
+    Object.assign(this, data);
+  }
 }
