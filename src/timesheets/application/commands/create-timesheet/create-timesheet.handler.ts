@@ -19,7 +19,7 @@ export class CreateTimesheetHandler
 
     const timesheetDomain = TimesheetModel.create({
       userId,
-      date: timesheetData.date, // Ajustado para trabajar directamente con Date
+      date: timesheetData.date,
       project: timesheetData.project,
       description: timesheetData.description,
       hours: timesheetData.hours,

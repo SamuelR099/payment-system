@@ -22,8 +22,8 @@ export class GetTimesheetsHandler implements IQueryHandler<GetTimesheetsQuery> {
       limit,
     });
 
-    const timesheets = data.map(doc => {
-      const timesheet = TimesheetModel.fromModel(doc as any);
+    const timesheets = data.map(document => {
+      const timesheet = TimesheetModel.fromModel(document as any);
       return {
         id: timesheet.id,
         ...timesheet.getUserInfo(),
