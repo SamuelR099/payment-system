@@ -23,6 +23,12 @@ export class Timesheet {
 
   @Prop({ required: true, min: 0 })
   hourlyRate: number;
+
+  @Prop({ default: false })
+  signed?: boolean;
+
+  @Prop()
+  signedAt?: Date;
 }
 
 export type TimesheetDocument = Timesheet & Document;

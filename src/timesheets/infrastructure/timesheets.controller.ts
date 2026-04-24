@@ -22,6 +22,9 @@ import { DeleteTimesheetCommand } from '../application/commands/delete-timesheet
 import { GetTimesheetsQuery } from '../application/queries/get-timesheets/get-timesheets.query';
 import { GetTimesheetByIdQuery } from '../application/queries/get-timesheet-by-id/get-timesheet-by-id.query';
 import { GetMonthlySummaryQuery } from '../application/queries/get-monthly-summary/get-monthly-summary.query';
+import { Roles } from 'src/shared/decorators/roles.decorator';
+import { UserRole } from 'src/shared/enums/user-role.enum';
+import { SignTimesheetCommand } from '../application/commands/sign-timesheet/sign-timesheet.command';
 
 @Controller('timesheets')
 export class TimesheetsController {
@@ -42,7 +45,6 @@ export class TimesheetsController {
 
   @Get('/')
   getTimesheets(@Req() req: any, @Query() query: GetTimesheetsDto) {
-    // Centraliza validación y transformación en el DTO
     return this.queryBus.execute(
       new GetTimesheetsQuery({
         userId: req.user.userId,
@@ -64,7 +66,7 @@ export class TimesheetsController {
   getTimesheetById(@Req() req: any, @Param('id') id: string) {
     return this.queryBus.execute(
       new GetTimesheetByIdQuery(id, req.user.userId),
-    ); // Constructor compacto
+    );
   }
 
   @Put('/:id')
@@ -86,6 +88,12 @@ export class TimesheetsController {
   deleteTimesheet(@Req() req: any, @Param('id') id: string) {
     return this.commandBus.execute(
       new DeleteTimesheetCommand(id, req.user.userId),
-    ); // Este command ya usa el constructor compacto
+    );
+  }
+
+  @Post('/:id/sign')
+  @Roles([UserRole.EMPLOYEE])
+  signTimesheet(@Req() req: any, @Param('id') id: string) {
+    return this.commandBus.execute(new SignTimesheetCommand(id, req.user.userId));
   }
 }
