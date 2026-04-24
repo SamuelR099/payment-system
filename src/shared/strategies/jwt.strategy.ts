@@ -27,7 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     //   orgId: payload.orgId,
     //   branchId: payload.branchId || undefined,
     // });
-    return { userId: payload.userId };
+    return { userId: payload.userId, id: payload.userId };
   }
 
   private validateExpiration(expirationDate: number) {

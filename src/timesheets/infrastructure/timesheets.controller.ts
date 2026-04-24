@@ -32,43 +32,60 @@ export class TimesheetsController {
 
   @Post('/')
   createTimesheet(@Req() req: any, @Body() body: CreateTimesheetDto) {
-    return this.commandBus.execute(new CreateTimesheetCommand({ userId: req.user.id, timesheetData: body }));
+    return this.commandBus.execute(
+      new CreateTimesheetCommand({
+        userId: req.user.userId,
+        timesheetData: body,
+      }),
+    );
   }
 
   @Get('/')
-  getTimesheets(
-    @Req() req: any,
-    @Query() query: GetTimesheetsDto,
-  ) {
+  getTimesheets(@Req() req: any, @Query() query: GetTimesheetsDto) {
     // Centraliza validación y transformación en el DTO
-    return this.queryBus.execute(new GetTimesheetsQuery({
-      userId: req.user.id,
-      ...query,
-      cursor: query.cursor,
-      limit: query.limit,
-    }));
+    return this.queryBus.execute(
+      new GetTimesheetsQuery({
+        userId: req.user.userId,
+        ...query,
+        cursor: query.cursor,
+        limit: query.limit,
+      }),
+    );
   }
 
   @Get('/summary/monthly')
-  getMonthlySummary(
-    @Req() req: any,
-    @Query() query: GetMonthlySummaryDto,
-  ) {
-    return this.queryBus.execute(new GetMonthlySummaryQuery(req.user.id, query.month, query.year));
+  getMonthlySummary(@Req() req: any, @Query() query: GetMonthlySummaryDto) {
+    return this.queryBus.execute(
+      new GetMonthlySummaryQuery(req.user.userId, query.month, query.year),
+    );
   }
 
   @Get('/:id')
   getTimesheetById(@Req() req: any, @Param('id') id: string) {
-    return this.queryBus.execute(new GetTimesheetByIdQuery(id, req.user.id)); // Constructor compacto
+    return this.queryBus.execute(
+      new GetTimesheetByIdQuery(id, req.user.userId),
+    ); // Constructor compacto
   }
 
   @Put('/:id')
-  updateTimesheet(@Req() req: any, @Param('id') id: string, @Body() body: UpdateTimesheetDto) {
-    return this.commandBus.execute(new UpdateTimesheetCommand({ timesheetId: id, userId: req.user.id, updateData: body }));
+  updateTimesheet(
+    @Req() req: any,
+    @Param('id') id: string,
+    @Body() body: UpdateTimesheetDto,
+  ) {
+    return this.commandBus.execute(
+      new UpdateTimesheetCommand({
+        timesheetId: id,
+        userId: req.user.userId,
+        updateData: body,
+      }),
+    );
   }
 
   @Delete('/:id')
   deleteTimesheet(@Req() req: any, @Param('id') id: string) {
-    return this.commandBus.execute(new DeleteTimesheetCommand(id, req.user.id)); // Este command ya usa el constructor compacto
+    return this.commandBus.execute(
+      new DeleteTimesheetCommand(id, req.user.userId),
+    ); // Este command ya usa el constructor compacto
   }
 }

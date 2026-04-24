@@ -20,6 +20,7 @@ import { RolesGuard } from './shared/guards/roles.guard';
 import { MailModule } from './shared/mail';
 import { IdentityModule } from './identity/infrastructure/identity.module';
 import { TimesheetsModule } from './timesheets/infrastructure/timesheets.module';
+import { ProjectsModule } from './projects/infrastructure/projects.module';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
@@ -41,6 +42,7 @@ import { PassportModule } from '@nestjs/passport';
     }),
     IdentityModule,
     TimesheetsModule,
+    ProjectsModule,
     MailModule.forRootAsync({
       imports: [ConfigModule, HttpModule],
       inject: [ConfigService],

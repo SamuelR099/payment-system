@@ -16,7 +16,9 @@ export class TimesheetRepository {
   }) {
     const { userId, month, year, cursor, limit } = params;
     const pageSize = limit ?? this.DEFAULT_PAGE_SIZE;
-    const filter: any = { userId: new Types.ObjectId(userId) };
+    const filter: any = {
+      userId: { $in: [userId, new Types.ObjectId(userId)] },
+    };
 
     if (month && year) {
       const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
@@ -29,9 +31,10 @@ export class TimesheetRepository {
     }
 
     const query = this.timesheetModel.find(filter).sort({ _id: -1 });
-  const data = await query.limit(pageSize).lean().exec();
-  const nextCursor = data.length < pageSize ? null : String(data[data.length - 1]._id);
-  return { data, nextCursor };
+    const data = await query.limit(pageSize).lean().exec();
+    const nextCursor =
+      data.length < pageSize ? null : String(data[data.length - 1]._id);
+    return { data, nextCursor };
   }
 
   constructor(
@@ -48,10 +51,7 @@ export class TimesheetRepository {
     return this.timesheetModel.findById(id).exec();
   }
 
-  async updateById(
-    id: string,
-    updateData: Partial<Timesheet>,
-  ) {
+  async updateById(id: string, updateData: Partial<Timesheet>) {
     const updated = await this.timesheetModel
       .findByIdAndUpdate(id, updateData, { new: true })
       .exec();
@@ -65,18 +65,13 @@ export class TimesheetRepository {
     return !!result;
   }
 
-
   async countByUserId(userId: string) {
     return this.timesheetModel
-      .countDocuments({ userId: new Types.ObjectId(userId) })
+      .countDocuments({ userId: { $in: [userId, new Types.ObjectId(userId)] } })
       .exec();
   }
 
-  async getHoursMonth(
-    userId: string,
-    month: number,
-    year: number,
-  ) {
+  async getHoursMonth(userId: string, month: number, year: number) {
     const { data } = await this.search({ userId, month, year, limit: 1000 });
     return data.reduce((total, timesheet) => total + timesheet.hours, 0);
   }
@@ -88,7 +83,7 @@ export class TimesheetRepository {
     excludeTimesheetId?: string;
   }): Promise<boolean> {
     const filter: any = {
-      userId: new Types.ObjectId(params.userId),
+      userId: { $in: [params.userId, new Types.ObjectId(params.userId)] },
       project: params.project,
       date: params.date,
     };
