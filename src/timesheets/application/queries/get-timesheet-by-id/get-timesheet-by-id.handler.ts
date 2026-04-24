@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { DomainError } from 'src/shared/domain';
-import { Timesheet } from 'src/timesheets/domain/timesheet.model';
+import { TimesheetModel } from 'src/timesheets/domain/timesheet.model';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { GetTimesheetByIdQuery } from './get-timesheet-by-id.query';
 
@@ -11,7 +11,7 @@ export class GetTimesheetByIdHandler implements IQueryHandler<GetTimesheetByIdQu
     private readonly timesheetRepository: TimesheetRepository,
   ) {}
 
-  async execute(query: GetTimesheetByIdQuery): Promise<Timesheet> {
+  async execute(query: GetTimesheetByIdQuery): Promise<any> {
     const { timesheetId, userId } = query;
 
     const timesheetDocument = await this.timesheetRepository.findById(timesheetId);
@@ -31,6 +31,7 @@ export class GetTimesheetByIdHandler implements IQueryHandler<GetTimesheetByIdQu
       );
     }
 
-  return Timesheet.fromModel(timesheetDocument as any);
+    const timesheet = TimesheetModel.fromModel(timesheetDocument as any);
+    return { id: timesheet.id, ...timesheet.getUserInfo() };
   }
 }

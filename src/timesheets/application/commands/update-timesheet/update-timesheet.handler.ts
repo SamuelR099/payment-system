@@ -1,11 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { DomainError } from 'src/shared/domain';
-import {
-  Timesheet,
-  TimesheetDate,
-  TimesheetHours,
-} from 'src/timesheets/domain/timesheet.model';
+import { TimesheetModel, TimesheetDate, TimesheetHours } from 'src/timesheets/domain/timesheet.model';
 import { TimesheetDomainService } from 'src/timesheets/domain/timesheet-domain.service';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { UpdateTimesheetCommand } from './update-timesheet.command';
@@ -19,7 +15,7 @@ export class UpdateTimesheetHandler
     private readonly timesheetDomainService: TimesheetDomainService,
   ) {}
 
-  async execute(command: UpdateTimesheetCommand): Promise<Timesheet> {
+  async execute(command: UpdateTimesheetCommand): Promise<any> {
     const { timesheetId, userId, updateData } = command;
 
     const foundTimesheet = await this.timesheetRepository.findById(timesheetId);
@@ -27,61 +23,41 @@ export class UpdateTimesheetHandler
       throw new DomainError('TIMESHEET_NOT_FOUND', 'No existe el timesheet.');
     if (foundTimesheet.userId.toString() !== userId)
       throw new DomainError('UNAUTHORIZED_TIMESHEET_ACCESS', 'No autorizado.');
-    if (updateData.date) {
-      TimesheetDate.validateIsNotFuture(new Date(updateData.date));
-    }
-    const targetDate = updateData.date
-      ? new Date(updateData.date)
-      : foundTimesheet.date instanceof Date
-        ? foundTimesheet.date
-        : ((foundTimesheet.date as any).value ?? foundTimesheet.date);
+
+    const targetDate = new Date(updateData.date ?? foundTimesheet.date);
     const targetProject = updateData.project ?? foundTimesheet.project;
 
-    if (
-      (updateData.date &&
-        targetDate.getTime() !== foundTimesheet.date.getTime()) ||
-      (updateData.project && updateData.project !== foundTimesheet.project)
-    ) {
-      await this.timesheetDomainService.validateNoDuplicateOnDate({
-        userId,
-        project: targetProject,
-        date: targetDate,
-        excludeTimesheetId: timesheetId,
-      });
-    }
-
-    const updatedTimesheetDomain = Timesheet.fromModel(
-      foundTimesheet as any,
-    ).update({
-      ...updateData,
-      date: updateData.date ? TimesheetDate.create(updateData.date) : undefined,
-      hours:
-        updateData.hours !== undefined
-          ? TimesheetHours.create(updateData.hours)
-          : undefined,
+    await this.timesheetDomainService.validateNoDuplicateOnDate({
+      userId,
+      project: targetProject,
+      date: targetDate,
+      excludeTimesheetId: timesheetId,
     });
-    const timesheetPrimitives = updatedTimesheetDomain.toPrimitives();
-    const { userId: _omit, ...updatePrimitives } = timesheetPrimitives;
+
+    const updatedTimesheetDomain = TimesheetModel.fromModel(foundTimesheet as any).update({
+      ...updateData,
+      date: updateData.date ? TimesheetDate.create(updateData.date).value : undefined,
+      hours: updateData.hours ? TimesheetHours.create(updateData.hours).value : undefined,
+    });
+
+    const updatedTimesheetData = updatedTimesheetDomain.getUserInfo();
     const savedTimesheet = await this.timesheetRepository.updateById(
       timesheetId,
-      updatePrimitives,
+      {
+        ...updatedTimesheetData,
+        userId: foundTimesheet.userId,
+      },
     );
+
     if (!savedTimesheet)
       throw new DomainError(
         'TIMESHEET_UPDATE_FAILED',
         'No se pudo actualizar el timesheet.',
       );
-    const t = Timesheet.fromModel(savedTimesheet as any);
+
     return {
-      id: t.id,
-      userId: t.userId,
-      date: t.date.value,
-      project: t.project,
-      description: t.description,
-      hours: t.hours.value,
-      hourlyRate: t.hourlyRate,
-      createdAt: t.createdAt,
-      updatedAt: t.updatedAt,
-    } as any;
+      id: savedTimesheet.id,
+      ...updatedTimesheetDomain.getUserInfo(),
+    };
   }
 }

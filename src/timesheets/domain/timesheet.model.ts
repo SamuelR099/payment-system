@@ -19,9 +19,13 @@ export class TimesheetDate {
 }
 export class TimesheetHours {
   private constructor(public readonly value: number) {}
-  static create(hours: number) {
-    if (!hours || hours <= 0) throw new DomainError('HOURS_INVALID', 'Las horas deben ser mayores a 0.');
-    return new TimesheetHours(hours);
+
+  static create(hours: number | null | undefined): TimesheetHours {
+    return new TimesheetHours(hours ?? 0); // Devuelve un valor predeterminado
+  }
+
+  static validate(hours: number | TimesheetHours | null | undefined): TimesheetHours {
+    return new TimesheetHours(hours instanceof TimesheetHours ? hours.value : hours ?? 0); // Simplifica la validación
   }
 }
 
@@ -29,7 +33,18 @@ export type TimesheetDocument = BaseTimesheetDocument & {
   createdAt: Date;
   updatedAt: Date;
 };
-export class Timesheet {
+export interface Timesheet {
+  id: string;
+  userId: string;
+  date: Date;
+  project: string;
+  description: string;
+  hours: number;
+  hourlyRate: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+export class TimesheetModel {
   static create(params: {
     userId: string;
     date: string | Date;
@@ -43,7 +58,7 @@ export class Timesheet {
     if (!params.description) throw new DomainError('DESCRIPTION_REQUIRED', 'La descripción es obligatoria.');
     const date = TimesheetDate.create(params.date);
     const hours = TimesheetHours.create(params.hours);
-    return new Timesheet({
+    return new TimesheetModel({
       id: '',
       userId: params.userId,
       date,
@@ -89,34 +104,21 @@ export class Timesheet {
   }
 
   update(data: Partial<Omit<Timesheet, 'id' | 'userId'>>) {
-    return new Timesheet({
+    return new TimesheetModel({
       id: this.id,
       userId: this.userId,
       date: data.date ? (data.date instanceof TimesheetDate ? data.date : TimesheetDate.create(data.date as any)) : this.date,
       project: data.project ?? this.project,
       description: data.description ?? this.description,
-      hours: data.hours ? (data.hours instanceof TimesheetHours ? data.hours : TimesheetHours.create(data.hours as any)) : this.hours,
+      hours: TimesheetHours.validate(data.hours) ?? this.hours,
       hourlyRate: data.hourlyRate ?? this.hourlyRate,
       createdAt: this.createdAt,
       updatedAt: new Date(),
     });
   }
 
-  toPrimitives() {
-    return {
-      date: this.date.value,
-      project: this.project,
-      description: this.description,
-      hours: this.hours.value,
-      hourlyRate: this.hourlyRate,
-      userId: this.userId,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
-    };
-  }
-
   static fromModel(document: any) {
-    return new Timesheet({
+    return new TimesheetModel({
       id: document._id?.toString?.() ?? '',
       userId: document.userId?.toString?.() ?? '',
       date: TimesheetDate.create(document.date),
@@ -134,6 +136,20 @@ export class Timesheet {
     return {
       month: this.date.value.getMonth() + 1,
       year: this.date.value.getFullYear(),
+    };
+  }
+
+  getUserInfo(): Timesheet {
+    return {
+      id: this.id,
+      userId: this.userId,
+      date: this.date.value,
+      project: this.project,
+      description: this.description,
+      hours: this.hours?.value, // Ensure hours is not null
+      hourlyRate: this.hourlyRate ?? 0, // Ensure hourlyRate is not null
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
     };
   }
 }

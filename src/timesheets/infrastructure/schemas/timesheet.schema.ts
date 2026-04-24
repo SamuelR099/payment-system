@@ -3,6 +3,9 @@ import { Document, Types } from 'mongoose';
 
 @Schema({ collection: 'timesheets', timestamps: true })
 export class Timesheet {
+  static fromModel(arg0: any) {
+    throw new Error('Method not implemented.');
+  }
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   userId: Types.ObjectId;
 
