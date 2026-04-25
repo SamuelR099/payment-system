@@ -1,14 +1,17 @@
-import { Controller, Get, Post, Body, Param, Put, Query, Req, ForbiddenException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Query } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
-import { GetReportsQuery } from '../application/queries/get-reports.query';
-import { GetReportByIdQuery } from '../application/queries/get-report-id.query';
+import { Roles } from 'src/shared/decorators/roles.decorator';
+import { UserRole } from 'src/shared/enums/user-role.enum';
+
+import { SearchReportQuery } from '../application/search-report/search-report.query';
+import { GetReportQuery } from '../application/get-report/get-report.query';
 import { SubmitReportCommand } from '../application/submit-report/submit-report.command';
 import { ApproveReportByAdminCommand } from '../application/approve-report-admin/approve-report-admin.command';
 import { UpdateReportCommand } from '../application/update-report/update-report.command';
-import { Roles } from 'src/shared/decorators/roles.decorator';
-import { UserRole } from 'src/shared/enums/user-role.enum';
+
 import { GetReportsDto } from './dto/get-reports.dto';
+import { UpdateReportDto } from './dto/update-report.dto';
 
 @Controller('reports')
 export class ReportsController {
@@ -17,14 +20,14 @@ export class ReportsController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  @Get()
+  @Get('/')
   async getReports(@Query() query: GetReportsDto) {
-    return this.queryBus.execute(new GetReportsQuery(query));
+    return this.queryBus.execute(new SearchReportQuery(query));
   }
 
   @Get('/:id')
   async getReport(@Param('id') id: string) {
-    return this.queryBus.execute(new GetReportByIdQuery(id));
+    return this.queryBus.execute(new GetReportQuery(id));
   }
 
   @Post('/submit')
@@ -44,8 +47,8 @@ export class ReportsController {
   @Roles([UserRole.ADMIN])
   async updateReport(
     @Param('id') id: string,
-    @Body() updateReportDto: any,
+    @Body() body: UpdateReportDto,
   ) {
-    return this.commandBus.execute(new UpdateReportCommand(id, updateReportDto));
+    return this.commandBus.execute(new UpdateReportCommand(id, body));
   }
 }

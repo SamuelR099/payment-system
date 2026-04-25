@@ -1,12 +1,12 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { GetReportsQuery } from './get-reports.query';
+import { SearchReportQuery } from './search-report.query';
 import { ReportRepository, SearchReportParams } from '../../infrastructure/repositories/report.repository';
 
-@QueryHandler(GetReportsQuery)
-export class GetReportsHandler implements IQueryHandler<GetReportsQuery> {
+@QueryHandler(SearchReportQuery)
+export class SearchReportHandler implements IQueryHandler<SearchReportQuery> {
   constructor(private readonly reportRepository: ReportRepository) {}
 
-  async execute(query: GetReportsQuery) {
+  async execute(query: SearchReportQuery) {
     const params: SearchReportParams = {
       terms: query.terms,
       status: query.status,

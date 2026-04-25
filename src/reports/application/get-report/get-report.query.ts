@@ -1,3 +1,3 @@
-export class GetReportByIdQuery {
+export class GetReportQuery {
   constructor(readonly id: string) {}
 }

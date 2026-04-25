@@ -35,8 +35,7 @@ export class ProjectsController {
     return this.commandBus.execute(
       new CreateProjectCommand({
         userId: req.user.userId,
-        name: body.name,
-        description: body.description ?? '',
+        ...body
       })
     );
   }
@@ -51,8 +50,7 @@ export class ProjectsController {
       new UpdateProjectCommand({
         projectId: id,
         userId: req.user.userId,
-        name: body.name,
-        description: body.description,
+        ...body
       })
     );
   }
