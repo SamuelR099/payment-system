@@ -10,6 +10,8 @@ import { Report, ReportSchema } from './schemas/report.schema';
 import { ApproveReportByAdminHandler } from '../application/approve-report-admin/approve-report-admin.handler';
 import { CloseMonthAndGenerateReportHandler } from '../application/close-month-generate-report/close-month-generate-report.handler';
 import { SubmitReportHandler } from '../application/submit-report/submit-report.handler';
+import { GetReportHandler } from '../application/get-report/get-report.handler';
+import { SearchReportHandler } from '../application/search-report/search-report.handler';
 
 @Module({
   imports: [
@@ -18,10 +20,12 @@ import { SubmitReportHandler } from '../application/submit-report/submit-report.
   ],
   controllers: [ReportsController],
   providers: [
-    ReportRepository,
-    ApproveReportByAdminHandler,
-    CloseMonthAndGenerateReportHandler,
-    SubmitReportHandler,
+  ReportRepository,
+  ApproveReportByAdminHandler,
+  CloseMonthAndGenerateReportHandler,
+  SubmitReportHandler,
+  GetReportHandler,
+  SearchReportHandler,
   ],
   exports: [ReportRepository],
 })
