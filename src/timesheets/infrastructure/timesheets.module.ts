@@ -10,8 +10,8 @@ import { TimesheetDomainService } from '../domain/timesheet-domain.service';
 import { CreateTimesheetHandler } from '../application/create-timesheet/create-timesheet.handler';
 import { UpdateTimesheetHandler } from '../application/update-timesheet/update-timesheet.handler';
 import { DeleteTimesheetHandler } from '../application/delete-timesheet/delete-timesheet.handler';
-import { GetTimesheetsHandler } from '../application/get-timesheets/get-timesheets.handler';
-import { GetTimesheetByIdHandler } from '../application/get-timesheet-by-id/get-timesheet-by-id.handler';
+import { GetTimesheetsHandler } from '../application/search-timesheets/get-timesheets.handler';
+import { GetTimesheetByIdHandler } from '../application/get-timesheet/get-timesheet-by-id.handler';
 import { GetMonthlySummaryHandler } from '../application/get-monthly-summary/get-monthly-summary.handler';
 import { SignTimesheetHandler } from '../application/sign-timesheet/sign-timesheet.handler';
 
