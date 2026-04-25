@@ -16,15 +16,15 @@ import { UpdateTimesheetDto } from './dto/update-timesheet.dto';
 import { GetTimesheetsDto } from './dto/get-timesheets.dto';
 import { GetMonthlySummaryDto } from './dto/get-monthly-summary.dto';
 
-import { CreateTimesheetCommand } from '../application/commands/create-timesheet/create-timesheet.command';
-import { UpdateTimesheetCommand } from '../application/commands/update-timesheet/update-timesheet.command';
-import { DeleteTimesheetCommand } from '../application/commands/delete-timesheet/delete-timesheet.command';
-import { GetTimesheetsQuery } from '../application/queries/get-timesheets/get-timesheets.query';
-import { GetTimesheetByIdQuery } from '../application/queries/get-timesheet-by-id/get-timesheet-by-id.query';
-import { GetMonthlySummaryQuery } from '../application/queries/get-monthly-summary/get-monthly-summary.query';
+import { CreateTimesheetCommand } from '../application/create-timesheet/create-timesheet.command';
+import { UpdateTimesheetCommand } from '../application/update-timesheet/update-timesheet.command';
+import { DeleteTimesheetCommand } from '../application/delete-timesheet/delete-timesheet.command';
+import { GetTimesheetsQuery } from '../application/get-timesheets/get-timesheets.query';
+import { GetTimesheetByIdQuery } from '../application/get-timesheet-by-id/get-timesheet-by-id.query';
+import { GetMonthlySummaryQuery } from '../application/get-monthly-summary/get-monthly-summary.query';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { UserRole } from 'src/shared/enums/user-role.enum';
-import { SignTimesheetCommand } from '../application/commands/sign-timesheet/sign-timesheet.command';
+import { SignTimesheetCommand } from '../application/sign-timesheet/sign-timesheet.command';
 
 @Controller('timesheets')
 export class TimesheetsController {

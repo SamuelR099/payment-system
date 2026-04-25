@@ -7,15 +7,13 @@ import { TimesheetRepository } from './repositories/timesheet.repository';
 import { TimesheetsController } from './timesheets.controller';
 import { TimesheetDomainService } from '../domain/timesheet-domain.service';
 
-// Commands
-import { CreateTimesheetHandler } from '../application/commands/create-timesheet/create-timesheet.handler';
-import { UpdateTimesheetHandler } from '../application/commands/update-timesheet/update-timesheet.handler';
-import { DeleteTimesheetHandler } from '../application/commands/delete-timesheet/delete-timesheet.handler';
-
-// Queries
-import { GetTimesheetsHandler } from '../application/queries/get-timesheets/get-timesheets.handler';
-import { GetTimesheetByIdHandler } from '../application/queries/get-timesheet-by-id/get-timesheet-by-id.handler';
-import { GetMonthlySummaryHandler } from '../application/queries/get-monthly-summary/get-monthly-summary.handler';
+import { CreateTimesheetHandler } from '../application/create-timesheet/create-timesheet.handler';
+import { UpdateTimesheetHandler } from '../application/update-timesheet/update-timesheet.handler';
+import { DeleteTimesheetHandler } from '../application/delete-timesheet/delete-timesheet.handler';
+import { GetTimesheetsHandler } from '../application/get-timesheets/get-timesheets.handler';
+import { GetTimesheetByIdHandler } from '../application/get-timesheet-by-id/get-timesheet-by-id.handler';
+import { GetMonthlySummaryHandler } from '../application/get-monthly-summary/get-monthly-summary.handler';
+import { SignTimesheetHandler } from '../application/sign-timesheet/sign-timesheet.handler';
 
 @Module({
   imports: [
@@ -34,6 +32,7 @@ import { GetMonthlySummaryHandler } from '../application/queries/get-monthly-sum
     GetTimesheetsHandler,
     GetTimesheetByIdHandler,
     GetMonthlySummaryHandler,
+    SignTimesheetHandler,
   ],
   exports: [TimesheetRepository],
 })
