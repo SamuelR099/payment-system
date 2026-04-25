@@ -6,10 +6,10 @@ import { Project, ProjectSchema } from './schemas/project.schema';
 import { ProjectRepository } from './repositories/project.repository';
 import { ProjectsController } from './projects.controller';
 
-import { CreateProjectHandler } from '../application/commands/create-project/create-project.handler';
-import { UpdateProjectHandler } from '../application/commands/update-project/update-project.handler';
-import { DeleteProjectHandler } from '../application/commands/delete-project/delete-project.handler';
-import { GetProjectsHandler } from '../application/queries/get-projects/get-projects.handler';
+import { CreateProjectHandler } from '../application/create-project/create-project.handler';
+import { UpdateProjectHandler } from '../application/update-project/update-project.handler';
+import { DeleteProjectHandler } from '../application/delete-project/delete-project.handler';
+import { GetProjectsHandler } from '../application/get-projects/get-projects.handler';
 
 @Module({
   imports: [

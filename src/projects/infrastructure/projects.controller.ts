@@ -13,10 +13,10 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 
-import { CreateProjectCommand } from '../application/commands/create-project/create-project.command';
-import { UpdateProjectCommand } from '../application/commands/update-project/update-project.command';
-import { DeleteProjectCommand } from '../application/commands/delete-project/delete-project.command';
-import { GetProjectsQuery } from '../application/queries/get-projects/get-projects.query';
+import { CreateProjectCommand } from '../application/create-project/create-project.command';
+import { UpdateProjectCommand } from '../application/update-project/update-project.command';
+import { DeleteProjectCommand } from '../application/delete-project/delete-project.command';
+import { GetProjectsQuery } from '../application/get-projects/get-projects.query';
 
 @Controller('projects')
 export class ProjectsController {
