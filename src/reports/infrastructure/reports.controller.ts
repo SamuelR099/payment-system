@@ -4,7 +4,6 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetReportsQuery } from '../application/queries/get-reports.query';
 import { GetReportByIdQuery } from '../application/queries/get-report-id.query';
 import { SubmitReportCommand } from '../application/submit-report/submit-report.command';
-import { SignReportByEmployeeCommand } from '../application/sign-report-employee/sign-report-employee.command';
 import { ApproveReportByAdminCommand } from '../application/approve-report-admin/approve-report-admin.command';
 import { UpdateReportCommand } from '../application/update-report/update-report.command';
 import { Roles } from 'src/shared/decorators/roles.decorator';
@@ -34,11 +33,6 @@ export class ReportsController {
     return this.commandBus.execute(new SubmitReportCommand(body.reportId, body.userId));
   }
 
-  @Post('/:id/sign-employee')
-  @Roles([UserRole.ADMIN])
-  async signReportByEmployee(@Param('id') id: string, @Body() body: { userId: string }) {
-    return this.commandBus.execute(new SignReportByEmployeeCommand(id, body.userId));
-  }
 
   @Post('/:id/approve')
   @Roles([UserRole.ADMIN])
