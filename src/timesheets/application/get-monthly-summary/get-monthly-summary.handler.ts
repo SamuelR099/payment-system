@@ -1,15 +1,13 @@
-
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetMonthlySummaryQuery } from './get-monthly-summary.query';
 import { DomainError } from 'src/shared/domain';
 import { TimesheetSummaryService } from 'src/timesheets/domain/timesheet-summary.service';
-import { MonthlySummaryResponseDto } from 'src/timesheets/infrastructure/dto/monthly-summary-response.dto';
 
 @QueryHandler(GetMonthlySummaryQuery)
 export class GetMonthlySummaryHandler implements IQueryHandler<GetMonthlySummaryQuery> {
   constructor(private readonly timesheetSummaryService: TimesheetSummaryService) {}
 
-  async execute(query: GetMonthlySummaryQuery): Promise<MonthlySummaryResponseDto> {
+  async execute(query: GetMonthlySummaryQuery) {
     const { userId, month, year } = query;
 
     if (!month || !year) {

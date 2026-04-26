@@ -1,7 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
-import { MonthlySummaryResponseDto, MonthlySummaryProjectDto, TimesheetDto } from 'src/timesheets/infrastructure/dto/monthly-summary-response.dto';
 
+interface TimesheetRaw {
+  id?: string;
+  _id?: any;
+  userId?: string;
+  date?: string | Date;
+  project?: string;
+  description?: string;
+  hours?: number;
+  hourlyRate?: number;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+}
+
+export interface ProjectSummary {
+  project: string;
+  hours: number;
+}
 @Injectable()
 export class TimesheetSummaryService {
   constructor(private readonly timesheetRepository: TimesheetRepository) {}
@@ -9,13 +25,12 @@ export class TimesheetSummaryService {
   private static readonly MAX_RESULTS = 1000;
 
   async getMonthlySummary(userId: string, month: number, year: number) {
-  const { data: timesheetList } = await this.timesheetRepository.search({ userId, month, year, limit: TimesheetSummaryService.MAX_RESULTS });
-  const totalWorkedHours = await this.timesheetRepository.getHoursMonth(userId, month, year);
-  const totalBilledAmount = this.getTotalBilled(timesheetList);
-  const projectSummary = this.getProjectSummary(timesheetList);
-  const averageHoursPerDay = this.getAverageHoursPerDay(totalWorkedHours, timesheetList.length);
-  const timesheets: TimesheetDto[] = timesheetList.map(this.toTimesheetDto);
-
+    const timesheetList = await this.fetchTimesheets(userId, month, year);
+    const totalWorkedHours = await this.getTotalWorkedHours(userId, month, year);
+    const totalBilledAmount = this.calculateTotalBilled(timesheetList);
+    const projectSummary = this.buildProjectSummary(timesheetList);
+    const averageHoursPerDay = this.calculateAverageHoursPerDay(totalWorkedHours, timesheetList.length);
+    const timesheets = timesheetList.map(this.mapTimesheet);
     return {
       month,
       year,
@@ -29,27 +44,35 @@ export class TimesheetSummaryService {
     };
   }
 
-  private getTotalBilled(timesheetList: any[]): number {
-    return timesheetList.reduce((sum, timesheet) => sum + (timesheet.hours * timesheet.hourlyRate), 0);
+  private async fetchTimesheets(userId: string, month: number, year: number): Promise<any[]> {
+    const { data } = await this.timesheetRepository.search({ userId, month, year, limit: TimesheetSummaryService.MAX_RESULTS });
+    return data;
   }
 
-  private getProjectSummary(timesheetList: any[]): MonthlySummaryProjectDto[] {
-    const hoursGroupedByProject: Record<string, number> = {};
+  private async getTotalWorkedHours(userId: string, month: number, year: number): Promise<number> {
+    return this.timesheetRepository.getHoursMonth(userId, month, year);
+  }
+
+  private calculateTotalBilled(timesheetList: TimesheetRaw[]): number {
+    return timesheetList.reduce((sum, timesheet) => sum + ((timesheet.hours ?? 0) * (timesheet.hourlyRate ?? 0)), 0);
+  }
+
+  private buildProjectSummary(timesheetList: TimesheetRaw[]): ProjectSummary[] {
+    const grouped: Record<string, number> = {};
     for (const timesheet of timesheetList) {
-      hoursGroupedByProject[timesheet.project] = (hoursGroupedByProject[timesheet.project] || 0) + timesheet.hours;
+      if (!timesheet.project) continue;
+      grouped[timesheet.project] = (grouped[timesheet.project] || 0) + (timesheet.hours ?? 0);
     }
-    return Object.entries(hoursGroupedByProject).map(([project, hours]) => ({ project, hours }));
+    return Object.entries(grouped).map(([project, hours]) => ({ project, hours }));
   }
 
-  private getAverageHoursPerDay(totalWorkedHours: number, totalEntries: number): number {
-    return totalEntries > 0 ? totalWorkedHours / totalEntries : 0;
+  private calculateAverageHoursPerDay(total: number, entries: number): number {
+    return entries > 0 ? total / entries : 0;
   }
 
-  private toTimesheetDto(timesheet: any): TimesheetDto {
-    if (!timesheet.id && !timesheet._id) throw new Error('El timesheet no tiene identificador.');
-    if (!timesheet.date || !timesheet.createdAt || !timesheet.updatedAt) throw new Error('El timesheet no tiene todas las fechas requeridas.');
+  private mapTimesheet(timesheet: TimesheetRaw) {
     return {
-      id: timesheet.id ?? timesheet._id?.toString?.(),
+      id: timesheet.id,
       userId: timesheet.userId,
       date: timesheet.date,
       project: timesheet.project,
@@ -60,5 +83,4 @@ export class TimesheetSummaryService {
       updatedAt: timesheet.updatedAt,
     };
   }
-  }
-
+ }

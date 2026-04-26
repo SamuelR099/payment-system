@@ -27,18 +27,6 @@ export class SignTimesheetHandler implements ICommandHandler<SignTimesheetComman
     if (!updatedTimesheet)
       throw new DomainError('SIGN_FAILED', 'No se pudo firmar el timesheet.');
 
-    return {
-      id: updatedTimesheet.id ?? updatedTimesheet._id?.toString?.() ?? '',
-      userId: updatedTimesheet.userId?.toString?.() ?? '',
-      date: updatedTimesheet.date,
-      project: updatedTimesheet.project,
-      description: updatedTimesheet.description,
-      hours: updatedTimesheet.hours,
-      hourlyRate: updatedTimesheet.hourlyRate,
-      createdAt: updatedTimesheet.createdAt,
-      updatedAt: updatedTimesheet.updatedAt,
-      signed: updatedTimesheet.signed,
-      signedAt: updatedTimesheet.signedAt,
-    };
+  return updatedTimesheet;
   }
 }
