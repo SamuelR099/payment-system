@@ -23,8 +23,6 @@ import { CreateTimesheetDto } from './dto/create-timesheet.dto';
 import { UpdateTimesheetDto } from './dto/update-timesheet.dto';
 import { GetTimesheetsDto } from './dto/get-timesheets.dto';
 import { GetMonthlySummaryDto } from './dto/get-monthly-summary.dto';
-import { SignTimesheetDto } from './dto/sign-timesheet.dto';
-
 
 import { CreateTimesheetCommand } from '../application/create-timesheet/create-timesheet.command';
 import { UpdateTimesheetCommand } from '../application/update-timesheet/update-timesheet.command';
@@ -106,7 +104,6 @@ export class TimesheetsController {
   @UseInterceptors(FileInterceptor('file'))
   async signTimesheet(
     @Param('id') id: string,
-    @Body() body: SignTimesheetDto,
     @Request() req: any,
     @UploadedFile(
       new FileUploadValidationPipe({
@@ -123,7 +120,6 @@ export class TimesheetsController {
         timesheetId: id,
         userId,
         file,
-        ...body,
       })
     );
   }
