@@ -49,6 +49,7 @@ export class ReportsController {
     @Param('id') id: string,
     @Body() body: UpdateReportDto,
   ) {
-    return this.commandBus.execute(new UpdateReportCommand(id, body));
+    // El comando ahora acepta un objeto, y el constructor hace Object.assign
+    return this.commandBus.execute(new UpdateReportCommand({ reportId: id, ...body }));
   }
 }

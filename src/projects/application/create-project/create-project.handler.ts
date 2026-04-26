@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ProjectRepository } from '../../../infrastructure/repositories/project.repository';
+import { ProjectRepository } from '../../infrastructure/repositories/project.repository';
 import { CreateProjectCommand } from './create-project.command';
 
 @CommandHandler(CreateProjectCommand)

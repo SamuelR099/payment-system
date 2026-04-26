@@ -1,5 +1,5 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { ProjectRepository } from '../../../infrastructure/repositories/project.repository';
+import { ProjectRepository } from '../../infrastructure/repositories/project.repository';
 import { GetProjectsQuery } from './get-projects.query';
 
 @QueryHandler(GetProjectsQuery)

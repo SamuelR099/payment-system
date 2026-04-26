@@ -1,3 +1,3 @@
 export class GetReportQuery {
-  constructor(readonly id: string) {}
+  constructor(readonly reportId: string) {}
 }

@@ -82,6 +82,7 @@ export class TimesheetRepository {
   async countByUserId(userId: string) {
     return this.timesheetModel
       .countDocuments({ userId: { $in: [userId, new Types.ObjectId(userId)] } })
+      .lean()
       .exec();
   }
 
@@ -95,7 +96,7 @@ export class TimesheetRepository {
     project: string;
     date: Date;
     excludeTimesheetId?: string;
-  }): Promise<boolean> {
+  }) {
     const filter: any = {
       userId: { $in: [params.userId, new Types.ObjectId(params.userId)] },
       project: params.project,
@@ -108,15 +109,17 @@ export class TimesheetRepository {
     return count > 0;
   }
 
-  async findByDateRange(startDate: Date, endDate: Date): Promise<TimesheetDocument[]> {
+  async findByDateRange(startDate: Date, endDate: Date) {
     return this.timesheetModel.find({
       date: { $gte: startDate, $lte: endDate },
-    }).lean().exec();
+    }).lean()
+      .exec();
   }
 
-  async findByMonthAndYear(month: number, year: number): Promise<TimesheetDocument[]> {
+  async findByMonthAndYear(month: number, year: number) {
     const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
     const endDate = new Date(year, month, 0, 23, 59, 59, 999);
     return this.findByDateRange(startDate, endDate);
   }
+
 }

@@ -1,8 +1,10 @@
-import { UpdateReportDto } from '../../infrastructure/dto/update-report.dto';
-
 export class UpdateReportCommand {
-  constructor(
-    public readonly id: string,
-    public readonly updateReportDto: UpdateReportDto,
-  ) {}
+    readonly reportId: string;
+    readonly totalHours?: number;
+    readonly totalAmount?: number;
+    readonly pdfPath?: string;
+
+    constructor(data: UpdateReportCommand) {
+      Object.assign(this, data);
+    }
 }

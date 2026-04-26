@@ -1,4 +1,5 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, Matches, MaxLength, ValidateIf } from 'class-validator';
+import { IsObjectId } from 'src/shared/validation';
 import { Type } from 'class-transformer';
 import { IsInt } from 'class-validator';
 
@@ -8,7 +9,7 @@ export class GetTimesheetsDto {
   date?: string;
 
   @IsOptional()
-  @IsString()
+  @IsObjectId()
   cursor?: string;
 
   @IsOptional()

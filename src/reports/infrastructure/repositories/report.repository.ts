@@ -72,4 +72,16 @@ export class ReportRepository {
   async findByIds(reportIds: string[]) {
     return this.reportModel.find({ _id: { $in: reportIds } }).exec();
   }
+
+  async updatePdfPath(reportId: string, pdfPath: string) {
+    const updatedReport = await this.reportModel.findByIdAndUpdate(
+      reportId,
+      { pdfPath },
+      { returnDocument: 'after' }
+    ).exec();
+    if (!updatedReport) {
+      throw new NotFoundException(`Report with ID '${reportId}' not found for PDF update.`);
+    }
+    return updatedReport;
+  }
 }

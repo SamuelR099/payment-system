@@ -7,6 +7,6 @@ export class GetReportHandler implements IQueryHandler<GetReportQuery> {
   constructor(private readonly reportRepository: ReportRepository) {}
 
   async execute(query: GetReportQuery) {
-    return this.reportRepository.findById(query.id, true);
+    return this.reportRepository.findById(query.reportId, true);
   }
 }
