@@ -3,7 +3,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { DomainError } from 'src/shared/domain';
 import { TimesheetModel } from 'src/timesheets/domain/timesheet.model';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
-import { GetTimesheetByIdQuery } from './get-timesheet-by-id.query';
+import { GetTimesheetByIdQuery } from './get-timesheet.query';
 
 @QueryHandler(GetTimesheetByIdQuery)
 export class GetTimesheetByIdHandler implements IQueryHandler<GetTimesheetByIdQuery> {
@@ -11,7 +11,7 @@ export class GetTimesheetByIdHandler implements IQueryHandler<GetTimesheetByIdQu
     private readonly timesheetRepository: TimesheetRepository,
   ) {}
 
-  async execute(query: GetTimesheetByIdQuery): Promise<any> {
+  async execute(query: GetTimesheetByIdQuery){
     const { timesheetId, userId } = query;
 
     const timesheetDocument = await this.timesheetRepository.findById(timesheetId);
@@ -31,7 +31,7 @@ export class GetTimesheetByIdHandler implements IQueryHandler<GetTimesheetByIdQu
       );
     }
 
-    const timesheet = TimesheetModel.fromModel(timesheetDocument as any);
+  const timesheet = TimesheetModel.fromModel(timesheetDocument);
     return { id: timesheet.id, ...timesheet.getUserInfo() };
   }
 }

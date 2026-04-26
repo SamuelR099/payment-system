@@ -23,7 +23,7 @@ export class GetTimesheetsHandler implements IQueryHandler<GetTimesheetsQuery> {
     });
 
     const timesheets = data.map(document => {
-      const timesheet = TimesheetModel.fromModel(document as any);
+  const timesheet = TimesheetModel.fromModel(document);
       return {
         id: timesheet.id,
         ...timesheet.getUserInfo(),

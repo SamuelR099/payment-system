@@ -1,9 +1,11 @@
-import { IsDateString, IsNotEmpty, IsNumber, IsString, Max, MaxLength, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, Max, MaxLength, Min, IsDate, MaxDate } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateTimesheetDto {
-  @IsDateString()
   @IsNotEmpty()
-  date: string;
+  @Type(() => Date)
+  @IsDate()
+  date: Date;
 
   @IsString()
   @IsNotEmpty()
@@ -16,11 +18,13 @@ export class CreateTimesheetDto {
   description: string;
 
   @IsNumber()
+  @IsNotEmpty()
   @Min(0.25)
   @Max(24)
   hours: number;
 
-  @IsNumber()
+  @IsNumber({ allowNaN: false, allowInfinity: false })
+  @IsNotEmpty()
   @Min(0)
   hourlyRate: number;
 }

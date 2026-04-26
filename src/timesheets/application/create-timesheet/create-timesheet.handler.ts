@@ -14,16 +14,16 @@ export class CreateTimesheetHandler
     private readonly timesheetDomainService: TimesheetDomainService,
   ) {}
 
-  async execute(command: CreateTimesheetCommand): Promise<any> {
-    const { userId, timesheetData } = command;
+  async execute(command: CreateTimesheetCommand) {
+    const { userId, date, project, description, hours, hourlyRate } = command;
 
     const timesheetDomain = TimesheetModel.create({
       userId,
-      date: timesheetData.date,
-      project: timesheetData.project,
-      description: timesheetData.description,
-      hours: timesheetData.hours,
-      hourlyRate: timesheetData.hourlyRate,
+      date,
+      project,
+      description,
+      hours,
+      hourlyRate,
     });
 
     await this.timesheetDomainService.validateNoDuplicateOnDate({

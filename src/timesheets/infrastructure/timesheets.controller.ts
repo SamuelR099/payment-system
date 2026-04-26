@@ -20,7 +20,7 @@ import { CreateTimesheetCommand } from '../application/create-timesheet/create-t
 import { UpdateTimesheetCommand } from '../application/update-timesheet/update-timesheet.command';
 import { DeleteTimesheetCommand } from '../application/delete-timesheet/delete-timesheet.command';
 import { GetTimesheetsQuery } from '../application/search-timesheets/get-timesheets.query';
-import { GetTimesheetByIdQuery } from '../application/get-timesheet/get-timesheet-by-id.query';
+import { GetTimesheetByIdQuery } from '../application/get-timesheet/get-timesheet.query';
 import { GetMonthlySummaryQuery } from '../application/get-monthly-summary/get-monthly-summary.query';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { UserRole } from 'src/shared/enums/user-role.enum';
@@ -37,8 +37,9 @@ export class TimesheetsController {
   createTimesheet(@Req() req: any, @Body() body: CreateTimesheetDto) {
     return this.commandBus.execute(
       new CreateTimesheetCommand({
+        ...body,
         userId: req.user.userId,
-        timesheetData: body,
+        date: new Date(body.date),
       }),
     );
   }
@@ -79,7 +80,8 @@ export class TimesheetsController {
       new UpdateTimesheetCommand({
         timesheetId: id,
         userId: req.user.userId,
-        updateData: body,
+        ...body,
+        date: new Date(body.date),
       }),
     );
   }

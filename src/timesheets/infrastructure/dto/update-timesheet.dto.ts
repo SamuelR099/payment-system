@@ -1,9 +1,11 @@
-import { IsDateString, IsNumber, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsDate, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 
 export class UpdateTimesheetDto {
-  @IsDateString()
-  @IsOptional()
-  date?: string;
+  @IsNotEmpty()
+  @Type(() => Date)
+  @IsDate()
+  date: Date;
 
   @IsString()
   @IsOptional()

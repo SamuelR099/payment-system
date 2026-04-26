@@ -10,7 +10,7 @@ export class DeleteTimesheetHandler implements ICommandHandler<DeleteTimesheetCo
     private readonly timesheetRepository: TimesheetRepository,
   ) {}
 
-  async execute(command: DeleteTimesheetCommand): Promise<boolean> {
+  async execute(command: DeleteTimesheetCommand) {
     const { timesheetId, userId } = command;
 
     const existingTimesheet = await this.timesheetRepository.findById(timesheetId);

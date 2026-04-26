@@ -1,10 +1,13 @@
-import { CreateTimesheetDto } from 'src/timesheets/infrastructure/dto/create-timesheet.dto';
-
-export class CreateTimesheetCommand {
+  export class CreateTimesheetCommand {
   readonly userId: string;
-  readonly timesheetData: CreateTimesheetDto;
+  readonly date: Date;
+  readonly project: string;
+  readonly description: string;
+  readonly hours: number;
+  readonly hourlyRate?: number;
 
   constructor(data: CreateTimesheetCommand) {
     Object.assign(this, data);
   }
-}
+ }
+

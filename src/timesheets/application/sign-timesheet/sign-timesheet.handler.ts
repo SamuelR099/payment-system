@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SignTimesheetCommand } from './sign-timesheet.command';
-import { TimesheetRepository } from '../../../infrastructure/repositories/timesheet.repository';
+import { TimesheetRepository } from '../../infrastructure/repositories/timesheet.repository';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
 
 @CommandHandler(SignTimesheetCommand)

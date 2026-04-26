@@ -15,8 +15,8 @@ export class UpdateTimesheetHandler
     private readonly timesheetDomainService: TimesheetDomainService,
   ) {}
 
-  async execute(command: UpdateTimesheetCommand): Promise<any> {
-    const { timesheetId, userId, updateData } = command;
+  async execute(command: UpdateTimesheetCommand) {
+    const { timesheetId, userId, date, project, description, hours, hourlyRate } = command;
 
     const foundTimesheet = await this.timesheetRepository.findById(timesheetId);
     if (!foundTimesheet)
@@ -24,23 +24,22 @@ export class UpdateTimesheetHandler
     if (foundTimesheet.userId.toString() !== userId)
       throw new DomainError('UNAUTHORIZED_TIMESHEET_ACCESS', 'No autorizado.');
 
-    const targetDate = updateData.date
-      ? new Date(updateData.date)
-      : foundTimesheet.date;
-
-    const targetProject = updateData.project ?? foundTimesheet.project;
+    const targetDate = date ?? foundTimesheet.date;
+    const targetProject = project ?? foundTimesheet.project;
 
     await this.timesheetDomainService.validateNoDuplicateOnDate({
       userId,
       project: targetProject,
-      date: new Date(targetDate),
+      date: targetDate,
       excludeTimesheetId: timesheetId,
     });
 
-    const updatedTimesheetDomain = TimesheetModel.fromModel(foundTimesheet as any).update({
-      ...updateData,
-      date: targetDate,
-      hours: updateData.hours,
+  const updatedTimesheetDomain = TimesheetModel.fromModel(foundTimesheet).update({
+      date: date ?? foundTimesheet.date,
+      project: project ?? foundTimesheet.project,
+      description: description ?? foundTimesheet.description,
+      hours: hours ?? foundTimesheet.hours,
+      hourlyRate: hourlyRate ?? foundTimesheet.hourlyRate,
     });
 
     const updatedTimesheetData = updatedTimesheetDomain.getUserInfo();
