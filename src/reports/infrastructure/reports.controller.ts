@@ -1,5 +1,10 @@
-import { Controller, Get, Post, Body, Param, Put, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Query, Request, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { FileInterceptor } from '@nestjs/platform-express';
+import type { Multer } from 'multer';
+import { FileUploadValidationPipe } from '../../file-management/infrastructure/file-upload-validation-pipe';
+import { ALLOWED_MIME_TYPES } from 'src/shared/enums/file-types.enum';
+import { FILE_SIZES } from 'src/shared/enums/file-size';
 
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { UserRole } from 'src/shared/enums/user-role.enum';
@@ -39,8 +44,22 @@ export class ReportsController {
 
   @Post('/:id/approve')
   @Roles([UserRole.ADMIN])
-  async approveReport(@Param('id') id: string, @Body() body: { adminId: string }) {
-    return this.commandBus.execute(new ApproveReportByAdminCommand(id, body.adminId));
+  @UseInterceptors(FileInterceptor('file'))
+  async approveReport(
+    @Param('id') id: string,
+    @Body() body: { adminId?: string },
+    @Request() req: any,
+    @UploadedFile(
+      new FileUploadValidationPipe({
+        allowedTypes: ALLOWED_MIME_TYPES,
+        maxSizeInBytes: FILE_SIZES.ONE_HUNDRED_MB,
+        isOptional: true,
+      })
+    )
+    file?: Multer.File,
+  ) {
+    const adminId = req.user?.userId || body.adminId;
+    return this.commandBus.execute(new ApproveReportByAdminCommand({ reportId: id, adminId, file }));
   }
 
   @Put('/:id')

@@ -36,6 +36,9 @@ export class Timesheet {
 
   @Prop()
   signedAt?: Date;
+
+  @Prop({ required: false })
+  signatureImageUrl?: string;
 }
 
 export type TimesheetDocument = Timesheet & Document;

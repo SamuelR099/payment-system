@@ -8,13 +8,23 @@ import {
   Put,
   Query,
   Req,
+  Request,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import type { Multer } from 'multer';
+import { UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { AwsS3Service } from '../../file-management/infrastructure/aws-s3.service';
+import { FileUploadValidationPipe } from '../../file-management/infrastructure/file-upload-validation-pipe';
+import { ALLOWED_MIME_TYPES } from 'src/shared/enums/file-types.enum';
+import { FILE_SIZES } from 'src/shared/enums/file-size';
 
 import { CreateTimesheetDto } from './dto/create-timesheet.dto';
 import { UpdateTimesheetDto } from './dto/update-timesheet.dto';
 import { GetTimesheetsDto } from './dto/get-timesheets.dto';
 import { GetMonthlySummaryDto } from './dto/get-monthly-summary.dto';
+import { SignTimesheetDto } from './dto/sign-timesheet.dto';
+
 
 import { CreateTimesheetCommand } from '../application/create-timesheet/create-timesheet.command';
 import { UpdateTimesheetCommand } from '../application/update-timesheet/update-timesheet.command';
@@ -31,7 +41,7 @@ export class TimesheetsController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
-  ) {}
+  ) { }
 
   @Post('/')
   createTimesheet(@Req() req: any, @Body() body: CreateTimesheetDto) {
@@ -93,7 +103,28 @@ export class TimesheetsController {
 
   @Post('/:id/sign')
   @Roles([UserRole.EMPLOYEE])
-  signTimesheet(@Req() req: any, @Param('id') id: string) {
-    return this.commandBus.execute(new SignTimesheetCommand(id, req.user.userId));
+  @UseInterceptors(FileInterceptor('file'))
+  async signTimesheet(
+    @Param('id') id: string,
+    @Body() body: SignTimesheetDto,
+    @Request() req: any,
+    @UploadedFile(
+      new FileUploadValidationPipe({
+        allowedTypes: ALLOWED_MIME_TYPES,
+        maxSizeInBytes: FILE_SIZES.ONE_HUNDRED_MB,
+        isOptional: true,
+      })
+    )
+    file?: Multer.File,
+  ) {
+    const userId = req.user.userId;
+    return this.commandBus.execute(
+      new SignTimesheetCommand({
+        timesheetId: id,
+        userId,
+        file,
+        ...body,
+      })
+    );
   }
 }

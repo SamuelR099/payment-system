@@ -6,6 +6,7 @@ import { ReportsController } from './reports.controller';
 import { ReportRepository } from './repositories/report.repository';
 import { TimesheetsModule } from '../../timesheets/infrastructure/timesheets.module';
 import { PdfModule } from '../../shared/pdf/pdf.module';
+import { FileManagementModule } from '../../file-management/file-management.module';
 
 import { Report, ReportSchema } from './schemas/report.schema';
 
@@ -22,6 +23,7 @@ import { ReportDomainService } from '../domain/report-domain.service';
     MongooseModule.forFeature([{ name: Report.name, schema: ReportSchema }]),
     TimesheetsModule,
     PdfModule,
+    FileManagementModule,
   ],
   controllers: [ReportsController],
   providers: [

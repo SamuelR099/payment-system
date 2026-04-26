@@ -1,6 +1,11 @@
+import type { Multer } from 'multer';
+
 export class ApproveReportByAdminCommand {
-  constructor(
-    readonly reportId: string,
-    readonly adminId: string,
-  ) {}
+  readonly reportId: string;
+  readonly adminId: string;
+  readonly file?: Multer.File;
+
+  constructor(data: ApproveReportByAdminCommand) {
+    Object.assign(this, data);
+  }
 }

@@ -15,6 +15,9 @@ export interface Timesheet {
   hourlyRate: number;
   createdAt: Date;
   updatedAt: Date;
+  signatureImageUrl?: string;
+  signed?: boolean;
+  signedAt?: Date;
 }
 export class TimesheetModel {
   static create(params: {
@@ -53,6 +56,7 @@ export class TimesheetModel {
   readonly updatedAt: Date;
   readonly signed: boolean;
   readonly signedAt?: Date;
+  readonly signatureImageUrl?: string;
 
   constructor(params: {
     id: string;
@@ -66,6 +70,7 @@ export class TimesheetModel {
     updatedAt: Date;
     signed?: boolean;
     signedAt?: Date;
+    signatureImageUrl?: string;
   }) {
     this.id = params.id;
     this.userId = params.userId;
@@ -78,9 +83,10 @@ export class TimesheetModel {
     this.updatedAt = params.updatedAt;
     this.signed = params.signed ?? false;
     this.signedAt = params.signedAt;
+    this.signatureImageUrl = params.signatureImageUrl;
   }
 
-  sign(): TimesheetModel {
+  sign(signatureImageUrl?: string): TimesheetModel {
     if (this.signed) {
       throw new DomainError('ALREADY_SIGNED', 'El timesheet ya está firmado.');
     }
@@ -89,6 +95,7 @@ export class TimesheetModel {
       signed: true,
       signedAt: new Date(),
       updatedAt: new Date(),
+      signatureImageUrl: signatureImageUrl ?? this.signatureImageUrl,
     });
   }
 
@@ -119,10 +126,9 @@ export class TimesheetModel {
       updatedAt: document.updatedAt,
       signed: document.signed ?? false,
       signedAt: document.signedAt,
+      signatureImageUrl: document.signatureImageUrl,
     });
   }
-  // sign method removed
-
 
   get monthYear() {
     return {
@@ -142,6 +148,9 @@ export class TimesheetModel {
       hourlyRate: this.hourlyRate ?? 0,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
+      signatureImageUrl: this.signatureImageUrl,
+      signed: this.signed,
+      signedAt: this.signedAt,
     };
   }
 }

@@ -70,6 +70,44 @@ export class Report {
     });
   }
 
+  static fromModel(document: any): Report {
+    return new Report({
+      id: document._id?.toString?.() ?? '',
+      userId: document.userId?.toString?.() ?? '',
+      month: document.month,
+      year: document.year,
+      totalHours: document.totalHours,
+      totalAmount: document.totalAmount,
+      status: document.status,
+      employeeSigned: document.employeeSigned ?? false,
+      employeeSignatureImage: document.employeeSignatureImage,
+      employeeSignedAt: document.employeeSignedAt,
+      adminSigned: document.adminSigned ?? false,
+      adminSignatureImage: document.adminSignatureImage,
+      adminSignedAt: document.adminSignedAt,
+      adminId: document.adminId?.toString?.(),
+    });
+  }
+
+  toDto() {
+    return {
+      id: this.id,
+      userId: this.userId,
+      month: this.month,
+      year: this.year,
+      totalHours: this.totalHours,
+      totalAmount: this.totalAmount,
+      status: this.status,
+      employeeSigned: this.employeeSigned,
+      employeeSignatureImage: this.employeeSignatureImage,
+      employeeSignedAt: this.employeeSignedAt,
+      adminSigned: this.adminSigned,
+      adminSignatureImage: this.adminSignatureImage,
+      adminSignedAt: this.adminSignedAt,
+      adminId: this.adminId,
+    };
+  }
+
   signByEmployee(signatureImage: string): Report {
     if (this.status !== ReportStatus.SUBMITTED) {
       throw new DomainError('INVALID_STATUS', 'El reporte debe estar en estado submitted para ser firmado.');
@@ -83,14 +121,14 @@ export class Report {
     });
   }
 
-  approveByAdmin(adminId: string, signatureImage: string): Report {
+  approveByAdmin(adminId: string, signatureImage?: string): Report {
     if (this.status !== ReportStatus.SIGNED_BY_EMPLOYEE) {
       throw new DomainError('INVALID_STATUS', 'El reporte debe estar firmado por el empleado antes de ser aprobado.');
     }
     return new Report({
       ...this,
       adminSigned: true,
-      adminSignatureImage: signatureImage,
+      adminSignatureImage: signatureImage ?? this.adminSignatureImage,
       adminSignedAt: new Date(),
       adminId,
       status: ReportStatus.APPROVED,
