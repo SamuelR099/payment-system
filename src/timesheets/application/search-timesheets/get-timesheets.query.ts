@@ -4,6 +4,8 @@ export class GetTimesheetsQuery {
   readonly year?: number;
   readonly cursor?: string;
   readonly limit?: number;
+  readonly status?: string;
+  readonly terms?: string;
 
   constructor(data: GetTimesheetsQuery) {
     Object.assign(this, data);

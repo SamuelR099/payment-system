@@ -20,4 +20,11 @@ export class GetTimesheetsDto {
   @IsString()
   search?: string;
 
+  @IsOptional()
+  @IsString()
+  status?: string;
+
+  @IsOptional()
+  @IsString()
+  terms?: string;
 }

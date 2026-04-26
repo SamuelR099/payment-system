@@ -3,15 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Timesheet, TimesheetDocument } from '../schemas/timesheet.schema';
 
-export class TimesheetDateRange {
-  private constructor(public readonly startDate: Date, public readonly endDate: Date) {}
-
-  static create(month: number, year: number): TimesheetDateRange {
-    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
-    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
-    return new TimesheetDateRange(startDate, endDate);
-  }
-}
 
 @Injectable()
 export class TimesheetRepository {
@@ -23,26 +14,45 @@ export class TimesheetRepository {
     year?: number;
     cursor?: string;
     limit?: number;
+    status?: string;
+    terms?: string;
   }) {
-    const { userId, month, year, cursor, limit } = params;
+    const { userId, month, year, cursor, limit, status, terms } = params;
     const pageSize = limit ?? this.DEFAULT_PAGE_SIZE;
-    const filter: any = {
-      userId: { $in: [userId, new Types.ObjectId(userId)] },
-    };
+    const query = this.timesheetModel.find().sort({ _id: -1 });
 
+    // Filtro por usuario
+    query.merge({ userId: { $in: [userId, new Types.ObjectId(userId)] } });
+
+    // Filtro por mes y año
     if (month && year) {
-      const dateRange = TimesheetDateRange.create(month, year);
-      filter.date = { $gte: dateRange.startDate, $lte: dateRange.endDate };
+      const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+      const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+      query.merge({ date: { $gte: startDate, $lte: endDate } });
     }
 
+    // Filtro por status
+    if (status) {
+      query.merge({ status });
+    }
+
+    // Filtro por términos
+    if (terms) {
+      query.merge({
+        $or: [
+          { project: { $regex: terms, $options: 'i' } },
+          { description: { $regex: terms, $options: 'i' } },
+        ],
+      });
+    }
+
+    // Filtro por cursor
     if (cursor) {
-      filter._id = { $lt: new Types.ObjectId(cursor) };
+      query.merge({ _id: { $lt: new Types.ObjectId(cursor) } });
     }
 
-    const query = this.timesheetModel.find(filter).sort({ _id: -1 });
     const data = await query.limit(pageSize).lean().exec();
-    const nextCursor =
-      data.length < pageSize ? null : String(data[data.length - 1]._id);
+    const nextCursor = data.length < pageSize ? null : String(data[data.length - 1]._id);
     return { data, nextCursor };
   }
 
@@ -103,14 +113,15 @@ export class TimesheetRepository {
     return count > 0;
   }
 
-  async findByDateRange(dateRange: TimesheetDateRange): Promise<TimesheetDocument[]> {
+  async findByDateRange(startDate: Date, endDate: Date): Promise<TimesheetDocument[]> {
     return this.timesheetModel.find({
-      date: { $gte: dateRange.startDate, $lte: dateRange.endDate },
+      date: { $gte: startDate, $lte: endDate },
     }).lean().exec();
   }
 
   async findByMonthAndYear(month: number, year: number): Promise<TimesheetDocument[]> {
-    const dateRange = TimesheetDateRange.create(month, year);
-    return this.findByDateRange(dateRange);
+    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+    return this.findByDateRange(startDate, endDate);
   }
 }
