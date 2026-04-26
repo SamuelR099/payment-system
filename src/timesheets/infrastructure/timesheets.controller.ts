@@ -50,10 +50,6 @@ export class TimesheetsController {
       new GetTimesheetsQuery({
         userId: req.user.userId,
         ...query,
-        terms: query.terms ?? query.search,
-        status: query.status,
-        cursor: query.cursor,
-        limit: query.limit,
       }),
     );
   }

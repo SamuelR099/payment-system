@@ -21,22 +21,18 @@ export class TimesheetRepository {
     const pageSize = limit ?? this.DEFAULT_PAGE_SIZE;
     const query = this.timesheetModel.find().sort({ _id: -1 });
 
-    // Filtro por usuario
     query.merge({ userId: { $in: [userId, new Types.ObjectId(userId)] } });
 
-    // Filtro por mes y año
     if (month && year) {
       const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
       const endDate = new Date(year, month, 0, 23, 59, 59, 999);
       query.merge({ date: { $gte: startDate, $lte: endDate } });
     }
 
-    // Filtro por status
     if (status) {
       query.merge({ status });
     }
 
-    // Filtro por términos
     if (terms) {
       query.merge({
         $or: [
@@ -46,7 +42,6 @@ export class TimesheetRepository {
       });
     }
 
-    // Filtro por cursor
     if (cursor) {
       query.merge({ _id: { $lt: new Types.ObjectId(cursor) } });
     }
