@@ -1,7 +1,9 @@
+
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SignTimesheetCommand } from './sign-timesheet.command';
 import { TimesheetRepository } from '../../infrastructure/repositories/timesheet.repository';
-import { NotFoundException, ForbiddenException } from '@nestjs/common';
+import { DomainError } from 'src/shared/domain';
+import { TimesheetModel } from 'src/timesheets/domain/timesheet.model';
 
 @CommandHandler(SignTimesheetCommand)
 export class SignTimesheetHandler implements ICommandHandler<SignTimesheetCommand> {
@@ -9,13 +11,34 @@ export class SignTimesheetHandler implements ICommandHandler<SignTimesheetComman
 
   async execute(command: SignTimesheetCommand) {
     const { timesheetId, userId } = command;
-    const timesheet = await this.timesheetRepository.findById(timesheetId);
-    if (!timesheet) throw new NotFoundException('Timesheet not found');
-    if (String(timesheet.userId) !== String(userId)) throw new ForbiddenException('No autorizado');
-    if (timesheet.signed) throw new ForbiddenException('Ya firmado');
-    timesheet.signed = true;
-    timesheet.signedAt = new Date();
-    await timesheet.save();
-    return timesheet;
+    const timesheetDocument = await this.timesheetRepository.findById(timesheetId);
+    if (!timesheetDocument)
+      throw new DomainError('TIMESHEET_NOT_FOUND', 'No existe el timesheet.');
+    if (String(timesheetDocument.userId) !== String(userId))
+      throw new DomainError('UNAUTHORIZED', 'No autorizado.');
+
+    const timesheet = TimesheetModel.fromModel(timesheetDocument);
+    const signedTimesheet = timesheet.sign();
+    const timesheetToUpdate = {
+      ...signedTimesheet.getUserInfo(),
+      userId: timesheetDocument.userId,
+    };
+    const updatedTimesheet = await this.timesheetRepository.updateById(timesheetId, timesheetToUpdate);
+    if (!updatedTimesheet)
+      throw new DomainError('SIGN_FAILED', 'No se pudo firmar el timesheet.');
+
+    return {
+      id: updatedTimesheet.id ?? updatedTimesheet._id?.toString?.() ?? '',
+      userId: updatedTimesheet.userId?.toString?.() ?? '',
+      date: updatedTimesheet.date,
+      project: updatedTimesheet.project,
+      description: updatedTimesheet.description,
+      hours: updatedTimesheet.hours,
+      hourlyRate: updatedTimesheet.hourlyRate,
+      createdAt: updatedTimesheet.createdAt,
+      updatedAt: updatedTimesheet.updatedAt,
+      signed: updatedTimesheet.signed,
+      signedAt: updatedTimesheet.signedAt,
+    };
   }
 }

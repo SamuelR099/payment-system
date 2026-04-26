@@ -5,7 +5,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Timesheet, TimesheetSchema } from './schemas/timesheet.schema';
 import { TimesheetRepository } from './repositories/timesheet.repository';
 import { TimesheetsController } from './timesheets.controller';
+
 import { TimesheetDomainService } from '../domain/timesheet-domain.service';
+import { TimesheetSummaryService } from '../domain/timesheet-summary.service';
 
 import { CreateTimesheetHandler } from '../application/create-timesheet/create-timesheet.handler';
 import { UpdateTimesheetHandler } from '../application/update-timesheet/update-timesheet.handler';
@@ -26,6 +28,7 @@ import { SignTimesheetHandler } from '../application/sign-timesheet/sign-timeshe
   providers: [
     TimesheetRepository,
     TimesheetDomainService,
+    TimesheetSummaryService,
     CreateTimesheetHandler,
     UpdateTimesheetHandler,
     DeleteTimesheetHandler,
@@ -34,6 +37,10 @@ import { SignTimesheetHandler } from '../application/sign-timesheet/sign-timeshe
     GetMonthlySummaryHandler,
     SignTimesheetHandler,
   ],
-  exports: [TimesheetRepository],
+  exports: [
+    TimesheetRepository,
+    TimesheetDomainService,
+    TimesheetSummaryService,
+  ],
 })
 export class TimesheetsModule {}

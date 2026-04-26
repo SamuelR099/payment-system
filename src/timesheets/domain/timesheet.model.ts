@@ -51,6 +51,8 @@ export class TimesheetModel {
   readonly hourlyRate: number;
   readonly createdAt: Date;
   readonly updatedAt: Date;
+  readonly signed: boolean;
+  readonly signedAt?: Date;
 
   constructor(params: {
     id: string;
@@ -62,6 +64,8 @@ export class TimesheetModel {
     hourlyRate: number;
     createdAt: Date;
     updatedAt: Date;
+    signed?: boolean;
+    signedAt?: Date;
   }) {
     this.id = params.id;
     this.userId = params.userId;
@@ -72,6 +76,20 @@ export class TimesheetModel {
     this.hourlyRate = params.hourlyRate;
     this.createdAt = params.createdAt;
     this.updatedAt = params.updatedAt;
+    this.signed = params.signed ?? false;
+    this.signedAt = params.signedAt;
+  }
+
+  sign(): TimesheetModel {
+    if (this.signed) {
+      throw new DomainError('ALREADY_SIGNED', 'El timesheet ya está firmado.');
+    }
+    return new TimesheetModel({
+      ...this,
+      signed: true,
+      signedAt: new Date(),
+      updatedAt: new Date(),
+    });
   }
 
   update(data: Partial<Omit<Timesheet, 'id' | 'userId'>>) {
@@ -92,15 +110,18 @@ export class TimesheetModel {
     return new TimesheetModel({
       id: document._id?.toString?.() ?? '',
       userId: document.userId?.toString?.() ?? '',
-      date: document.date instanceof Date ? document.date : new Date(document.date),
+      date: document.date,
       project: document.project,
       description: document.description,
       hours: document.hours,
       hourlyRate: document.hourlyRate,
-      createdAt: document.createdAt ?? new Date(),
-      updatedAt: document.updatedAt ?? new Date(),
+      createdAt: document.createdAt,
+      updatedAt: document.updatedAt,
+      signed: document.signed ?? false,
+      signedAt: document.signedAt,
     });
   }
+  // sign method removed
 
 
   get monthYear() {

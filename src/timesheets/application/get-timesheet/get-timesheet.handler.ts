@@ -23,7 +23,6 @@ export class GetTimesheetByIdHandler implements IQueryHandler<GetTimesheetByIdQu
       );
     }
 
-    // Check ownership
     if (timesheetDocument.userId.toString() !== userId) {
       throw new DomainError(
         'UNAUTHORIZED_TIMESHEET_ACCESS',
