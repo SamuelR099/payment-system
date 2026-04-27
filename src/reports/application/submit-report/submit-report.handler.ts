@@ -1,8 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ReportRepository } from 'src/reports/infrastructure/repositories/report.repository';
-import { SubmitReportCommand } from './submit-report.command';
+
 import { DomainError } from 'src/shared/domain';
 import { ReportStatus } from '../../domain/enums/report-status.enum';
+import { ReportRepository } from 'src/reports/infrastructure/repositories/report.repository';
+import { SubmitReportCommand } from './submit-report.command';
 
 @CommandHandler(SubmitReportCommand)
 export class SubmitReportHandler implements ICommandHandler<SubmitReportCommand> {

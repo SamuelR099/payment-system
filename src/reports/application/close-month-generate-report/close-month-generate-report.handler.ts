@@ -1,14 +1,15 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CloseMonthAndGenerateReportCommand } from './close-month-generate-report.command';
-import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
+
 import { ReportRepository } from '../../infrastructure/repositories/report.repository';
+import { CloseMonthGenerateReportCommand } from './close-month-generate-report.command';
+import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { PdfService } from 'src/shared/pdf/pdf.service';
 import { ReportDomainService, Timesheet, GeneratedReport } from '../../domain/report-domain.service';
 import { DomainError } from 'src/shared/domain';
 
-@CommandHandler(CloseMonthAndGenerateReportCommand)
-export class CloseMonthAndGenerateReportHandler
-  implements ICommandHandler<CloseMonthAndGenerateReportCommand>
+@CommandHandler(CloseMonthGenerateReportCommand)
+export class CloseMonthGenerateReportHandler
+  implements ICommandHandler<CloseMonthGenerateReportCommand>
 {
   constructor(
     private readonly timesheetRepository: TimesheetRepository,
@@ -17,12 +18,12 @@ export class CloseMonthAndGenerateReportHandler
     private readonly reportDomainService: ReportDomainService,
   ) {}
 
-  async execute(command: CloseMonthAndGenerateReportCommand): Promise<{ reportId: string; pdfPath: string }> {
+  async execute(command: CloseMonthGenerateReportCommand): Promise<{ reportId: string; pdfPath: string }> {
     const { month, year } = command;
 
-    this.validatePeriodParameters(month, year);
+    this.validatePeriodParameters((month), year);
 
-    const timesheetDocuments = await this.timesheetRepository.findByMonthAndYear(month, year);
+    const timesheetDocuments = await this.timesheetRepository.findByMonthAndYear((month), year);
     if (!timesheetDocuments || timesheetDocuments.length === 0) {
       throw new DomainError('NO_TIMESHEETS_FOUND', `No timesheets found for ${month}/${year}.`);
     }
@@ -37,7 +38,7 @@ export class CloseMonthAndGenerateReportHandler
       };
     });
 
-    const generatedReport: GeneratedReport = this.reportDomainService.generateMonthlyReport(timesheetDtos, month, year);
+    const generatedReport: GeneratedReport = this.reportDomainService.generateMonthlyReport(timesheetDtos, (month), year);
 
     const createdReport = await this.reportRepository.create(generatedReport);
     const generatedPdfPath = await this.pdfService.generatePdf(createdReport);

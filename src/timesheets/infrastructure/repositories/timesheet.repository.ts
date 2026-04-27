@@ -6,6 +6,9 @@ import { Timesheet, TimesheetDocument } from '../schemas/timesheet.schema';
 
 @Injectable()
 export class TimesheetRepository {
+  getMonthlySummary(userId: string, month: number, year: number): any {
+    throw new Error('Method not implemented.');
+  }
   private readonly DEFAULT_PAGE_SIZE = 30;
 
   async search(params: {

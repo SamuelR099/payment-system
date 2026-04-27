@@ -1,6 +1,5 @@
-export class CloseMonthAndGenerateReportCommand {
+export class CloseMonthGenerateReportCommand {
   constructor(
     readonly month: number,
-    readonly year: number) {
-    }
+    readonly year: number) {}
 }

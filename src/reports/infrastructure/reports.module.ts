@@ -2,16 +2,16 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { PdfModule } from 'src/shared/pdf/pdf.module';
+import { FileManagementModule } from 'src/file-management/file-management.module';
+import { TimesheetsModule } from 'src/timesheets/infrastructure/timesheets.module';
+
 import { ReportsController } from './reports.controller';
 import { ReportRepository } from './repositories/report.repository';
-import { TimesheetsModule } from '../../timesheets/infrastructure/timesheets.module';
-import { PdfModule } from '../../shared/pdf/pdf.module';
-import { FileManagementModule } from '../../file-management/file-management.module';
-
 import { Report, ReportSchema } from './schemas/report.schema';
 
-import { ApproveReportByAdminHandler } from '../application/approve-report-admin/approve-report-admin.handler';
-import { CloseMonthAndGenerateReportHandler } from '../application/close-month-generate-report/close-month-generate-report.handler';
+import { ApproveReportAdminHandler } from '../application/approve-report-admin/approve-report-admin.handler';
+import { CloseMonthGenerateReportHandler } from '../application/close-month-generate-report/close-month-generate-report.handler';
 import { SubmitReportHandler } from '../application/submit-report/submit-report.handler';
 import { GetReportHandler } from '../application/get-report/get-report.handler';
 import { SearchReportHandler } from '../application/search-report/search-report.handler';
@@ -27,13 +27,13 @@ import { ReportDomainService } from '../domain/report-domain.service';
   ],
   controllers: [ReportsController],
   providers: [
-  ReportRepository,
-  ApproveReportByAdminHandler,
-  CloseMonthAndGenerateReportHandler,
-  SubmitReportHandler,
-  GetReportHandler,
-  SearchReportHandler,
-  ReportDomainService,
+    ReportRepository,
+    ApproveReportAdminHandler,
+    CloseMonthGenerateReportHandler,
+    SubmitReportHandler,
+    GetReportHandler,
+    SearchReportHandler,
+    ReportDomainService,
   ],
   exports: [ReportRepository],
 })

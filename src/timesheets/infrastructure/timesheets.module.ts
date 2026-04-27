@@ -2,10 +2,11 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { FileManagementModule } from '../../file-management/file-management.module';
+
 import { Timesheet, TimesheetSchema } from './schemas/timesheet.schema';
 import { TimesheetRepository } from './repositories/timesheet.repository';
 import { TimesheetsController } from './timesheets.controller';
-import { FileManagementModule } from '../../file-management/file-management.module';
 
 import { TimesheetDomainService } from '../domain/timesheet-domain.service';
 import { TimesheetSummaryService } from '../domain/timesheet-summary.service';

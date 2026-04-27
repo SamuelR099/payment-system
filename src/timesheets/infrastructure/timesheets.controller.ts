@@ -11,13 +11,16 @@ import {
   Request,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import type { Multer } from 'multer';
 import { UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AwsS3Service } from '../../file-management/infrastructure/aws-s3.service';
-import { FileUploadValidationPipe } from '../../file-management/infrastructure/file-upload-validation-pipe';
+import type { Multer } from 'multer';
+
+import { Roles } from 'src/shared/decorators/roles.decorator';
+import { UserRole } from 'src/shared/enums/user-role.enum';
 import { ALLOWED_MIME_TYPES } from 'src/shared/enums/file-types.enum';
 import { FILE_SIZES } from 'src/shared/enums/file-size';
+
+import { FileUploadValidationPipe } from '../../file-management/infrastructure/file-upload-validation-pipe';
 
 import { CreateTimesheetDto } from './dto/create-timesheet.dto';
 import { UpdateTimesheetDto } from './dto/update-timesheet.dto';
@@ -30,8 +33,6 @@ import { DeleteTimesheetCommand } from '../application/delete-timesheet/delete-t
 import { GetTimesheetsQuery } from '../application/search-timesheets/get-timesheets.query';
 import { GetTimesheetByIdQuery } from '../application/get-timesheet/get-timesheet.query';
 import { GetMonthlySummaryQuery } from '../application/get-monthly-summary/get-monthly-summary.query';
-import { Roles } from 'src/shared/decorators/roles.decorator';
-import { UserRole } from 'src/shared/enums/user-role.enum';
 import { SignTimesheetCommand } from '../application/sign-timesheet/sign-timesheet.command';
 
 @Controller('timesheets')

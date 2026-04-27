@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, UpdateQuery } from 'mongoose';
-import { ReportDocument, Report } from '../schemas/report.schema';
+
+import { Report, ReportDocument } from '../schemas/report.schema';
 import { CreateReportDto } from '../dto/create-report.dto';
-import { UpdateReportDto } from '../dto/update-report.dto';
 
 export type SearchReportParams = {
   terms?: string;
