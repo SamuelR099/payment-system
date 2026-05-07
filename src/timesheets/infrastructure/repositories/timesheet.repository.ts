@@ -3,12 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Timesheet, TimesheetDocument } from '../schemas/timesheet.schema';
 
-
 @Injectable()
 export class TimesheetRepository {
-  getMonthlySummary(userId: string, month: number, year: number): any {
-    throw new Error('Method not implemented.');
-  }
   private readonly DEFAULT_PAGE_SIZE = 30;
 
   async search(params: {
@@ -50,7 +46,8 @@ export class TimesheetRepository {
     }
 
     const data = await query.limit(pageSize).lean().exec();
-    const nextCursor = data.length < pageSize ? null : String(data[data.length - 1]._id);
+    const nextCursor =
+      data.length < pageSize ? null : String(data[data.length - 1]._id);
     return { data, nextCursor };
   }
 
@@ -113,9 +110,11 @@ export class TimesheetRepository {
   }
 
   async findByDateRange(startDate: Date, endDate: Date) {
-    return this.timesheetModel.find({
-      date: { $gte: startDate, $lte: endDate },
-    }).lean()
+    return this.timesheetModel
+      .find({
+        date: { $gte: startDate, $lte: endDate },
+      })
+      .lean()
       .exec();
   }
 
@@ -124,5 +123,4 @@ export class TimesheetRepository {
     const endDate = new Date(year, month, 0, 23, 59, 59, 999);
     return this.findByDateRange(startDate, endDate);
   }
-
 }

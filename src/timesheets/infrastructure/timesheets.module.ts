@@ -3,6 +3,8 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { FileManagementModule } from '../../file-management/file-management.module';
+import { ReportsModule } from 'src/reports/infrastructure/reports.module';
+import { PdfModule } from 'src/shared/pdf/pdf.module';
 
 import { Timesheet, TimesheetSchema } from './schemas/timesheet.schema';
 import { TimesheetRepository } from './repositories/timesheet.repository';
@@ -18,6 +20,7 @@ import { GetTimesheetsHandler } from '../application/search-timesheets/get-times
 import { GetTimesheetByIdHandler } from '../application/get-timesheet/get-timesheet.handler';
 import { GetMonthlySummaryHandler } from '../application/get-monthly-summary/get-monthly-summary.handler';
 import { SignTimesheetHandler } from '../application/sign-timesheet/sign-timesheet.handler';
+import { CloseMonthGenerateReportHandler } from '../application/close-month-generate-report/close-month-generate-report.handler';
 
 @Module({
   imports: [
@@ -26,6 +29,8 @@ import { SignTimesheetHandler } from '../application/sign-timesheet/sign-timeshe
       { name: Timesheet.name, schema: TimesheetSchema },
     ]),
     FileManagementModule,
+    ReportsModule,
+    PdfModule,
   ],
   controllers: [TimesheetsController],
   providers: [
@@ -39,6 +44,7 @@ import { SignTimesheetHandler } from '../application/sign-timesheet/sign-timeshe
     GetTimesheetByIdHandler,
     GetMonthlySummaryHandler,
     SignTimesheetHandler,
+    CloseMonthGenerateReportHandler,
   ],
   exports: [
     TimesheetRepository,
@@ -46,4 +52,4 @@ import { SignTimesheetHandler } from '../application/sign-timesheet/sign-timeshe
     TimesheetSummaryService,
   ],
 })
-export class TimesheetsModule { }
+export class TimesheetsModule {}

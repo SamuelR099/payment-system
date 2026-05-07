@@ -2,16 +2,23 @@ import React from 'react';
 
 interface ReportTemplateProps {
   title: string;
-  month: string;
+  month: number;
   year: number;
-  data: Array<{
-    employeeName: string;
-    hoursWorked: number;
-    tasksCompleted: number;
-  }>;
+  userId: string;
+  totalHours: number;
+  totalAmount: number;
+  status?: string;
 }
 
-const ReportTemplate: React.FC<ReportTemplateProps> = ({ title, month, year, data }) => {
+const ReportTemplate: React.FC<ReportTemplateProps> = ({
+  title,
+  month,
+  year,
+  userId,
+  totalHours,
+  totalAmount,
+  status,
+}) => {
   return (
     <html>
       <head>
@@ -25,47 +32,37 @@ const ReportTemplate: React.FC<ReportTemplateProps> = ({ title, month, year, dat
               text-align: center;
               color: #333;
             }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              margin-top: 20px;
+            .row {
+              margin: 8px 0;
             }
-            table, th, td {
-              border: 1px solid #ccc;
-            }
-            th, td {
-              padding: 10px;
-              text-align: left;
-            }
-            th {
-              background-color: #f4f4f4;
+            .label {
+              font-weight: 700;
             }
           `}
         </style>
       </head>
       <body>
         <h1>{title}</h1>
-        <p><strong>Month:</strong> {month}</p>
-        <p><strong>Year:</strong> {year}</p>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Employee</th>
-              <th>Hours Worked</th>
-              <th>Tasks Completed</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item, index) => (
-              <tr key={index}>
-                <td>{item.employeeName}</td>
-                <td>{item.hoursWorked}</td>
-                <td>{item.tasksCompleted}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="row">
+          <span className="label">Mes:</span> {month}
+        </div>
+        <div className="row">
+          <span className="label">Año:</span> {year}
+        </div>
+        <div className="row">
+          <span className="label">Usuario:</span> {userId}
+        </div>
+        <div className="row">
+          <span className="label">Total horas:</span> {totalHours}
+        </div>
+        <div className="row">
+          <span className="label">Total monto:</span> {totalAmount}
+        </div>
+        {status ? (
+          <div className="row">
+            <span className="label">Estado:</span> {status}
+          </div>
+        ) : null}
       </body>
     </html>
   );

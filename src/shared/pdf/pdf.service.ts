@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as puppeteer from 'puppeteer';
-import React from 'react';
+import * as React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import ReportTemplate from './template/ReportTemplate';
 
@@ -12,11 +12,14 @@ export class PdfService {
 
     const htmlContent = renderToStaticMarkup(
       React.createElement(ReportTemplate, {
-        title: data.title,
+        title: `Reporte mensual ${data.month}/${data.year}`,
         month: data.month,
         year: data.year,
-        data: data.data,
-      })
+        userId: data.userId,
+        totalHours: data.totalHours,
+        totalAmount: data.totalAmount,
+        status: data.status,
+      }),
     );
 
     await page.setContent(htmlContent);

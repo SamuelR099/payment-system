@@ -1,15 +1,16 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { ReportRepository } from '../../infrastructure/repositories/report.repository';
-import { CloseMonthGenerateReportCommand } from './close-month-generate-report.command';
-import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
-import { PdfService } from 'src/shared/pdf/pdf.service';
+import { ReportRepository } from 'src/reports/infrastructure/repositories/report.repository';
 import {
   ReportDomainService,
-  Timesheet,
-  GeneratedReport,
-} from '../../domain/report-domain.service';
+  type Timesheet,
+  type GeneratedReport,
+} from 'src/reports/domain/report-domain.service';
+import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
+import { PdfService } from 'src/shared/pdf/pdf.service';
 import { DomainError } from 'src/shared/domain';
+
+import { CloseMonthGenerateReportCommand } from './close-month-generate-report.command';
 
 @CommandHandler(CloseMonthGenerateReportCommand)
 export class CloseMonthGenerateReportHandler
@@ -42,6 +43,7 @@ export class CloseMonthGenerateReportHandler
         `No timesheets found for ${month}/${year}.`,
       );
     }
+
     const timesheetDtos: Timesheet[] = timesheetDocuments.map(
       timesheetDocument => {
         const date = new Date(timesheetDocument.date);

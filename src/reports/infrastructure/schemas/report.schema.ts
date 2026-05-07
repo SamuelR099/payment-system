@@ -44,6 +44,9 @@ export class Report {
 
   @Prop()
   adminId?: string;
+
+  @Prop()
+  pdfPath?: string;
 }
 
 export const ReportSchema = SchemaFactory.createForClass(Report);

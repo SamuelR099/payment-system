@@ -34,13 +34,14 @@ import { GetTimesheetsQuery } from '../application/search-timesheets/get-timeshe
 import { GetTimesheetByIdQuery } from '../application/get-timesheet/get-timesheet.query';
 import { GetMonthlySummaryQuery } from '../application/get-monthly-summary/get-monthly-summary.query';
 import { SignTimesheetCommand } from '../application/sign-timesheet/sign-timesheet.command';
+import { CloseMonthGenerateReportCommand } from '../application/close-month-generate-report/close-month-generate-report.command';
 
 @Controller('timesheets')
 export class TimesheetsController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
-  ) { }
+  ) {}
 
   @Post('/')
   createTimesheet(@Req() req: any, @Body() body: CreateTimesheetDto) {
@@ -67,6 +68,21 @@ export class TimesheetsController {
   getMonthlySummary(@Req() req: any, @Query() query: GetMonthlySummaryDto) {
     return this.queryBus.execute(
       new GetMonthlySummaryQuery(req.user.userId, query.month, query.year),
+    );
+  }
+
+  @Post('/close-month')
+  @Roles([UserRole.EMPLOYEE])
+  closeMonthGenerateReport(
+    @Req() req: any,
+    @Body() body: { month: number; year: number },
+  ) {
+    return this.commandBus.execute(
+      new CloseMonthGenerateReportCommand(
+        req.user.userId,
+        body.month,
+        body.year,
+      ),
     );
   }
 
@@ -111,7 +127,7 @@ export class TimesheetsController {
         allowedTypes: ALLOWED_MIME_TYPES,
         maxSizeInBytes: FILE_SIZES.ONE_HUNDRED_MB,
         isOptional: true,
-      })
+      }),
     )
     file?: Multer.File,
   ) {
@@ -121,7 +137,7 @@ export class TimesheetsController {
         timesheetId: id,
         userId,
         file,
-      })
+      }),
     );
   }
 }
