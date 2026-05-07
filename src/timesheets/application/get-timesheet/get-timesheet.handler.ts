@@ -6,21 +6,19 @@ import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/
 import { GetTimesheetByIdQuery } from './get-timesheet.query';
 
 @QueryHandler(GetTimesheetByIdQuery)
-export class GetTimesheetByIdHandler implements IQueryHandler<GetTimesheetByIdQuery> {
-  constructor(
-    private readonly timesheetRepository: TimesheetRepository,
-  ) {}
+export class GetTimesheetByIdHandler
+  implements IQueryHandler<GetTimesheetByIdQuery>
+{
+  constructor(private readonly timesheetRepository: TimesheetRepository) {}
 
-  async execute(query: GetTimesheetByIdQuery){
+  async execute(query: GetTimesheetByIdQuery) {
     const { timesheetId, userId } = query;
 
-    const timesheetDocument = await this.timesheetRepository.findById(timesheetId);
+    const timesheetDocument =
+      await this.timesheetRepository.findById(timesheetId);
 
     if (!timesheetDocument) {
-      throw new DomainError(
-        'TIMESHEET_NOT_FOUND',
-        'Timesheet not found.',
-      );
+      throw new DomainError('TIMESHEET_NOT_FOUND', 'Timesheet not found.');
     }
 
     if (timesheetDocument.userId.toString() !== userId) {
@@ -30,7 +28,7 @@ export class GetTimesheetByIdHandler implements IQueryHandler<GetTimesheetByIdQu
       );
     }
 
-  const timesheet = TimesheetModel.fromModel(timesheetDocument);
+    const timesheet = TimesheetModel.fromModel(timesheetDocument);
     return { id: timesheet.id, ...timesheet.getUserInfo() };
   }
 }

@@ -1,6 +1,9 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { SearchReportQuery } from './search-report.query';
-import { ReportRepository, SearchReportParams } from '../../infrastructure/repositories/report.repository';
+import {
+  ReportRepository,
+  SearchReportParams,
+} from '../../infrastructure/repositories/report.repository';
 
 @QueryHandler(SearchReportQuery)
 export class SearchReportHandler implements IQueryHandler<SearchReportQuery> {

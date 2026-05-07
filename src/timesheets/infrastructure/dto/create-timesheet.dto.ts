@@ -1,4 +1,13 @@
-import { IsNotEmpty, IsNumber, IsString, Max, MaxLength, Min, IsDate, MaxDate } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Max,
+  MaxLength,
+  Min,
+  IsDate,
+  MaxDate,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateTimesheetDto {

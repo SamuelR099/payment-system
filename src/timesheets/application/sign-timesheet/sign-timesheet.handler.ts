@@ -9,18 +9,21 @@ import { AwsS3Service } from '../../../file-management/infrastructure/aws-s3.ser
 import { MediaFolder } from '../../domain/enums/media-folder.enum';
 
 @CommandHandler(SignTimesheetCommand)
-export class SignTimesheetHandler implements ICommandHandler<SignTimesheetCommand> {
+export class SignTimesheetHandler
+  implements ICommandHandler<SignTimesheetCommand>
+{
   constructor(
     private readonly timesheetRepository: TimesheetRepository,
     private readonly awsS3Service: AwsS3Service,
-  ) { }
+  ) {}
 
   async execute(command: SignTimesheetCommand) {
     const { timesheetId, userId, file } = command;
 
     const signatureImageUrl = await this.uploadFile(timesheetId, file);
 
-    const timesheetDocument = await this.timesheetRepository.findById(timesheetId);
+    const timesheetDocument =
+      await this.timesheetRepository.findById(timesheetId);
     if (!timesheetDocument)
       throw new DomainError('TIMESHEET_NOT_FOUND', 'No existe el timesheet.');
     if (String(timesheetDocument.userId) !== String(userId))
@@ -29,11 +32,15 @@ export class SignTimesheetHandler implements ICommandHandler<SignTimesheetComman
     const timesheet = TimesheetModel.fromModel(timesheetDocument);
     const signedTimesheet = timesheet.sign(signatureImageUrl);
 
-    const { id, userId: _userId, ...updateData } = signedTimesheet.getUserInfo();
+    const {
+      id,
+      userId: _userId,
+      ...updateData
+    } = signedTimesheet.getUserInfo();
 
     const updatedTimesheet = await this.timesheetRepository.updateById(
       timesheetId,
-      updateData
+      updateData,
     );
 
     if (!updatedTimesheet)
@@ -42,7 +49,10 @@ export class SignTimesheetHandler implements ICommandHandler<SignTimesheetComman
     return updatedTimesheet;
   }
 
-  private async uploadFile(timesheetId: string, file?: Multer.File): Promise<string | undefined> {
+  private async uploadFile(
+    timesheetId: string,
+    file?: Multer.File,
+  ): Promise<string | undefined> {
     if (!file) {
       return undefined;
     }
@@ -50,10 +60,6 @@ export class SignTimesheetHandler implements ICommandHandler<SignTimesheetComman
     const fileName = `${uuidv4()}_${file.originalname}`;
     const filePath = `${MediaFolder}/${fileName}`;
 
-    return this.awsS3Service.upload(
-      filePath,
-      file,
-      'private',
-    );
+    return this.awsS3Service.upload(filePath, file, 'private');
   }
 }

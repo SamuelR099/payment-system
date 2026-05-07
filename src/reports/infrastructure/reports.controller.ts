@@ -22,6 +22,7 @@ import { UserRole } from 'src/shared/enums/user-role.enum';
 
 import { SearchReportQuery } from '../application/search-report/search-report.query';
 import { GetReportQuery } from '../application/get-report/get-report.query';
+import { GetReportPdfQuery } from '../application/get-report-pdf/get-report-pdf.query';
 import { SubmitReportCommand } from '../application/submit-report/submit-report.command';
 import { ApproveReportAdminCommand } from '../application/approve-report-admin/approve-report-admin.command';
 import { UpdateReportCommand } from '../application/update-report/update-report.command';
@@ -44,6 +45,11 @@ export class ReportsController {
   @Get('/:id')
   async getReport(@Param('id') id: string) {
     return this.queryBus.execute(new GetReportQuery(id));
+  }
+
+  @Get('/:id/pdf')
+  async getReportPdf(@Param('id') id: string) {
+    return this.queryBus.execute(new GetReportPdfQuery(id));
   }
 
   @Post('/submit')

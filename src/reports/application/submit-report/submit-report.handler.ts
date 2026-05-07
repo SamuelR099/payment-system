@@ -6,7 +6,9 @@ import { ReportRepository } from 'src/reports/infrastructure/repositories/report
 import { SubmitReportCommand } from './submit-report.command';
 
 @CommandHandler(SubmitReportCommand)
-export class SubmitReportHandler implements ICommandHandler<SubmitReportCommand> {
+export class SubmitReportHandler
+  implements ICommandHandler<SubmitReportCommand>
+{
   constructor(private readonly reportRepository: ReportRepository) {}
 
   async execute(command: SubmitReportCommand): Promise<void> {
@@ -17,10 +19,16 @@ export class SubmitReportHandler implements ICommandHandler<SubmitReportCommand>
       throw new DomainError('REPORT_NOT_FOUND', 'El reporte no existe.');
     }
     if (report.userId !== userId) {
-      throw new DomainError('UNAUTHORIZED', 'No tienes permiso para modificar este reporte.');
+      throw new DomainError(
+        'UNAUTHORIZED',
+        'No tienes permiso para modificar este reporte.',
+      );
     }
     if (report.status !== ReportStatus.DRAFT) {
-      throw new DomainError('INVALID_STATUS', 'Solo los reportes en estado draft pueden ser enviados.');
+      throw new DomainError(
+        'INVALID_STATUS',
+        'Solo los reportes en estado draft pueden ser enviados.',
+      );
     }
 
     const updatedReport = { ...report, status: ReportStatus.SUBMITTED };

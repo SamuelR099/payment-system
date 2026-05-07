@@ -24,7 +24,6 @@ export class Timesheet {
   @Prop({ required: true, min: 0 })
   hourlyRate: number;
 
-
   @Prop({ type: Date })
   createdAt?: Date;
 

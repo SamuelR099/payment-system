@@ -33,7 +33,9 @@ export class ReportRepository {
       .findByIdAndUpdate(reportId, updateData, { returnDocument: 'after' })
       .exec();
     if (!updatedReport) {
-      throw new NotFoundException(`Report with ID '${reportId}' not found for update.`);
+      throw new NotFoundException(
+        `Report with ID '${reportId}' not found for update.`,
+      );
     }
     return updatedReport;
   }
@@ -64,7 +66,8 @@ export class ReportRepository {
 
     const pageSize = limit ?? this.DEFAULT_PAGE_SIZE;
     const data = await query.limit(pageSize).exec();
-    const nextCursor = data.length < pageSize ? null : data[data.length - 1]._id;
+    const nextCursor =
+      data.length < pageSize ? null : data[data.length - 1]._id;
 
     return { data, nextCursor };
   }
@@ -74,13 +77,13 @@ export class ReportRepository {
   }
 
   async updatePdfPath(reportId: string, pdfPath: string) {
-    const updatedReport = await this.reportModel.findByIdAndUpdate(
-      reportId,
-      { pdfPath },
-      { returnDocument: 'after' }
-    ).exec();
+    const updatedReport = await this.reportModel
+      .findByIdAndUpdate(reportId, { pdfPath }, { returnDocument: 'after' })
+      .exec();
     if (!updatedReport) {
-      throw new NotFoundException(`Report with ID '${reportId}' not found for PDF update.`);
+      throw new NotFoundException(
+        `Report with ID '${reportId}' not found for PDF update.`,
+      );
     }
     return updatedReport;
   }

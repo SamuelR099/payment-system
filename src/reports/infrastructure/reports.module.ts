@@ -12,6 +12,7 @@ import { Report, ReportSchema } from './schemas/report.schema';
 import { ApproveReportAdminHandler } from '../application/approve-report-admin/approve-report-admin.handler';
 import { SubmitReportHandler } from '../application/submit-report/submit-report.handler';
 import { GetReportHandler } from '../application/get-report/get-report.handler';
+import { GetReportPdfHandler } from '../application/get-report-pdf/get-report-pdf.handler';
 import { SearchReportHandler } from '../application/search-report/search-report.handler';
 import { UpdateReportHandler } from '../application/update-report/update-report.handler';
 import { ReportDomainService } from '../domain/report-domain.service';
@@ -29,6 +30,7 @@ import { ReportDomainService } from '../domain/report-domain.service';
     ApproveReportAdminHandler,
     SubmitReportHandler,
     GetReportHandler,
+    GetReportPdfHandler,
     SearchReportHandler,
     UpdateReportHandler,
     ReportDomainService,

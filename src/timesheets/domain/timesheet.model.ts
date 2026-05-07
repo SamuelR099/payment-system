@@ -28,10 +28,17 @@ export class TimesheetModel {
     hours: number;
     hourlyRate?: number;
   }) {
-    if (!params.userId) throw new DomainError('USER_ID_REQUIRED', 'El usuario es obligatorio.');
-    if (!params.project) throw new DomainError('PROJECT_REQUIRED', 'El proyecto es obligatorio.');
-    if (!params.description) throw new DomainError('DESCRIPTION_REQUIRED', 'La descripción es obligatoria.');
-    const date = params.date instanceof Date ? params.date : new Date(params.date);
+    if (!params.userId)
+      throw new DomainError('USER_ID_REQUIRED', 'El usuario es obligatorio.');
+    if (!params.project)
+      throw new DomainError('PROJECT_REQUIRED', 'El proyecto es obligatorio.');
+    if (!params.description)
+      throw new DomainError(
+        'DESCRIPTION_REQUIRED',
+        'La descripción es obligatoria.',
+      );
+    const date =
+      params.date instanceof Date ? params.date : new Date(params.date);
     return new TimesheetModel({
       id: '',
       userId: params.userId,
@@ -103,7 +110,11 @@ export class TimesheetModel {
     return new TimesheetModel({
       id: this.id,
       userId: this.userId,
-      date: data.date ? (data.date instanceof Date ? data.date : new Date(data.date)) : this.date,
+      date: data.date
+        ? data.date instanceof Date
+          ? data.date
+          : new Date(data.date)
+        : this.date,
       project: data.project ?? this.project,
       description: data.description ?? this.description,
       hours: data.hours ?? this.hours,

@@ -5,21 +5,19 @@ import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/
 import { DeleteTimesheetCommand } from './delete-timesheet.command';
 
 @CommandHandler(DeleteTimesheetCommand)
-export class DeleteTimesheetHandler implements ICommandHandler<DeleteTimesheetCommand> {
-  constructor(
-    private readonly timesheetRepository: TimesheetRepository,
-  ) {}
+export class DeleteTimesheetHandler
+  implements ICommandHandler<DeleteTimesheetCommand>
+{
+  constructor(private readonly timesheetRepository: TimesheetRepository) {}
 
   async execute(command: DeleteTimesheetCommand) {
     const { timesheetId, userId } = command;
 
-    const existingTimesheet = await this.timesheetRepository.findById(timesheetId);
+    const existingTimesheet =
+      await this.timesheetRepository.findById(timesheetId);
 
     if (!existingTimesheet) {
-      throw new DomainError(
-        'TIMESHEET_NOT_FOUND',
-        'Timesheet not found.',
-      );
+      throw new DomainError('TIMESHEET_NOT_FOUND', 'Timesheet not found.');
     }
 
     if (existingTimesheet.userId.toString() !== userId) {

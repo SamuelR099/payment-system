@@ -19,15 +19,24 @@ export class AwsS3Service {
 
   async upload(
     fileName: string,
-  file: Multer.File,
+    file: Multer.File,
+    acl: 'private' | 'public-read' = 'private',
+  ) {
+    return this.uploadBuffer(fileName, file.buffer, file.mimetype, acl);
+  }
+
+  async uploadBuffer(
+    fileName: string,
+    buffer: Buffer,
+    mimetype: string,
     acl: 'private' | 'public-read' = 'private',
   ) {
     await this.s3Client.send(
       new PutObjectCommand({
         Bucket: this.config.aws.bucket,
         Key: fileName,
-        Body: file.buffer,
-        ContentType: file.mimetype,
+        Body: buffer,
+        ContentType: mimetype,
         ACL: acl,
       }),
     );
@@ -43,10 +52,17 @@ export class AwsS3Service {
     );
   }
 
-  async getSignedUrl(fileName: string, expires: number) {
+  async getSignedUrl(fileName: string, expires = 3600) {
+    // Si el fileName ya es una URL completa, extraemos solo la key
+    const key = fileName.includes('amazonaws.com/')
+      ? fileName.split('amazonaws.com/').pop()
+      : fileName;
+
+    if (!key) return fileName;
+
     const command = new GetObjectCommand({
       Bucket: this.config.aws.bucket,
-      Key: fileName,
+      Key: key,
     });
     return getSignedUrl(this.s3Client, command, { expiresIn: expires });
   }

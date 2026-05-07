@@ -26,10 +26,17 @@ export class TimesheetSummaryService {
 
   async getMonthlySummary(userId: string, month: number, year: number) {
     const timesheetList = await this.fetchTimesheets(userId, month, year);
-    const totalWorkedHours = await this.getTotalWorkedHours(userId, month, year);
+    const totalWorkedHours = await this.getTotalWorkedHours(
+      userId,
+      month,
+      year,
+    );
     const totalBilledAmount = this.calculateTotalBilled(timesheetList);
     const projectSummary = this.buildProjectSummary(timesheetList);
-    const averageHoursPerDay = this.calculateAverageHoursPerDay(totalWorkedHours, timesheetList.length);
+    const averageHoursPerDay = this.calculateAverageHoursPerDay(
+      totalWorkedHours,
+      timesheetList.length,
+    );
     const timesheets = timesheetList.map(this.mapTimesheet);
     return {
       month,
@@ -44,26 +51,47 @@ export class TimesheetSummaryService {
     };
   }
 
-  private async fetchTimesheets(userId: string, month: number, year: number): Promise<any[]> {
-    const { data } = await this.timesheetRepository.search({ userId, month, year, limit: TimesheetSummaryService.MAX_RESULTS });
+  private async fetchTimesheets(
+    userId: string,
+    month: number,
+    year: number,
+  ): Promise<any[]> {
+    const { data } = await this.timesheetRepository.search({
+      userId,
+      month,
+      year,
+      limit: TimesheetSummaryService.MAX_RESULTS,
+    });
     return data;
   }
 
-  private async getTotalWorkedHours(userId: string, month: number, year: number): Promise<number> {
+  private async getTotalWorkedHours(
+    userId: string,
+    month: number,
+    year: number,
+  ): Promise<number> {
     return this.timesheetRepository.getHoursMonth(userId, month, year);
   }
 
   private calculateTotalBilled(timesheetList: TimesheetRaw[]): number {
-    return timesheetList.reduce((sum, timesheet) => sum + ((timesheet.hours ?? 0) * (timesheet.hourlyRate ?? 0)), 0);
+    return timesheetList.reduce(
+      (sum, timesheet) =>
+        sum + (timesheet.hours ?? 0) * (timesheet.hourlyRate ?? 0),
+      0,
+    );
   }
 
   private buildProjectSummary(timesheetList: TimesheetRaw[]): ProjectSummary[] {
     const grouped: Record<string, number> = {};
     for (const timesheet of timesheetList) {
       if (!timesheet.project) continue;
-      grouped[timesheet.project] = (grouped[timesheet.project] || 0) + (timesheet.hours ?? 0);
+      grouped[timesheet.project] =
+        (grouped[timesheet.project] || 0) + (timesheet.hours ?? 0);
     }
-    return Object.entries(grouped).map(([project, hours]) => ({ project, hours }));
+    return Object.entries(grouped).map(([project, hours]) => ({
+      project,
+      hours,
+    }));
   }
 
   private calculateAverageHoursPerDay(total: number, entries: number): number {
@@ -83,4 +111,4 @@ export class TimesheetSummaryService {
       updatedAt: timesheet.updatedAt,
     };
   }
- }
+}

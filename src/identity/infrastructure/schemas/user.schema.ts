@@ -46,7 +46,7 @@ export class User {
 
   @Prop({
     enum: Object.values(UserRole),
-    default: UserRole.EMPLOYEE
+    default: UserRole.EMPLOYEE,
   })
   role: UserRole;
 

@@ -1,4 +1,12 @@
-import { IsEmail, IsNotEmpty, IsString, IsOptional, IsEnum, IsNumber, Min } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsNumber,
+  Min,
+} from 'class-validator';
 import { UserRole } from 'src/shared/enums';
 
 export class CreateUserDto {

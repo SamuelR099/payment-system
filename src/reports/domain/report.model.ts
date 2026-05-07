@@ -110,7 +110,10 @@ export class Report {
 
   signByEmployee(signatureImage: string): Report {
     if (this.status !== ReportStatus.SUBMITTED) {
-      throw new DomainError('INVALID_STATUS', 'El reporte debe estar en estado submitted para ser firmado.');
+      throw new DomainError(
+        'INVALID_STATUS',
+        'El reporte debe estar en estado submitted para ser firmado.',
+      );
     }
     return new Report({
       ...this,
@@ -123,7 +126,10 @@ export class Report {
 
   approveByAdmin(adminId: string, signatureImage?: string): Report {
     if (this.status !== ReportStatus.SIGNED_BY_EMPLOYEE) {
-      throw new DomainError('INVALID_STATUS', 'El reporte debe estar firmado por el empleado antes de ser aprobado.');
+      throw new DomainError(
+        'INVALID_STATUS',
+        'El reporte debe estar firmado por el empleado antes de ser aprobado.',
+      );
     }
     return new Report({
       ...this,

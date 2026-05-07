@@ -1,5 +1,8 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { Timesheet, TimesheetModel } from 'src/timesheets/domain/timesheet.model';
+import {
+  Timesheet,
+  TimesheetModel,
+} from 'src/timesheets/domain/timesheet.model';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { GetTimesheetsQuery } from './get-timesheets.query';
 
@@ -25,7 +28,7 @@ export class GetTimesheetsHandler implements IQueryHandler<GetTimesheetsQuery> {
     });
 
     const timesheets = data.map(document => {
-  const timesheet = TimesheetModel.fromModel(document);
+      const timesheet = TimesheetModel.fromModel(document);
       return {
         id: timesheet.id,
         ...timesheet.getUserInfo(),

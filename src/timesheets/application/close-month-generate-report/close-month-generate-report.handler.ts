@@ -1,4 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import * as fs from 'fs';
 
 import { ReportRepository } from 'src/reports/infrastructure/repositories/report.repository';
 import {
@@ -8,6 +9,7 @@ import {
 } from 'src/reports/domain/report-domain.service';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { PdfService } from 'src/shared/pdf/pdf.service';
+import { AwsS3Service } from 'src/file-management/infrastructure/aws-s3.service';
 import { DomainError } from 'src/shared/domain';
 
 import { CloseMonthGenerateReportCommand } from './close-month-generate-report.command';
@@ -20,6 +22,7 @@ export class CloseMonthGenerateReportHandler
     private readonly timesheetRepository: TimesheetRepository,
     private readonly reportRepository: ReportRepository,
     private readonly pdfService: PdfService,
+    private readonly awsS3Service: AwsS3Service,
     private readonly reportDomainService: ReportDomainService,
   ) {}
 
@@ -65,12 +68,40 @@ export class CloseMonthGenerateReportHandler
       );
 
     const createdReport = await this.reportRepository.create(generatedReport);
-    const generatedPdfPath = await this.pdfService.generatePdf(createdReport);
-    await this.reportRepository.update(createdReport.id, {
-      pdfPath: generatedPdfPath,
-    });
+    
+    // Generar el PDF en disco
+    const tempPdfPath = await this.pdfService.generatePdf(createdReport);
+    
+    try {
+      // Leer el PDF y subirlo a S3
+      const pdfBuffer = fs.readFileSync(tempPdfPath);
+      const s3FileName = `reports/${createdReport.id}-${month}-${year}.pdf`;
+      const publicUrl = await this.awsS3Service.uploadBuffer(
+        s3FileName,
+        pdfBuffer,
+        'application/pdf',
+        'private'
+      );
 
-    return { reportId: createdReport.id, pdfPath: generatedPdfPath };
+      // Actualizar el reporte con la ruta de S3
+      await this.reportRepository.update(createdReport.id, {
+        pdfPath: s3FileName,
+      });
+
+      // Limpiar archivo temporal
+      if (fs.existsSync(tempPdfPath)) {
+        fs.unlinkSync(tempPdfPath);
+      }
+
+      return { reportId: createdReport.id, pdfPath: publicUrl };
+    } catch (error) {
+      console.error('Error uploading PDF to S3:', error);
+      // Fallback: al menos guardamos la ruta temporal si falla S3
+      await this.reportRepository.update(createdReport.id, {
+        pdfPath: tempPdfPath,
+      });
+      return { reportId: createdReport.id, pdfPath: tempPdfPath };
+    }
   }
 
   private validatePeriodParameters(month: number, year: number): void {

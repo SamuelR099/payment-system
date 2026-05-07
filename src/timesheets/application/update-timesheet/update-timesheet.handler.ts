@@ -16,7 +16,15 @@ export class UpdateTimesheetHandler
   ) {}
 
   async execute(command: UpdateTimesheetCommand) {
-    const { timesheetId, userId, date, project, description, hours, hourlyRate } = command;
+    const {
+      timesheetId,
+      userId,
+      date,
+      project,
+      description,
+      hours,
+      hourlyRate,
+    } = command;
 
     const foundTimesheet = await this.timesheetRepository.findById(timesheetId);
     if (!foundTimesheet)
@@ -34,7 +42,9 @@ export class UpdateTimesheetHandler
       excludeTimesheetId: timesheetId,
     });
 
-  const updatedTimesheetDomain = TimesheetModel.fromModel(foundTimesheet).update({
+    const updatedTimesheetDomain = TimesheetModel.fromModel(
+      foundTimesheet,
+    ).update({
       date: date ?? foundTimesheet.date,
       project: project ?? foundTimesheet.project,
       description: description ?? foundTimesheet.description,

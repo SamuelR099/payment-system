@@ -4,8 +4,12 @@ import { TimesheetSummaryService } from 'src/timesheets/domain/timesheet-summary
 import { GetMonthlySummaryQuery } from './get-monthly-summary.query';
 
 @QueryHandler(GetMonthlySummaryQuery)
-export class GetMonthlySummaryHandler implements IQueryHandler<GetMonthlySummaryQuery> {
-  constructor(private readonly timesheetSummaryService: TimesheetSummaryService) {}
+export class GetMonthlySummaryHandler
+  implements IQueryHandler<GetMonthlySummaryQuery>
+{
+  constructor(
+    private readonly timesheetSummaryService: TimesheetSummaryService,
+  ) {}
 
   async execute(query: GetMonthlySummaryQuery) {
     const { userId, month, year } = query;

@@ -6,9 +6,7 @@ import { SignInCommand } from './sign-in.command';
 
 @CommandHandler(SignInCommand)
 export class SignInHandler implements ICommandHandler<SignInCommand> {
-  constructor(
-    private readonly authService: AuthService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   async execute(command: SignInCommand) {
     const { email, password } = command;

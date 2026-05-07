@@ -20,7 +20,10 @@ export class TimesheetDomainService {
       excludeTimesheetId: params.excludeTimesheetId,
     });
     if (exists) {
-      throw new DomainError('DUPLICATE_TIMESHEET', 'Ya existe un timesheet para este proyecto en esa fecha.');
+      throw new DomainError(
+        'DUPLICATE_TIMESHEET',
+        'Ya existe un timesheet para este proyecto en esa fecha.',
+      );
     }
   }
 }

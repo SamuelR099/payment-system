@@ -1,4 +1,4 @@
-  export class CreateTimesheetCommand {
+export class CreateTimesheetCommand {
   readonly userId: string;
   readonly date: Date;
   readonly project: string;
@@ -9,5 +9,4 @@
   constructor(data: CreateTimesheetCommand) {
     Object.assign(this, data);
   }
- }
-
+}

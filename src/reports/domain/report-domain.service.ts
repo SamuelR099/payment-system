@@ -20,20 +20,31 @@ export interface GeneratedReport {
 
 @Injectable()
 export class ReportDomainService {
-  generateMonthlyReport(timesheets: Timesheet[], month: number, year: number): GeneratedReport {
+  generateMonthlyReport(
+    timesheets: Timesheet[],
+    month: number,
+    year: number,
+  ): GeneratedReport {
     if (!timesheets || timesheets.length === 0) {
       throw new Error('No timesheets provided for report generation.');
     }
     const userId = timesheets[0].userId;
-    const totalHours = timesheets.reduce((sum, timesheet) => sum + (timesheet.hours ?? 0), 0);
-    const totalAmount = timesheets.reduce((sum, timesheet) => sum + ((timesheet.hours ?? 0) * (timesheet.hourlyRate ?? 0)), 0);
+    const totalHours = timesheets.reduce(
+      (sum, timesheet) => sum + (timesheet.hours ?? 0),
+      0,
+    );
+    const totalAmount = timesheets.reduce(
+      (sum, timesheet) =>
+        sum + (timesheet.hours ?? 0) * (timesheet.hourlyRate ?? 0),
+      0,
+    );
     return {
       userId,
       month,
       year,
       totalHours,
       totalAmount,
-  status: ReportStatus.CLOSED,
+      status: ReportStatus.CLOSED,
     };
   }
 }

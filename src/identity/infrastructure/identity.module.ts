@@ -12,7 +12,6 @@ import { JwtStrategy } from 'src/shared/strategies/jwt.strategy';
 import { CreateUserHandler } from '../application/create-user/create-user.handler';
 import { SignInHandler } from '../application/sign-in/sign-in.handler';
 
-
 import { User, UserSchema } from './schemas/user.schema';
 import { UserRepository } from './repositories/user.repository';
 import { GetUserProfileHandler } from '../application/queries/get-user-profile.handler';

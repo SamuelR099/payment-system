@@ -26,7 +26,10 @@ export class ApproveReportAdminHandler
     const signatureImageUrl = await this.uploadFile(file);
 
     const reportDomain = Report.fromModel(reportDoc);
-    const approvedReport = reportDomain.approveByAdmin(adminId, signatureImageUrl);
+    const approvedReport = reportDomain.approveByAdmin(
+      adminId,
+      signatureImageUrl,
+    );
 
     const { id, userId, ...updateData } = approvedReport.toDto();
 
@@ -41,10 +44,6 @@ export class ApproveReportAdminHandler
     const fileName = `${uuidv4()}_${file.originalname}`;
     const filePath = `${MediaFolder}/${fileName}`;
 
-    return this.awsS3Service.upload(
-      filePath,
-      file,
-      'private',
-    );
+    return this.awsS3Service.upload(filePath, file, 'private');
   }
 }

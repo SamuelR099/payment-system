@@ -5,7 +5,9 @@ import { GetUserProfileQuery } from './get-user-profile.query';
 import { AuthService } from 'src/identity/infrastructure/auth.service';
 
 @QueryHandler(GetUserProfileQuery)
-export class GetUserProfileHandler implements IQueryHandler<GetUserProfileQuery> {
+export class GetUserProfileHandler
+  implements IQueryHandler<GetUserProfileQuery>
+{
   constructor(
     private readonly userRepository: UserRepository,
     private readonly authService: AuthService,
