@@ -16,6 +16,7 @@ export class Report {
   readonly adminSignatureImage?: string;
   readonly adminSignedAt?: Date;
   readonly adminId?: string;
+  readonly pdfPath?: string;
 
   private constructor(params: {
     id: string;
@@ -32,6 +33,7 @@ export class Report {
     adminSignatureImage?: string;
     adminSignedAt?: Date;
     adminId?: string;
+    pdfPath?: string;
   }) {
     this.id = params.id;
     this.userId = params.userId;
@@ -47,6 +49,7 @@ export class Report {
     this.adminSignatureImage = params.adminSignatureImage;
     this.adminSignedAt = params.adminSignedAt;
     this.adminId = params.adminId;
+    this.pdfPath = params.pdfPath;
   }
 
   static create(params: {
@@ -86,10 +89,11 @@ export class Report {
       adminSignatureImage: document.adminSignatureImage,
       adminSignedAt: document.adminSignedAt,
       adminId: document.adminId?.toString?.(),
+      pdfPath: document.pdfPath,
     });
   }
 
-  toDto() {
+  getUserInfo() {
     return {
       id: this.id,
       userId: this.userId,
@@ -105,6 +109,7 @@ export class Report {
       adminSignatureImage: this.adminSignatureImage,
       adminSignedAt: this.adminSignedAt,
       adminId: this.adminId,
+      pdfPath: this.pdfPath,
     };
   }
 
@@ -138,6 +143,38 @@ export class Report {
       adminSignedAt: new Date(),
       adminId,
       status: ReportStatus.APPROVED,
+    });
+  }
+
+  submit(): Report {
+    if (this.status !== ReportStatus.DRAFT) {
+      throw new DomainError(
+        'INVALID_STATUS',
+        'Solo los reportes en estado draft pueden ser enviados.',
+      );
+    }
+    return new Report({
+      ...this,
+      status: ReportStatus.SUBMITTED,
+    });
+  }
+
+  update(params: {
+    totalHours?: number;
+    totalAmount?: number;
+    pdfPath?: string;
+  }): Report {
+    if (this.status !== ReportStatus.DRAFT && !params.pdfPath) {
+      throw new DomainError(
+        'INVALID_STATUS',
+        'Solo se pueden editar reportes en estado draft.',
+      );
+    }
+    return new Report({
+      ...this,
+      totalHours: params.totalHours ?? this.totalHours,
+      totalAmount: params.totalAmount ?? this.totalAmount,
+      pdfPath: params.pdfPath ?? this.pdfPath,
     });
   }
 }

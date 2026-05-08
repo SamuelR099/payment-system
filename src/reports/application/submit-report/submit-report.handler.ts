@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { DomainError } from 'src/shared/domain';
-import { ReportStatus } from '../../domain/enums/report-status.enum';
+import { Report } from '../../domain/report.model';
 import { ReportRepository } from 'src/reports/infrastructure/repositories/report.repository';
 import { SubmitReportCommand } from './submit-report.command';
 
@@ -14,24 +14,19 @@ export class SubmitReportHandler
   async execute(command: SubmitReportCommand): Promise<void> {
     const { reportId, userId } = command;
 
-    const report = await this.reportRepository.findById(reportId);
-    if (!report) {
-      throw new DomainError('REPORT_NOT_FOUND', 'El reporte no existe.');
-    }
+    const reportDoc = await this.reportRepository.findById(reportId, true);
+    const report = Report.fromModel(reportDoc);
+
     if (report.userId !== userId) {
       throw new DomainError(
         'UNAUTHORIZED',
         'No tienes permiso para modificar este reporte.',
       );
     }
-    if (report.status !== ReportStatus.DRAFT) {
-      throw new DomainError(
-        'INVALID_STATUS',
-        'Solo los reportes en estado draft pueden ser enviados.',
-      );
-    }
 
-    const updatedReport = { ...report, status: ReportStatus.SUBMITTED };
-    await this.reportRepository.update(reportId, updatedReport);
+    const submittedReport = report.submit();
+
+    const { id, userId: _, ...updateData } = submittedReport.getUserInfo();
+    await this.reportRepository.update(reportId, updateData);
   }
 }

@@ -32,11 +32,7 @@ export class SignTimesheetHandler
     const timesheet = TimesheetModel.fromModel(timesheetDocument);
     const signedTimesheet = timesheet.sign(signatureImageUrl);
 
-    const {
-      id,
-      userId: _userId,
-      ...updateData
-    } = signedTimesheet.getUserInfo();
+    const updateData = signedTimesheet.getUserInfo();
 
     const updatedTimesheet = await this.timesheetRepository.updateById(
       timesheetId,

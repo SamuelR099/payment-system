@@ -55,10 +55,7 @@ export class UpdateTimesheetHandler
     const updatedTimesheetData = updatedTimesheetDomain.getUserInfo();
     const savedTimesheet = await this.timesheetRepository.updateById(
       timesheetId,
-      {
-        ...updatedTimesheetData,
-        userId: foundTimesheet.userId,
-      },
+      updatedTimesheetData,
     );
 
     if (!savedTimesheet)
@@ -67,9 +64,6 @@ export class UpdateTimesheetHandler
         'No se pudo actualizar el timesheet.',
       );
 
-    return {
-      id: savedTimesheet.id,
-      ...updatedTimesheetDomain.getUserInfo(),
-    };
+    return savedTimesheet;
   }
 }

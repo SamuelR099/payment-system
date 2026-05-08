@@ -29,10 +29,7 @@ export class GetTimesheetsHandler implements IQueryHandler<GetTimesheetsQuery> {
 
     const timesheets = data.map(document => {
       const timesheet = TimesheetModel.fromModel(document);
-      return {
-        id: timesheet.id,
-        ...timesheet.getUserInfo(),
-      };
+      return timesheet.getUserInfo();
     });
 
     return { timesheets, nextCursor };

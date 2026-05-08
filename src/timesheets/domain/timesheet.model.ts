@@ -1,10 +1,5 @@
-import { TimesheetDocument as BaseTimesheetDocument } from '../infrastructure/schemas/timesheet.schema';
 import { DomainError } from 'src/shared/domain';
 
-export type TimesheetDocument = BaseTimesheetDocument & {
-  createdAt: Date;
-  updatedAt: Date;
-};
 export interface Timesheet {
   id: string;
   userId: string;
@@ -19,39 +14,8 @@ export interface Timesheet {
   signed?: boolean;
   signedAt?: Date;
 }
-export class TimesheetModel {
-  static create(params: {
-    userId: string;
-    date: string | Date;
-    project: string;
-    description: string;
-    hours: number;
-    hourlyRate?: number;
-  }) {
-    if (!params.userId)
-      throw new DomainError('USER_ID_REQUIRED', 'El usuario es obligatorio.');
-    if (!params.project)
-      throw new DomainError('PROJECT_REQUIRED', 'El proyecto es obligatorio.');
-    if (!params.description)
-      throw new DomainError(
-        'DESCRIPTION_REQUIRED',
-        'La descripción es obligatoria.',
-      );
-    const date =
-      params.date instanceof Date ? params.date : new Date(params.date);
-    return new TimesheetModel({
-      id: '',
-      userId: params.userId,
-      date,
-      project: params.project,
-      description: params.description,
-      hours: params.hours,
-      hourlyRate: params.hourlyRate ?? 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-  }
 
+export class TimesheetModel {
   readonly id: string;
   readonly userId: string;
   readonly date: Date;
@@ -93,6 +57,38 @@ export class TimesheetModel {
     this.signatureImageUrl = params.signatureImageUrl;
   }
 
+  static create(params: {
+    userId: string;
+    date: string | Date;
+    project: string;
+    description: string;
+    hours: number;
+    hourlyRate?: number;
+  }) {
+    if (!params.userId)
+      throw new DomainError('USER_ID_REQUIRED', 'El usuario es obligatorio.');
+    if (!params.project)
+      throw new DomainError('PROJECT_REQUIRED', 'El proyecto es obligatorio.');
+    if (!params.description)
+      throw new DomainError(
+        'DESCRIPTION_REQUIRED',
+        'La descripción es obligatoria.',
+      );
+    const date =
+      params.date instanceof Date ? params.date : new Date(params.date);
+    return new TimesheetModel({
+      id: '',
+      userId: params.userId,
+      date,
+      project: params.project,
+      description: params.description,
+      hours: params.hours,
+      hourlyRate: params.hourlyRate ?? 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+  }
+
   sign(signatureImageUrl?: string): TimesheetModel {
     if (this.signed) {
       throw new DomainError('ALREADY_SIGNED', 'El timesheet ya está firmado.');
@@ -108,8 +104,7 @@ export class TimesheetModel {
 
   update(data: Partial<Omit<Timesheet, 'id' | 'userId'>>) {
     return new TimesheetModel({
-      id: this.id,
-      userId: this.userId,
+      ...this,
       date: data.date
         ? data.date instanceof Date
           ? data.date
@@ -119,7 +114,6 @@ export class TimesheetModel {
       description: data.description ?? this.description,
       hours: data.hours ?? this.hours,
       hourlyRate: data.hourlyRate ?? this.hourlyRate,
-      createdAt: this.createdAt,
       updatedAt: new Date(),
     });
   }
@@ -141,13 +135,6 @@ export class TimesheetModel {
     });
   }
 
-  get monthYear() {
-    return {
-      month: this.date.getMonth() + 1,
-      year: this.date.getFullYear(),
-    };
-  }
-
   getUserInfo(): Timesheet {
     return {
       id: this.id,
@@ -156,12 +143,19 @@ export class TimesheetModel {
       project: this.project,
       description: this.description,
       hours: this.hours,
-      hourlyRate: this.hourlyRate ?? 0,
+      hourlyRate: this.hourlyRate,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
-      signatureImageUrl: this.signatureImageUrl,
       signed: this.signed,
       signedAt: this.signedAt,
+      signatureImageUrl: this.signatureImageUrl,
+    };
+  }
+
+  get monthYear() {
+    return {
+      month: this.date.getMonth() + 1,
+      year: this.date.getFullYear(),
     };
   }
 }

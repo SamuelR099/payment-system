@@ -65,7 +65,7 @@ export class TimesheetRepository {
     return this.timesheetModel.findById(id).exec();
   }
 
-  async updateById(id: string, updateData: Partial<Timesheet>) {
+  async updateById(id: string, updateData: any) {
     const updated = await this.timesheetModel
       .findByIdAndUpdate(id, updateData, { new: true })
       .exec();

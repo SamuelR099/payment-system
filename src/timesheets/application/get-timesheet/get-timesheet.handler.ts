@@ -29,6 +29,6 @@ export class GetTimesheetByIdHandler
     }
 
     const timesheet = TimesheetModel.fromModel(timesheetDocument);
-    return { id: timesheet.id, ...timesheet.getUserInfo() };
+    return timesheet.getUserInfo();
   }
 }

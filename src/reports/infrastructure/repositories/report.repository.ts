@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, UpdateQuery } from 'mongoose';
 
 import { Report, ReportDocument } from '../schemas/report.schema';
-import { CreateReportDto } from '../dto/create-report.dto';
 
 export type SearchReportParams = {
   terms?: string;
@@ -40,7 +39,7 @@ export class ReportRepository {
     return updatedReport;
   }
 
-  async create(reportData: CreateReportDto) {
+  async create(reportData: any) {
     return this.reportModel.create(reportData);
   }
 
@@ -76,15 +75,4 @@ export class ReportRepository {
     return this.reportModel.find({ _id: { $in: reportIds } }).exec();
   }
 
-  async updatePdfPath(reportId: string, pdfPath: string) {
-    const updatedReport = await this.reportModel
-      .findByIdAndUpdate(reportId, { pdfPath }, { returnDocument: 'after' })
-      .exec();
-    if (!updatedReport) {
-      throw new NotFoundException(
-        `Report with ID '${reportId}' not found for PDF update.`,
-      );
-    }
-    return updatedReport;
-  }
 }

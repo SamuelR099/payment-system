@@ -31,7 +31,7 @@ export class ApproveReportAdminHandler
       signatureImageUrl,
     );
 
-    const { id, userId, ...updateData } = approvedReport.toDto();
+    const { id, userId, ...updateData } = approvedReport.getUserInfo();
 
     await this.reportRepository.update(reportId, updateData);
   }

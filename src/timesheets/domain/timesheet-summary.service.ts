@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { TimesheetModel } from 'src/timesheets/domain/timesheet.model';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 
 interface TimesheetRaw {
@@ -98,17 +99,7 @@ export class TimesheetSummaryService {
     return entries > 0 ? total / entries : 0;
   }
 
-  private mapTimesheet(timesheet: TimesheetRaw) {
-    return {
-      id: timesheet.id,
-      userId: timesheet.userId,
-      date: timesheet.date,
-      project: timesheet.project,
-      description: timesheet.description,
-      hours: timesheet.hours,
-      hourlyRate: timesheet.hourlyRate,
-      createdAt: timesheet.createdAt,
-      updatedAt: timesheet.updatedAt,
-    };
+  private mapTimesheet(document: any) {
+    return TimesheetModel.fromModel(document).getUserInfo();
   }
 }
