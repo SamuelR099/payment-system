@@ -17,7 +17,7 @@ export class ReportRepository {
   constructor(
     @InjectModel(Report.name)
     private readonly reportModel: Model<ReportDocument>,
-  ) {}
+  ) { }
 
   async findById(reportId: string, failIfNotFound = false) {
     const report = await this.reportModel.findById(reportId).exec();
@@ -75,4 +75,7 @@ export class ReportRepository {
     return this.reportModel.find({ _id: { $in: reportIds } }).exec();
   }
 
+  async findByPeriod(userId: string, month: number, year: number) {
+    return this.reportModel.findOne({ userId, month, year }).exec();
+  }
 }

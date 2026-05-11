@@ -11,21 +11,25 @@ export class TimesheetRepository {
     userId: string;
     month?: number;
     year?: number;
+    startDate?: Date;
+    endDate?: Date;
     cursor?: string;
     limit?: number;
     status?: string;
     terms?: string;
   }) {
-    const { userId, month, year, cursor, limit, status, terms } = params;
+    const { userId, month, year, startDate, endDate, cursor, limit, status, terms } = params;
     const pageSize = limit ?? this.DEFAULT_PAGE_SIZE;
     const query = this.timesheetModel.find().sort({ _id: -1 });
 
     query.merge({ userId: { $in: [userId, new Types.ObjectId(userId)] } });
 
-    if (month && year) {
-      const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
-      const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+    if (startDate && endDate) {
       query.merge({ date: { $gte: startDate, $lte: endDate } });
+    } else if (month && year) {
+      const start = new Date(year, month - 1, 1, 0, 0, 0, 0);
+      const end = new Date(year, month, 0, 23, 59, 59, 999);
+      query.merge({ date: { $gte: start, $lte: end } });
     }
 
     if (status) {

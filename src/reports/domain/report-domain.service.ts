@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ReportStatus } from './enums/report-status.enum';
+import { DomainError } from 'src/shared/domain';
+import { ReportPeriod } from './value-objects/report-period';
 
 export interface Timesheet {
   userId: string;
@@ -22,12 +24,15 @@ export interface GeneratedReport {
 export class ReportDomainService {
   generateMonthlyReport(
     timesheets: Timesheet[],
-    month: number,
-    year: number,
+    period: ReportPeriod,
   ): GeneratedReport {
     if (!timesheets || timesheets.length === 0) {
-      throw new Error('No timesheets provided for report generation.');
+      throw new DomainError(
+        'NO_TIMESHEETS_FOUND',
+        `No hay hojas de tiempo para el periodo ${period.getLabel()}.`,
+      );
     }
+
     const userId = timesheets[0].userId;
     const totalHours = timesheets.reduce(
       (sum, timesheet) => sum + (timesheet.hours ?? 0),
@@ -38,13 +43,14 @@ export class ReportDomainService {
         sum + (timesheet.hours ?? 0) * (timesheet.hourlyRate ?? 0),
       0,
     );
+
     return {
       userId,
-      month,
-      year,
+      month: period.month,
+      year: period.year,
       totalHours,
       totalAmount,
-      status: ReportStatus.CLOSED,
+      status: ReportStatus.DRAFT,
     };
   }
 }
