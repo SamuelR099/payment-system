@@ -12,6 +12,8 @@ import { ReportPeriod } from 'src/reports/domain/value-objects/report-period';
 import { CloseMonthGenerateReportCommand } from './close-month-generate-report.command';
 import { DomainError } from 'src/shared/domain';
 
+import { ReportStatus } from 'src/reports/domain/enums/report-status.enum';
+
 @CommandHandler(CloseMonthGenerateReportCommand)
 export class CloseMonthGenerateReportHandler
   implements ICommandHandler<CloseMonthGenerateReportCommand> {
@@ -32,7 +34,11 @@ export class CloseMonthGenerateReportHandler
 
     const alreadyExists = await this.reportRepository.findByPeriod(userId, month, year);
     if (alreadyExists) {
-      throw new DomainError('REPORT_ALREADY_EXISTS', `Ya existe un reporte para el periodo ${period.getLabel()}.`);
+      if (alreadyExists.status === ReportStatus.DRAFT || alreadyExists.status === ReportStatus.REJECTED) {
+        await this.reportRepository.deleteById(alreadyExists.id);
+      } else {
+        throw new DomainError('REPORT_ALREADY_EXISTS', `Ya existe un reporte en proceso para el periodo ${period.getLabel()}.`);
+      }
     }
 
     const { data: timesheetDocuments } = await this.timesheetRepository.search({
@@ -49,6 +55,7 @@ export class CloseMonthGenerateReportHandler
         hourlyRate: timesheetDocument.hourlyRate,
         month: period.month,
         year: period.year,
+        signatureImageUrl: timesheetDocument.signatureImageUrl,
       }),
     );
 

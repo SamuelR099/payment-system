@@ -12,6 +12,16 @@ export class GetTimesheetsDto {
   date?: string;
 
   @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  month?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  year?: number;
+
+  @IsOptional()
   @IsObjectId()
   cursor?: string;
 

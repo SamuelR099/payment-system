@@ -28,25 +28,41 @@ export class PdfService {
     const user = await this.userRepository.findById(report.userId, true);
     const professionalName = `${user.profile.firstName} ${user.profile.lastName}`;
 
+    // Find the first signature available in the timesheets if the report is not signed
+    const timesheetWithSignature = timesheetDocuments.find(ts => ts.signed && ts.signatureImageUrl);
+    const signatureUrl = report.employeeSignatureImage || timesheetWithSignature?.signatureImageUrl || user.profile.avatarUrl;
+
+    // Use the signature date from the report or the first signed timesheet
+    const signatureDate = report.employeeSignedAt
+      ? report.employeeSignedAt
+      : timesheetWithSignature?.signedAt;
+
     const pdfData = {
       logoUrl: undefined,
       professionalName,
       specialty: 'Programador Backend',
       monthYear: period.getLabel(),
-      timesheets: timesheetDocuments.map(ts => ({
-        date: new Date(ts.date).toLocaleDateString('es-PR'),
-        description: ts.description,
-        startTime: '8:00:00 a. m.',
-        endTime: '5:00:00 p. m.',
-        hours: ts.hours,
-      })),
+      timesheets: timesheetDocuments.map(ts => {
+        const start = 8; // 8:00 AM
+        const end = start + ts.hours;
+        const ampm = end >= 12 ? 'p. m.' : 'a. m.';
+        const displayEnd = end > 12 ? end - 12 : end;
+
+        return {
+          date: new Date(ts.date).toLocaleDateString('es-PR'),
+          description: ts.description,
+          startTime: '8:00:00 a. m.',
+          endTime: `${displayEnd}:00:00 ${ampm}`,
+          hours: ts.hours,
+        };
+      }),
       totalHours: report.totalHours,
-      hourlyRate: user.hourlyRate || 25,
+      hourlyRate: timesheetDocuments[0]?.hourlyRate || 0,
       totalAmount: report.totalAmount,
-      professionalSignatureUrl: user.profile.avatarUrl,
+      professionalSignatureUrl: await this.getBase64Image(signatureUrl),
       supervisorName: 'Raúl D. Olivero Carrucini',
       supervisorSignatureUrl: undefined,
-      signatureDate: new Date().toLocaleDateString('es-PR'),
+      signatureDate: (signatureDate || new Date()).toLocaleDateString('es-PR'),
     };
 
     const htmlContent = renderPdfTemplate(ReportTemplate, pdfData);
@@ -70,6 +86,34 @@ export class PdfService {
     } catch (error) {
       console.error('Error generating or uploading PDF:', error);
       throw error;
+    }
+  }
+
+  private async getBase64Image(url?: string): Promise<string | undefined> {
+    if (!url) return undefined;
+    try {
+      let fetchUrl = url;
+      if (url.includes('amazonaws.com')) {
+        fetchUrl = await this.awsS3Service.getSignedUrl(url);
+      }
+
+      const response = await fetch(fetchUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const contentType = response.headers.get('content-type') || 'image/png';
+
+      if (contentType.includes('xml')) {
+        throw new Error('Received XML instead of an image. Likely an S3 access error.');
+      }
+
+      return `data:${contentType};base64,${buffer.toString('base64')}`;
+    } catch (e) {
+      console.error('Error fetching image for PDF:', e);
+      return undefined;
     }
   }
 

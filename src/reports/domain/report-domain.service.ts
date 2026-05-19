@@ -9,6 +9,7 @@ export interface Timesheet {
   hourlyRate: number;
   month: number;
   year: number;
+  signatureImageUrl?: string;
 }
 
 export interface GeneratedReport {
@@ -18,6 +19,9 @@ export interface GeneratedReport {
   totalHours: number;
   totalAmount: number;
   status: string;
+  employeeSigned?: boolean;
+  employeeSignatureImage?: string;
+  employeeSignedAt?: Date;
 }
 
 @Injectable()
@@ -44,13 +48,18 @@ export class ReportDomainService {
       0,
     );
 
+    const signature = timesheets.find(t => t.signatureImageUrl)?.signatureImageUrl;
+
     return {
       userId,
       month: period.month,
       year: period.year,
       totalHours,
       totalAmount,
-      status: ReportStatus.DRAFT,
+      status: signature ? ReportStatus.SIGNED_BY_EMPLOYEE : ReportStatus.DRAFT,
+      employeeSigned: !!signature,
+      employeeSignatureImage: signature,
+      employeeSignedAt: signature ? new Date() : undefined,
     };
   }
 }

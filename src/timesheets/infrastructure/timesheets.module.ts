@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { FileManagementModule } from '../../file-management/file-management.module';
 import { ReportsModule } from 'src/reports/infrastructure/reports.module';
 import { PdfModule } from 'src/shared/pdf/pdf.module';
+import { IdentityModule } from 'src/identity/infrastructure/identity.module';
 
 import { Timesheet, TimesheetSchema } from './schemas/timesheet.schema';
 import { TimesheetRepository } from './repositories/timesheet.repository';
@@ -31,6 +32,7 @@ import { CloseMonthGenerateReportHandler } from '../application/close-month-gene
     FileManagementModule,
     ReportsModule,
     PdfModule,
+    IdentityModule,
   ],
   controllers: [TimesheetsController],
   providers: [

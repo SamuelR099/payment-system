@@ -114,6 +114,9 @@ export class TimesheetModel {
       description: data.description ?? this.description,
       hours: data.hours ?? this.hours,
       hourlyRate: data.hourlyRate ?? this.hourlyRate,
+      signed: false,
+      signedAt: undefined,
+      signatureImageUrl: undefined,
       updatedAt: new Date(),
     });
   }

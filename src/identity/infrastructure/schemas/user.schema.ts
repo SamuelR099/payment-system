@@ -53,8 +53,8 @@ export class User {
   @Prop()
   wallet?: string;
 
-  @Prop({ default: 25.0 })
-  hourlyRate: number;
+  @Prop()
+  hourlyRate?: number;
 }
 
 export type UserDocument = User & Document;

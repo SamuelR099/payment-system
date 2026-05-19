@@ -6,6 +6,7 @@ import { TimesheetDomainService } from 'src/timesheets/domain/timesheet-domain.s
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { UpdateTimesheetCommand } from './update-timesheet.command';
 
+
 @CommandHandler(UpdateTimesheetCommand)
 export class UpdateTimesheetHandler
   implements ICommandHandler<UpdateTimesheetCommand>
@@ -42,14 +43,16 @@ export class UpdateTimesheetHandler
       excludeTimesheetId: timesheetId,
     });
 
+    const effectiveHourlyRate = hourlyRate ?? foundTimesheet.hourlyRate;
+
     const updatedTimesheetDomain = TimesheetModel.fromModel(
       foundTimesheet,
     ).update({
-      date: date ?? foundTimesheet.date,
-      project: project ?? foundTimesheet.project,
+      date: targetDate,
+      project: targetProject,
       description: description ?? foundTimesheet.description,
       hours: hours ?? foundTimesheet.hours,
-      hourlyRate: hourlyRate ?? foundTimesheet.hourlyRate,
+      hourlyRate: effectiveHourlyRate,
     });
 
     const updatedTimesheetData = updatedTimesheetDomain.getUserInfo();

@@ -5,4 +5,5 @@ export enum ReportStatus {
   APPROVED = 'approved',
   PAID = 'paid',
   CLOSED = 'closed',
+  REJECTED = 'rejected',
 }

@@ -14,7 +14,7 @@ import { SubmitReportHandler } from '../application/submit-report/submit-report.
 import { GetReportHandler } from '../application/get-report/get-report.handler';
 import { GetReportPdfHandler } from '../application/get-report-pdf/get-report-pdf.handler';
 import { SearchReportHandler } from '../application/search-report/search-report.handler';
-import { UpdateReportHandler } from '../application/update-report/update-report.handler';
+import { RejectReportAdminHandler } from '../application/reject-report-admin/reject-report-admin.handler';
 import { ReportDomainService } from '../domain/report-domain.service';
 
 @Module({
@@ -28,11 +28,11 @@ import { ReportDomainService } from '../domain/report-domain.service';
   providers: [
     ReportRepository,
     ApproveReportAdminHandler,
+    RejectReportAdminHandler,
     SubmitReportHandler,
     GetReportHandler,
     GetReportPdfHandler,
     SearchReportHandler,
-    UpdateReportHandler,
     ReportDomainService,
   ],
   exports: [ReportRepository, ReportDomainService],

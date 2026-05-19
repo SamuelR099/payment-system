@@ -46,7 +46,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
       },
       role: data.role || UserRole.EMPLOYEE,
       wallet: data.wallet,
-      hourlyRate: data.hourlyRate || 25.0,
+      hourlyRate: data.hourlyRate,
     };
   }
 }

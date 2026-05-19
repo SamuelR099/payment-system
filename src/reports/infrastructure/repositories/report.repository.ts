@@ -43,6 +43,14 @@ export class ReportRepository {
     return this.reportModel.create(reportData);
   }
 
+  async deleteById(reportId: string) {
+    const deletedReport = await this.reportModel.findByIdAndDelete(reportId).exec();
+    if (!deletedReport) {
+      throw new NotFoundException(`Report not found for deletion.`);
+    }
+    return deletedReport;
+  }
+
   async search(params: SearchReportParams, limit?: number) {
     const query = this.reportModel.find().sort({ _id: -1 });
 

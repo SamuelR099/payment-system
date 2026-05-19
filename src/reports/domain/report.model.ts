@@ -59,6 +59,10 @@ export class Report {
     year: number;
     totalHours: number;
     totalAmount: number;
+    status?: ReportStatus;
+    employeeSigned?: boolean;
+    employeeSignatureImage?: string;
+    employeeSignedAt?: Date;
   }): Report {
     return new Report({
       id: params.id,
@@ -67,8 +71,10 @@ export class Report {
       year: params.year,
       totalHours: params.totalHours,
       totalAmount: params.totalAmount,
-      status: ReportStatus.DRAFT,
-      employeeSigned: false,
+      status: params.status ?? ReportStatus.DRAFT,
+      employeeSigned: params.employeeSigned ?? false,
+      employeeSignatureImage: params.employeeSignatureImage,
+      employeeSignedAt: params.employeeSignedAt,
       adminSigned: false,
     });
   }
@@ -143,6 +149,13 @@ export class Report {
       adminSignedAt: new Date(),
       adminId,
       status: ReportStatus.APPROVED,
+    });
+  }
+
+  reject(): Report {
+    return new Report({
+      ...this,
+      status: ReportStatus.REJECTED,
     });
   }
 

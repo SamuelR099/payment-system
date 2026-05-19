@@ -6,6 +6,7 @@ import { TimesheetDomainService } from 'src/timesheets/domain/timesheet-domain.s
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { CreateTimesheetCommand } from './create-timesheet.command';
 
+
 @CommandHandler(CreateTimesheetCommand)
 export class CreateTimesheetHandler
   implements ICommandHandler<CreateTimesheetCommand>
@@ -18,13 +19,19 @@ export class CreateTimesheetHandler
   async execute(command: CreateTimesheetCommand) {
     const { userId, date, project, description, hours, hourlyRate } = command;
 
+    if (!hourlyRate) {
+      throw new DomainError('INVALID_HOURLY_RATE', 'El hourlyRate es requerido para crear un timesheet.');
+    }
+
+    const effectiveHourlyRate = hourlyRate;
+
     const timesheetDomain = TimesheetModel.create({
       userId,
       date,
       project,
       description,
       hours,
-      hourlyRate,
+      hourlyRate: effectiveHourlyRate,
     });
 
     await this.timesheetDomainService.validateNoDuplicateOnDate({

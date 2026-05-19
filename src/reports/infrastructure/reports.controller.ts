@@ -4,7 +4,6 @@ import {
   Post,
   Body,
   Param,
-  Put,
   Query,
   Request,
   UploadedFile,
@@ -25,17 +24,16 @@ import { GetReportQuery } from '../application/get-report/get-report.query';
 import { GetReportPdfQuery } from '../application/get-report-pdf/get-report-pdf.query';
 import { SubmitReportCommand } from '../application/submit-report/submit-report.command';
 import { ApproveReportAdminCommand } from '../application/approve-report-admin/approve-report-admin.command';
-import { UpdateReportCommand } from '../application/update-report/update-report.command';
+import { RejectReportAdminCommand } from '../application/reject-report-admin/reject-report-admin.command';
 
 import { GetReportsDto } from './dto/get-reports.dto';
-import { UpdateReportDto } from './dto/update-report.dto';
 
 @Controller('reports')
 export class ReportsController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
-  ) {}
+  ) { }
 
   @Get('/')
   async getReports(@Query() query: GetReportsDto) {
@@ -82,11 +80,13 @@ export class ReportsController {
     );
   }
 
-  @Put('/:id')
+  @Post('/:id/reject')
   @Roles([UserRole.ADMIN])
-  async updateReport(@Param('id') id: string, @Body() body: UpdateReportDto) {
+  async rejectReport(
+    @Param('id') id: string,
+  ) {
     return this.commandBus.execute(
-      new UpdateReportCommand({ reportId: id, ...body }),
+      new RejectReportAdminCommand(id),
     );
   }
 }
