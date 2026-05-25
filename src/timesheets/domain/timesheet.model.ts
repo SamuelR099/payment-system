@@ -89,6 +89,16 @@ export class TimesheetModel {
     });
   }
 
+  unsign(): TimesheetModel {
+    return new TimesheetModel({
+      ...this,
+      signed: false,
+      signedAt: undefined,
+      signatureImageUrl: undefined,
+      updatedAt: new Date(),
+    });
+  }
+
   sign(signatureImageUrl?: string): TimesheetModel {
     if (this.signed) {
       throw new DomainError('ALREADY_SIGNED', 'El timesheet ya está firmado.');

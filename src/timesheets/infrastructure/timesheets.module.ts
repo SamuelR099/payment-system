@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { MongooseModule } from '@nestjs/mongoose';
 
@@ -30,7 +30,7 @@ import { CloseMonthGenerateReportHandler } from '../application/close-month-gene
       { name: Timesheet.name, schema: TimesheetSchema },
     ]),
     FileManagementModule,
-    ReportsModule,
+    forwardRef(() => ReportsModule),
     PdfModule,
     IdentityModule,
   ],

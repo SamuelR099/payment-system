@@ -127,4 +127,18 @@ export class TimesheetRepository {
     const endDate = new Date(year, month, 0, 23, 59, 59, 999);
     return this.findByDateRange(startDate, endDate);
   }
+
+  async bulkUnsignByPeriod(userId: string, month: number, year: number) {
+    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+    await this.timesheetModel.updateMany(
+      {
+        userId: { $in: [userId, new Types.ObjectId(userId)] },
+        date: { $gte: startDate, $lte: endDate },
+      },
+      {
+        $set: { signed: false, signatureImageUrl: undefined, signedAt: undefined },
+      },
+    );
+  }
 }

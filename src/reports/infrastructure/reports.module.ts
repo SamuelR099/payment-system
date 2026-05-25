@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { PdfModule } from 'src/shared/pdf/pdf.module';
 import { FileManagementModule } from 'src/file-management/file-management.module';
+import { TimesheetsModule } from 'src/timesheets/infrastructure/timesheets.module';
 
 import { ReportsController } from './reports.controller';
 import { ReportRepository } from './repositories/report.repository';
@@ -23,6 +24,7 @@ import { ReportDomainService } from '../domain/report-domain.service';
     MongooseModule.forFeature([{ name: Report.name, schema: ReportSchema }]),
     PdfModule,
     FileManagementModule,
+    forwardRef(() => TimesheetsModule),
   ],
   controllers: [ReportsController],
   providers: [
