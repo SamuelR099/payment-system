@@ -43,6 +43,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
       profile: {
         firstName: data.firstName,
         lastName: data.lastName,
+        position: data.position,
       },
       role: data.role || UserRole.EMPLOYEE,
       wallet: data.wallet,

@@ -100,15 +100,28 @@ export class TimesheetModel {
   }
 
   sign(signatureImageUrl?: string): TimesheetModel {
-    if (this.signed) {
-      throw new DomainError('ALREADY_SIGNED', 'El timesheet ya está firmado.');
+    const now = new Date();
+
+    if (signatureImageUrl) {
+      return new TimesheetModel({
+        ...this,
+        signed: true,
+        signedAt: this.signedAt ?? now,
+        updatedAt: now,
+        signatureImageUrl: signatureImageUrl,
+      });
     }
+
+    if (this.signed) {
+      return this;
+    }
+
     return new TimesheetModel({
       ...this,
       signed: true,
-      signedAt: new Date(),
-      updatedAt: new Date(),
-      signatureImageUrl: signatureImageUrl ?? this.signatureImageUrl,
+      signedAt: now,
+      updatedAt: now,
+      signatureImageUrl: undefined,
     });
   }
 

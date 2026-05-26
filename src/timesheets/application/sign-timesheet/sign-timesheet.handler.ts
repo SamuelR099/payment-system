@@ -20,7 +20,7 @@ export class SignTimesheetHandler
   async execute(command: SignTimesheetCommand) {
     const { timesheetId, userId, file } = command;
 
-    const signatureImageUrl = await this.uploadFile(timesheetId, file);
+    const signatureImageUrl = await this.uploadFile(file);
 
     const timesheetDocument =
       await this.timesheetRepository.findById(timesheetId);
@@ -45,10 +45,7 @@ export class SignTimesheetHandler
     return updatedTimesheet;
   }
 
-  private async uploadFile(
-    timesheetId: string,
-    file?: Multer.File,
-  ): Promise<string | undefined> {
+  private async uploadFile(file?: Multer.File): Promise<string | undefined> {
     if (!file) {
       return undefined;
     }

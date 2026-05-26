@@ -1,4 +1,4 @@
-import { Language, UserRole } from 'src/shared/enums';
+import { Language, UserRole, EmployeePosition } from 'src/shared/enums';
 import { Address, UserDocument } from '../infrastructure/schemas/user.schema';
 
 type ExtendedUserDocument = UserDocument & {
@@ -19,6 +19,7 @@ export class User {
   readonly role: UserRole;
   readonly wallet?: string;
   readonly hourlyRate: number;
+  readonly position?: EmployeePosition;
   readonly createdAt?: Date;
   readonly updatedAt?: Date;
 
@@ -34,6 +35,7 @@ export class User {
     role: UserRole;
     wallet?: string;
     hourlyRate: number;
+    position?: EmployeePosition;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -48,6 +50,7 @@ export class User {
     this.role = params.role;
     this.wallet = params.wallet;
     this.hourlyRate = params.hourlyRate;
+    this.position = params.position;
     this.createdAt = params.createdAt;
     this.updatedAt = params.updatedAt;
   }
@@ -68,6 +71,7 @@ export class User {
       role: document.role,
       wallet: document.wallet,
       hourlyRate: document.hourlyRate,
+      position: document.profile.position,
       createdAt: document.createdAt,
       updatedAt: document.updatedAt,
     });
@@ -84,6 +88,7 @@ export class User {
         lastName: this.lastName,
         address: this.address,
         avatarUrl: this.avatarUrl,
+        position: this.position,
       },
       language: this.language,
       createdAt: this.createdAt,

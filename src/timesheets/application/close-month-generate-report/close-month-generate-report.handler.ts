@@ -1,4 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { v4 as uuidv4 } from 'uuid';
+import type { Multer } from 'multer';
 
 import { ReportRepository } from 'src/reports/infrastructure/repositories/report.repository';
 import {
@@ -8,6 +10,8 @@ import {
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { PdfService } from 'src/shared/pdf/pdf.service';
 import { ReportPeriod } from 'src/reports/domain/value-objects/report-period';
+import { AwsS3Service } from 'src/file-management/infrastructure/aws-s3.service';
+import { MediaFolder } from 'src/timesheets/domain/enums/media-folder.enum';
 
 import { CloseMonthGenerateReportCommand } from './close-month-generate-report.command';
 import { DomainError } from 'src/shared/domain';
@@ -22,12 +26,13 @@ export class CloseMonthGenerateReportHandler
     private readonly reportRepository: ReportRepository,
     private readonly reportDomainService: ReportDomainService,
     private readonly pdfService: PdfService,
+    private readonly awsS3Service: AwsS3Service,
   ) { }
 
   async execute(
     command: CloseMonthGenerateReportCommand,
   ) {
-    const { userId, month, year } = command;
+    const { userId, month, year, file } = command;
 
     const period = ReportPeriod.create(month, year);
     const { startDate, endDate } = period.getDateRange();
@@ -39,6 +44,11 @@ export class CloseMonthGenerateReportHandler
       } else {
         throw new DomainError('REPORT_ALREADY_EXISTS', `Ya existe un reporte en proceso para el periodo ${period.getLabel()}.`);
       }
+    }
+
+    if (file) {
+      const signatureImageUrl = await this.uploadSignatureFile(file);
+      await this.timesheetRepository.signAllByPeriod(userId, month, year, signatureImageUrl);
     }
 
     const { data: timesheetDocuments } = await this.timesheetRepository.search({
@@ -73,5 +83,12 @@ export class CloseMonthGenerateReportHandler
     );
 
     return { reportId: createdReport.id, pdfPath: publicUrl };
+  }
+
+  private async uploadSignatureFile(file: Multer.File): Promise<string> {
+    const fileName = `${uuidv4()}_${file.originalname}`;
+    const filePath = `${MediaFolder}/${fileName}`;
+
+    return this.awsS3Service.upload(filePath, file, 'private');
   }
 }

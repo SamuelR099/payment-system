@@ -9,9 +9,10 @@ import {
   Query,
   Req,
   Request,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Multer } from 'multer';
 
@@ -73,15 +74,25 @@ export class TimesheetsController {
 
   @Post('/close-month')
   @Roles([UserRole.EMPLOYEE])
+  @UseInterceptors(FileInterceptor('file'))
   closeMonthGenerateReport(
     @Req() req: any,
     @Body() body: { month: number; year: number },
+    @UploadedFile(
+      new FileUploadValidationPipe({
+        allowedTypes: ALLOWED_MIME_TYPES,
+        maxSizeInBytes: FILE_SIZES.ONE_HUNDRED_MB,
+        isOptional: true,
+      }),
+    )
+    file?: Multer.File,
   ) {
     return this.commandBus.execute(
       new CloseMonthGenerateReportCommand(
         req.user.userId,
         body.month,
         body.year,
+        file,
       ),
     );
   }

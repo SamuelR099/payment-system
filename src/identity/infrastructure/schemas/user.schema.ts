@@ -1,10 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { Language } from 'src/shared/enums';
-import { UserRole } from 'src/shared/enums';
+import { Language, UserRole, EmployeePosition } from 'src/shared/enums';
 
 @Schema({ _id: false })
-export class Address {}
+export class Address { }
 
 @Schema({ _id: false })
 export class UserProfile {
@@ -22,6 +21,11 @@ export class UserProfile {
 
   @Prop()
   avatarUrl?: string;
+
+  @Prop({
+    enum: Object.values(EmployeePosition),
+  })
+  position?: EmployeePosition;
 }
 
 @Schema({ collection: 'users', timestamps: true })

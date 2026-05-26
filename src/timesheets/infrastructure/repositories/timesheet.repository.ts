@@ -20,24 +20,32 @@ export class TimesheetRepository {
   }) {
     const { userId, month, year, startDate, endDate, cursor, limit, status, terms } = params;
     const pageSize = limit ?? this.DEFAULT_PAGE_SIZE;
-    const query = this.timesheetModel.find().sort({ _id: -1 });
 
-    query.merge({ userId: { $in: [userId, new Types.ObjectId(userId)] } });
+    const filter: any = {
+      $and: [
+        {
+          $or: [
+            { userId: userId },
+            { userId: new Types.ObjectId(userId) },
+          ],
+        },
+      ],
+    };
 
     if (startDate && endDate) {
-      query.merge({ date: { $gte: startDate, $lte: endDate } });
+      filter.$and.push({ date: { $gte: startDate, $lte: endDate } });
     } else if (month && year) {
       const start = new Date(year, month - 1, 1, 0, 0, 0, 0);
       const end = new Date(year, month, 0, 23, 59, 59, 999);
-      query.merge({ date: { $gte: start, $lte: end } });
+      filter.$and.push({ date: { $gte: start, $lte: end } });
     }
 
     if (status) {
-      query.merge({ status });
+      filter.$and.push({ status });
     }
 
     if (terms) {
-      query.merge({
+      filter.$and.push({
         $or: [
           { project: { $regex: terms, $options: 'i' } },
           { description: { $regex: terms, $options: 'i' } },
@@ -46,10 +54,16 @@ export class TimesheetRepository {
     }
 
     if (cursor) {
-      query.merge({ _id: { $lt: new Types.ObjectId(cursor) } });
+      filter.$and.push({ _id: { $lt: new Types.ObjectId(cursor) } });
     }
 
-    const data = await query.limit(pageSize).lean().exec();
+    const data = await this.timesheetModel
+      .find(filter)
+      .sort({ _id: -1 })
+      .limit(pageSize)
+      .lean()
+      .exec();
+
     const nextCursor =
       data.length < pageSize ? null : String(data[data.length - 1]._id);
     return { data, nextCursor };
@@ -85,7 +99,12 @@ export class TimesheetRepository {
 
   async countByUserId(userId: string) {
     return this.timesheetModel
-      .countDocuments({ userId: { $in: [userId, new Types.ObjectId(userId)] } })
+      .countDocuments({
+        $or: [
+          { userId: userId },
+          { userId: new Types.ObjectId(userId) },
+        ],
+      })
       .lean()
       .exec();
   }
@@ -102,12 +121,19 @@ export class TimesheetRepository {
     excludeTimesheetId?: string;
   }) {
     const filter: any = {
-      userId: { $in: [params.userId, new Types.ObjectId(params.userId)] },
-      project: params.project,
-      date: params.date,
+      $and: [
+        {
+          $or: [
+            { userId: params.userId },
+            { userId: new Types.ObjectId(params.userId) },
+          ],
+        },
+        { project: params.project },
+        { date: params.date },
+      ],
     };
     if (params.excludeTimesheetId) {
-      filter._id = { $ne: new Types.ObjectId(params.excludeTimesheetId) };
+      filter.$and.push({ _id: { $ne: new Types.ObjectId(params.excludeTimesheetId) } });
     }
     const count = await this.timesheetModel.countDocuments(filter).exec();
     return count > 0;
@@ -128,16 +154,50 @@ export class TimesheetRepository {
     return this.findByDateRange(startDate, endDate);
   }
 
-  async bulkUnsignByPeriod(userId: string, month: number, year: number) {
+  async unsignAllByPeriod(userId: string, month: number, year: number) {
     const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
     const endDate = new Date(year, month, 0, 23, 59, 59, 999);
     await this.timesheetModel.updateMany(
       {
-        userId: { $in: [userId, new Types.ObjectId(userId)] },
-        date: { $gte: startDate, $lte: endDate },
+        $and: [
+          {
+            $or: [
+              { userId: userId },
+              { userId: new Types.ObjectId(userId) },
+            ],
+          },
+          { date: { $gte: startDate, $lte: endDate } },
+        ],
       },
       {
         $set: { signed: false, signatureImageUrl: undefined, signedAt: undefined },
+      },
+    );
+  }
+
+  async signAllByPeriod(userId: string, month: number, year: number, signatureImageUrl: string) {
+    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+    const now = new Date();
+    await this.timesheetModel.updateMany(
+      {
+        $and: [
+          {
+            $or: [
+              { userId: userId },
+              { userId: new Types.ObjectId(userId) },
+            ],
+          },
+          { date: { $gte: startDate, $lte: endDate } },
+        ],
+      },
+      {
+        $set: {
+          signed: true,
+          signatureImageUrl: signatureImageUrl,
+          signedAt: now,
+          updatedAt: now,
+        },
       },
     );
   }

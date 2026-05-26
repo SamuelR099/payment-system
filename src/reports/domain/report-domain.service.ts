@@ -56,7 +56,7 @@ export class ReportDomainService {
       year: period.year,
       totalHours,
       totalAmount,
-      status: signature ? ReportStatus.SIGNED_BY_EMPLOYEE : ReportStatus.DRAFT,
+      status: ReportStatus.SIGNED_BY_EMPLOYEE,
       employeeSigned: !!signature,
       employeeSignatureImage: signature,
       employeeSignedAt: signature ? new Date() : undefined,

@@ -7,7 +7,7 @@ import {
   IsNumber,
   Min,
 } from 'class-validator';
-import { UserRole } from 'src/shared/enums';
+import { UserRole, EmployeePosition } from 'src/shared/enums';
 
 export class CreateUserDto {
   @IsString()
@@ -38,4 +38,8 @@ export class CreateUserDto {
   @Min(0)
   @IsOptional()
   hourlyRate?: number;
+
+  @IsEnum(EmployeePosition)
+  @IsOptional()
+  position?: EmployeePosition;
 }

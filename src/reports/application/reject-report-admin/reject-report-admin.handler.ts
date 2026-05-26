@@ -24,7 +24,7 @@ export class RejectReportAdminHandler
     const { id, userId, ...updateData } = rejectedReport.getUserInfo();
     const updatedReport = await this.reportRepository.update(reportId, updateData);
 
-    await this.timesheetRepository.bulkUnsignByPeriod(
+    await this.timesheetRepository.unsignAllByPeriod(
       userId,
       report.month,
       report.year,

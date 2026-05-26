@@ -11,7 +11,7 @@ export interface TimesheetRow {
 interface ReportTemplateProps {
   logoUrl?: string;
   professionalName: string;
-  specialty: string;
+  position: string;
   monthYear: string;
   timesheets: TimesheetRow[];
   totalHours: number;
@@ -21,6 +21,7 @@ interface ReportTemplateProps {
   supervisorName: string;
   supervisorSignatureUrl?: string;
   signatureDate: string;
+  supervisorSignatureDate?: string;
 }
 
 const formatNumber = (num: number, decimals = 2) => {
@@ -29,7 +30,7 @@ const formatNumber = (num: number, decimals = 2) => {
 
 const ReportTemplate: React.FC<ReportTemplateProps> = ({
   professionalName,
-  specialty,
+  position,
   monthYear,
   timesheets,
   totalHours,
@@ -39,6 +40,7 @@ const ReportTemplate: React.FC<ReportTemplateProps> = ({
   supervisorName,
   supervisorSignatureUrl,
   signatureDate,
+  supervisorSignatureDate,
 }) => {
   return (
     <html lang="es">
@@ -237,14 +239,14 @@ const ReportTemplate: React.FC<ReportTemplateProps> = ({
           <thead>
             <tr>
               <th style={{ width: '33%' }}>Nombre del Profesional</th>
-              <th style={{ width: '33%' }}>Especialidad</th>
+              <th style={{ width: '33%' }}>Cargo</th>
               <th style={{ width: '34%' }}>Mes Facturado</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>{professionalName}</td>
-              <td>{specialty}</td>
+              <td>{position}</td>
               <td>{monthYear}</td>
             </tr>
           </tbody>
@@ -345,7 +347,7 @@ const ReportTemplate: React.FC<ReportTemplateProps> = ({
                   <div className="signature-label">Firma del supervisor</div>
                 </div>
                 <div className="signature-col date-col">
-                  <div className="name-display">{signatureDate}</div>
+                  <div className="name-display">{supervisorSignatureDate}</div>
                   <div className="signature-line"></div>
                   <div className="signature-label">Fecha</div>
                 </div>

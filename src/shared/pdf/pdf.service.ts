@@ -28,11 +28,9 @@ export class PdfService {
     const user = await this.userRepository.findById(report.userId, true);
     const professionalName = `${user.profile.firstName} ${user.profile.lastName}`;
 
-    // Find the first signature available in the timesheets if the report is not signed
     const timesheetWithSignature = timesheetDocuments.find(ts => ts.signed && ts.signatureImageUrl);
     const signatureUrl = report.employeeSignatureImage || timesheetWithSignature?.signatureImageUrl || user.profile.avatarUrl;
 
-    // Use the signature date from the report or the first signed timesheet
     const signatureDate = report.employeeSignedAt
       ? report.employeeSignedAt
       : timesheetWithSignature?.signedAt;
@@ -40,7 +38,7 @@ export class PdfService {
     const pdfData = {
       logoUrl: undefined,
       professionalName,
-      specialty: 'Programador Backend',
+      position: user.profile.position || 'Programador Backend',
       monthYear: period.getLabel(),
       timesheets: timesheetDocuments.map(ts => {
         const start = 8; // 8:00 AM
@@ -60,9 +58,12 @@ export class PdfService {
       hourlyRate: timesheetDocuments[0]?.hourlyRate || 0,
       totalAmount: report.totalAmount,
       professionalSignatureUrl: await this.getBase64Image(signatureUrl),
-      supervisorName: 'Raúl D. Olivero Carrucini',
-      supervisorSignatureUrl: undefined,
-      signatureDate: (signatureDate || new Date()).toLocaleDateString('es-PR'),
+       supervisorName: 'Raúl D. Olivero Carrucini',
+       supervisorSignatureUrl: await this.getBase64Image(report.adminSignatureImage),
+       signatureDate: (signatureDate || new Date()).toLocaleDateString('es-PR'),
+       supervisorSignatureDate: report.adminSignedAt
+         ? report.adminSignedAt.toLocaleDateString('es-PR')
+         : '',
     };
 
     const htmlContent = renderPdfTemplate(ReportTemplate, pdfData);
