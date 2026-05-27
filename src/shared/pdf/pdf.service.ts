@@ -38,7 +38,7 @@ export class PdfService {
     const pdfData = {
       logoUrl: undefined,
       professionalName,
-      position: user.profile.position || 'Programador Backend',
+      position: user.profile.position,
       monthYear: period.getLabel(),
       timesheets: timesheetDocuments.map(ts => {
         const start = 8; // 8:00 AM
