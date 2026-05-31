@@ -47,6 +47,12 @@ export class Report {
 
   @Prop()
   pdfPath?: string;
+
+  @Prop()
+  paymentId?: string;
+
+  @Prop()
+  paidAt?: Date;
 }
 
 export const ReportSchema = SchemaFactory.createForClass(Report);

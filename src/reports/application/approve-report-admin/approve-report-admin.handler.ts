@@ -1,4 +1,4 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
 import { v4 as uuidv4 } from 'uuid';
 import type { Multer } from 'multer';
 
@@ -12,6 +12,7 @@ import { ReportPeriod } from 'src/reports/domain/value-objects/report-period';
 import { MediaFolder } from '../../domain/enums/media-folder.enum';
 import { Report } from '../../domain/report.model';
 import { ApproveReportAdminCommand } from './approve-report-admin.command';
+import { ReportApprovedEvent } from '../../../payment-system/payments/application/events/report-approved.event';
 
 @CommandHandler(ApproveReportAdminCommand)
 export class ApproveReportAdminHandler
@@ -21,7 +22,8 @@ export class ApproveReportAdminHandler
     private readonly awsS3Service: AwsS3Service,
     private readonly timesheetRepository: TimesheetRepository,
     private readonly pdfService: PdfService,
-  ) { }
+    private readonly eventBus: EventBus,
+  ) {}
 
   async execute(command: ApproveReportAdminCommand): Promise<void> {
     const { reportId, adminId, file } = command;
@@ -60,6 +62,14 @@ export class ApproveReportAdminHandler
       updatedReport,
       timesheetDocuments,
       period,
+    );
+
+    this.eventBus.publish(
+      new ReportApprovedEvent({
+        reportId,
+        userId: reportDoc.userId,
+        totalAmount: reportDoc.totalAmount,
+      }),
     );
   }
 

@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import apiConfig from './config/api.config';
 import corsConfig from './config/cors.config';
@@ -22,6 +23,9 @@ import { IdentityModule } from './identity/infrastructure/identity.module';
 import { TimesheetsModule } from './timesheets/infrastructure/timesheets.module';
 import { ProjectsModule } from './projects/infrastructure/projects.module';
 import { ReportsModule } from './reports/infrastructure/reports.module';
+import { BlockchainModule } from './payment-system/blockchain/blockchain.module';
+import { UserWalletModule } from './payment-system/user-wallet/user-wallet.module';
+import { PaymentsModule } from './payment-system/payments/payments.module';
 
 @Module({
   imports: [
@@ -40,10 +44,14 @@ import { ReportsModule } from './reports/infrastructure/reports.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => config.get('recaptcha'),
     }),
+    ScheduleModule.forRoot(),
     IdentityModule,
     TimesheetsModule,
     ProjectsModule,
     ReportsModule,
+    BlockchainModule,
+    UserWalletModule,
+    PaymentsModule,
     MailModule.forRootAsync({
       imports: [ConfigModule, HttpModule],
       inject: [ConfigService],
