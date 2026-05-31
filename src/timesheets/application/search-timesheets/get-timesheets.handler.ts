@@ -16,11 +16,13 @@ export class GetTimesheetsHandler implements IQueryHandler<GetTimesheetsQuery> {
   constructor(private readonly timesheetRepository: TimesheetRepository) {}
 
   async execute(query: GetTimesheetsQuery): Promise<GetTimesheetsResult> {
-    const { userId, month, year, cursor, limit, status, terms } = query;
+    const { userId, month, year, startDate, endDate, cursor, limit, status, terms } = query;
     const { data, nextCursor } = await this.timesheetRepository.search({
       userId,
       month,
       year,
+      startDate,
+      endDate,
       cursor,
       limit,
       status,

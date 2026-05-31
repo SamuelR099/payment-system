@@ -34,10 +34,10 @@ export class CloseMonthGenerateReportHandler
   ) {
     const { userId, month, year, file } = command;
 
-    const period = ReportPeriod.create(month, year);
+    const period = ReportPeriod.create(Number(month), Number(year));
     const { startDate, endDate } = period.getDateRange();
 
-    const alreadyExists = await this.reportRepository.findByPeriod(userId, month, year);
+    const alreadyExists = await this.reportRepository.findByPeriod(userId, Number(month), Number(year));
     if (alreadyExists) {
       if (alreadyExists.status === ReportStatus.DRAFT || alreadyExists.status === ReportStatus.REJECTED) {
         await this.reportRepository.deleteById(alreadyExists.id);
@@ -48,7 +48,7 @@ export class CloseMonthGenerateReportHandler
 
     if (file) {
       const signatureImageUrl = await this.uploadSignatureFile(file);
-      await this.timesheetRepository.signAllByPeriod(userId, month, year, signatureImageUrl);
+      await this.timesheetRepository.signAllByPeriod(userId, Number(month), Number(year), signatureImageUrl);
     }
 
     const { data: timesheetDocuments } = await this.timesheetRepository.search({
