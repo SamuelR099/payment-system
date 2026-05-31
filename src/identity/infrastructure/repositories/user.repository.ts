@@ -51,4 +51,12 @@ export class UserRepository {
   async updatePassword(userId: string, password: string) {
     return this.userModel.findByIdAndUpdate(userId, { password }).exec();
   }
+
+  async findByIds(userIds: string[]) {
+    return this.userModel
+      .find({ _id: { $in: userIds } })
+      .select('profile.firstName profile.lastName')
+      .lean()
+      .exec();
+  }
 }

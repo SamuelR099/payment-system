@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, UpdateQuery } from 'mongoose';
 
 import { Report, ReportDocument } from '../schemas/report.schema';
+import { UserRepository } from 'src/identity/infrastructure/repositories/user.repository';
 
 export type SearchReportParams = {
   terms?: string;
@@ -17,6 +18,7 @@ export class ReportRepository {
   constructor(
     @InjectModel(Report.name)
     private readonly reportModel: Model<ReportDocument>,
+    private readonly userRepository: UserRepository,
   ) { }
 
   async findById(reportId: string, failIfNotFound = false) {
@@ -72,11 +74,32 @@ export class ReportRepository {
     }
 
     const pageSize = limit ?? this.DEFAULT_PAGE_SIZE;
-    const data = await query.limit(pageSize).exec();
+    const data = await query.limit(pageSize).lean().exec();
     const nextCursor =
       data.length < pageSize ? null : data[data.length - 1]._id;
 
-    return { data, nextCursor };
+    const userIds = [...new Set(data.map((r) => String(r.userId)))];
+    const users = await this.userRepository.findByIds(userIds);
+
+    const userMap = new Map(
+      users.map((u) => [
+        String(u._id),
+        {
+          firstName: (u as any).profile?.firstName ?? '',
+          lastName: (u as any).profile?.lastName ?? '',
+        },
+      ]),
+    );
+
+    const enrichedData = data.map((report) => {
+      const user = userMap.get(String(report.userId));
+      return Object.assign({}, report, {
+        firstName: user?.firstName ?? '',
+        lastName: user?.lastName ?? '',
+      });
+    });
+
+    return { data: enrichedData, nextCursor };
   }
 
   async findByIds(reportIds: string[]) {

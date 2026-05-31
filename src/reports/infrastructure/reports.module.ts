@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { PdfModule } from 'src/shared/pdf/pdf.module';
 import { FileManagementModule } from 'src/file-management/file-management.module';
 import { TimesheetsModule } from 'src/timesheets/infrastructure/timesheets.module';
+import { IdentityModule } from 'src/identity/infrastructure/identity.module';
 
 import { ReportsController } from './reports.controller';
 import { ReportRepository } from './repositories/report.repository';
@@ -25,6 +26,7 @@ import { ReportDomainService } from '../domain/report-domain.service';
     PdfModule,
     FileManagementModule,
     forwardRef(() => TimesheetsModule),
+    IdentityModule,
   ],
   controllers: [ReportsController],
   providers: [
