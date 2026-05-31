@@ -41,8 +41,12 @@ export class PdfService {
       position: user.profile.position,
       monthYear: period.getLabel(),
       timesheets: timesheetDocuments.map(ts => {
-        const start = 8; // 8:00 AM
-        const end = start + ts.hours;
+        const start = 8;
+        const endBeforeLunch = start + ts.hours;
+        const crossesLunch = endBeforeLunch > 12;
+        const end = crossesLunch ? endBeforeLunch + 1 : endBeforeLunch;
+        const hours = ts.hours;
+
         const ampm = end >= 12 ? 'p. m.' : 'a. m.';
         const displayEnd = end > 12 ? end - 12 : end;
 
@@ -51,7 +55,7 @@ export class PdfService {
           description: ts.description,
           startTime: '8:00:00 a. m.',
           endTime: `${displayEnd}:00:00 ${ampm}`,
-          hours: ts.hours,
+          hours,
         };
       }),
       totalHours: report.totalHours,
