@@ -19,10 +19,10 @@ export class CreateTimesheetHandler
   async execute(command: CreateTimesheetCommand) {
     const { userId, date, project, description, hours, hourlyRate } = command;
 
-    if (!hourlyRate) {
+  /*  if (!hourlyRate) {
       throw new DomainError('INVALID_HOURLY_RATE', 'El hourlyRate es requerido para crear un timesheet.');
     }
-
+*/
     const effectiveHourlyRate = hourlyRate;
 
     const timesheetDomain = TimesheetModel.create({

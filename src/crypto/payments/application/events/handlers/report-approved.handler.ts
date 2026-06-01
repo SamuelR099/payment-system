@@ -3,6 +3,7 @@ import { Inject, forwardRef } from '@nestjs/common';
 import { ReportApprovedEvent } from '../report-approved.event';
 import { PaymentRepository } from '../../../infrastructure/repositories/payment.repository';
 import { UserWalletRepository } from '../../../../user-wallet/infrastructure/repositories/user-wallet.repository';
+import { ReportRepository } from '../../../../../reports/infrastructure/repositories/report.repository';
 import { PaymentStatus } from 'src/shared/enums/payment-status.enum';
 import { PAYMENT_EXPIRATION_DAYS } from '../../../domain/payment.constants';
 
@@ -12,6 +13,7 @@ export class ReportApprovedEventHandler {
     @Inject(forwardRef(() => PaymentRepository))
     private readonly paymentRepository: PaymentRepository,
     private readonly walletRepository: UserWalletRepository,
+    private readonly reportRepository: ReportRepository,
   ) {}
 
   async handle(event: ReportApprovedEvent) {
@@ -34,7 +36,7 @@ export class ReportApprovedEventHandler {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + PAYMENT_EXPIRATION_DAYS);
 
-    await this.paymentRepository.create({
+    const payment = await this.paymentRepository.create({
       userId: event.userId,
       reportId: event.reportId,
       network: defaultWallet.network,
@@ -43,6 +45,10 @@ export class ReportApprovedEventHandler {
       amountReceived: 0,
       status: PaymentStatus.PENDING,
       expiresAt,
+    });
+
+    await this.reportRepository.update(event.reportId, {
+      paymentId: payment.id,
     });
   }
 }

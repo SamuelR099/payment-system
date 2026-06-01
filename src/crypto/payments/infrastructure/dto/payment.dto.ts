@@ -1,4 +1,6 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsInt } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsObjectId } from 'src/shared/validation';
 
 export class GetPaymentsDto {
   @IsOptional()
@@ -6,8 +8,13 @@ export class GetPaymentsDto {
   status?: string;
 
   @IsOptional()
-  @IsString()
+  @IsObjectId()
   cursor?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  limit?: number;
 }
 
 export class GetPaymentByIdDto {

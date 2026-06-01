@@ -6,6 +6,8 @@ import { PaymentStatus } from 'src/shared/enums/payment-status.enum';
 
 @Injectable()
 export class PaymentRepository {
+  private readonly DEFAULT_PAGE_SIZE = 20;
+
   constructor(
     @InjectModel(Payment.name)
     private readonly paymentModel: Model<PaymentDocument>,
@@ -51,6 +53,49 @@ export class PaymentRepository {
       .find({ userId: new Types.ObjectId(userId) })
       .sort({ createdAt: -1 })
       .exec();
+  }
+
+  async findByUserIdWithFilters(
+    userId?: string,
+    status?: string,
+    cursor?: string,
+    limit?: number,
+  ) {
+    const pageSize = limit ?? this.DEFAULT_PAGE_SIZE;
+    const filter: any = { $and: [] };
+
+    if (userId) {
+      filter.$and.push({
+        $or: [
+          { userId: userId },
+          { userId: new Types.ObjectId(userId) },
+        ],
+      });
+    }
+
+    if (status) {
+      filter.$and.push({ status });
+    }
+
+    if (cursor) {
+      filter.$and.push({ _id: { $lt: new Types.ObjectId(cursor) } });
+    }
+
+    if (filter.$and.length === 0) {
+      delete filter.$and;
+    }
+
+    const data = await this.paymentModel
+      .find(filter)
+      .sort({ _id: -1 })
+      .limit(pageSize)
+      .lean()
+      .exec();
+
+    const nextCursor =
+      data.length < pageSize ? null : String(data[data.length - 1]._id);
+
+    return { data, nextCursor };
   }
 
   async updateById(id: string, updateData: Partial<Payment>) {

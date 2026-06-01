@@ -17,7 +17,7 @@ export class CompletePaymentHandler implements ICommandHandler<CompletePaymentCo
       throw new Error('Transaction already processed');
     }
 
-    this.paymentRepository.markAsCompleted(
+    await this.paymentRepository.markAsCompleted(
       command.paymentId,
       command.txid,
       command.amountReceived,

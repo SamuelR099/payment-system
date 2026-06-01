@@ -1,14 +1,14 @@
 import {
   Controller,
   Get,
+  Post,
+  Delete,
   Param,
   Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { QueryBus } from '@nestjs/cqrs';
-import { Request } from 'express';
-
+import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { Roles } from 'src/shared/decorators/roles.decorator';
@@ -18,20 +18,25 @@ import { GetPaymentsDto } from '../dto/payment.dto';
 import { GetPaymentsQuery } from '../../application/get-payments/get-payments.query';
 import { GetPaymentQuery } from '../../application/get-payment/get-payment.query';
 import { GetPendingPaymentsQuery } from '../../application/get-pending-payments/get-pending-payments.query';
+import { DeletePaymentCommand } from '../../application/delete-payment/delete-payment.command';
+import { VerifyPaymentCommand } from '../../application/verify-payment/verify-payment.command';
 
 @Controller('payments')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class PaymentsController {
-  constructor(private readonly queryBus: QueryBus) {}
+  constructor(
+    private readonly queryBus: QueryBus,
+    private readonly commandBus: CommandBus,
+  ) {}
 
   @Get()
-  @Roles([UserRole.EMPLOYEE, UserRole.ADMIN, UserRole.SUPER_ADMIN])
+  @Roles([UserRole.EMPLOYEE, UserRole.ADMIN])
   async getPayments(@Req() req: any, @Query() query: GetPaymentsDto) {
     return this.queryBus.execute(
       new GetPaymentsQuery({
         userId: req.user.userId,
-        status: query.status,
-        cursor: query.cursor,
+        userRole: req.user.role,
+        ...query,
       }),
     );
   }
@@ -46,7 +51,29 @@ export class PaymentsController {
   @Roles([UserRole.EMPLOYEE, UserRole.ADMIN, UserRole.SUPER_ADMIN])
   async getPayment(@Req() req: any, @Param('id') id: string) {
     return this.queryBus.execute(
-      new GetPaymentQuery({ paymentId: id, userId: req.user.userId }),
+      new GetPaymentQuery({
+        paymentId: id,
+        userId: req.user.userId,
+        userRole: req.user.role,
+      }),
     );
+  }
+
+  @Delete(':id')
+  @Roles([UserRole.ADMIN, UserRole.SUPER_ADMIN])
+  async deletePayment(@Req() req: any, @Param('id') id: string) {
+    return this.commandBus.execute(
+      new DeletePaymentCommand({
+        paymentId: id,
+        userId: req.user.userId,
+        userRole: req.user.role,
+      }),
+    );
+  }
+
+  @Post(':id/verify')
+  @Roles([UserRole.ADMIN, UserRole.SUPER_ADMIN])
+  async verifyPayment(@Param('id') id: string) {
+    return this.commandBus.execute(new VerifyPaymentCommand(id));
   }
 }

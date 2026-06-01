@@ -14,6 +14,8 @@ import { GetPaymentsHandler } from './application/get-payments/get-payments.hand
 import { GetPaymentHandler } from './application/get-payment/get-payment.handler';
 import { GetPendingPaymentsHandler } from './application/get-pending-payments/get-pending-payments.handler';
 import { PaymentVerificationCron } from './application/cron/payment-verification.cron';
+import { DeletePaymentHandler } from './application/delete-payment/delete-payment.handler';
+import { VerifyPaymentHandler } from './application/verify-payment/verify-payment.handler';
 
 import { BlockchainModule } from '../blockchain/blockchain.module';
 import { UserWalletModule } from '../user-wallet/user-wallet.module';
@@ -38,6 +40,8 @@ import { ReportsModule } from '../../reports/infrastructure/reports.module';
     GetPaymentsHandler,
     GetPaymentHandler,
     GetPendingPaymentsHandler,
+    DeletePaymentHandler,
+    VerifyPaymentHandler,
   ],
   exports: [PaymentRepository],
 })

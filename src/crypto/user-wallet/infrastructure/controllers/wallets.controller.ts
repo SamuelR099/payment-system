@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Body,
   Param,
   Req,
@@ -21,6 +22,7 @@ import { AddWalletCommand } from '../../application/add-wallet/add-wallet.comman
 import { UpdateWalletCommand } from '../../application/update-wallet/update-wallet.command';
 import { SetDefaultWalletCommand } from '../../application/set-default-wallet/set-default-wallet.command';
 import { GetUserWalletsQuery } from '../../application/get-wallets/get-wallets.query';
+import { DeleteWalletCommand } from '../../application/delete-wallet/delete-wallet.command';
 
 @Controller('wallets')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -68,6 +70,18 @@ export class WalletsController {
   async setDefaultWallet(@Req() req: any, @Param('id') id: string) {
     return this.commandBus.execute(
       new SetDefaultWalletCommand({ walletId: id, userId: req.user.userId }),
+    );
+  }
+
+  @Delete(':id')
+  @Roles([UserRole.EMPLOYEE, UserRole.ADMIN, UserRole.SUPER_ADMIN])
+  async deleteWallet(@Req() req: any, @Param('id') id: string) {
+    return this.commandBus.execute(
+      new DeleteWalletCommand({
+        walletId: id,
+        userId: req.user.userId,
+        userRole: req.user.role,
+      }),
     );
   }
 }

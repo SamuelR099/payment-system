@@ -10,6 +10,7 @@ import { AddWalletHandler } from './application/add-wallet/add-wallet.handler';
 import { UpdateWalletHandler } from './application/update-wallet/update-wallet.handler';
 import { SetDefaultWalletHandler } from './application/set-default-wallet/set-default-wallet.handler';
 import { GetUserWalletsHandler } from './application/get-wallets/get-wallets.handler';
+import { DeleteWalletHandler } from './application/delete-wallet/delete-wallet.handler';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { GetUserWalletsHandler } from './application/get-wallets/get-wallets.han
     UpdateWalletHandler,
     SetDefaultWalletHandler,
     GetUserWalletsHandler,
+    DeleteWalletHandler,
   ],
   exports: [UserWalletRepository],
 })

@@ -117,6 +117,7 @@ PAYMENT_MINIMUM_CONFIRMATIONS,
         await this.reportRepository.update(matchingPayment.reportId.toString(), {
           status: 'PAID',
           paidAt: new Date(),
+          paymentId: matchingPayment.id,
         });
       }
     }

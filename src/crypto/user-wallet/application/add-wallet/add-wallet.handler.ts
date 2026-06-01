@@ -16,15 +16,7 @@ export class AddWalletHandler implements ICommandHandler<AddWalletCommand> {
       throw new Error('Invalid wallet address format');
     }
 
-    if (command.isDefault) {
-      await this.walletRepository.updateDefaultStatus(
-        command.userId,
-        command.network,
-        'temp-exclude',
-      );
-    }
-
-    this.walletRepository.create({
+    const wallet = await this.walletRepository.create({
       userId: command.userId,
       network: command.network,
       walletAddress: command.walletAddress,
@@ -32,5 +24,15 @@ export class AddWalletHandler implements ICommandHandler<AddWalletCommand> {
       isDefault: command.isDefault ?? false,
       status: WalletStatus.ACTIVE,
     });
+
+    if (command.isDefault && wallet) {
+      await this.walletRepository.updateDefaultStatus(
+        command.userId,
+        command.network,
+        wallet.id,
+      );
+    }
+
+    return wallet;
   }
 }

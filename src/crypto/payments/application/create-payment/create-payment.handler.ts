@@ -13,7 +13,7 @@ export class CreatePaymentHandler implements ICommandHandler<CreatePaymentComman
       throw new Error('Payment already exists for this report');
     }
 
-    this.paymentRepository.create({
+    const payment = await this.paymentRepository.create({
       userId: command.userId,
       reportId: command.reportId,
       network: command.network,
@@ -23,5 +23,7 @@ export class CreatePaymentHandler implements ICommandHandler<CreatePaymentComman
       status: PaymentStatus.PENDING,
       expiresAt: command.expiresAt,
     });
+
+    return payment;
   }
 }
