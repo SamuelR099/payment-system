@@ -76,13 +76,27 @@ export class UserWalletRepository {
     return !!result;
   }
 
-  async validateWalletAddress(address: string, network: BlockchainNetwork) {
+  validateWalletAddress(address: string, network: BlockchainNetwork): { valid: boolean; reason?: string } {
     if (network === BlockchainNetwork.TRC20) {
-      return address.startsWith('T') && address.length === 34;
+      if (!address.startsWith('T')) {
+        return { valid: false, reason: 'la dirección TRC20 debe comenzar con "T"' };
+      }
+      if (address.length !== 34) {
+        return { valid: false, reason: `la dirección TRC20 debe tener 34 caracteres (tiene ${address.length})` };
+      }
+      return { valid: true };
     }
+
     if (network === BlockchainNetwork.BEP20) {
-      return address.startsWith('0x') && address.length === 42;
+      if (!address.startsWith('0x')) {
+        return { valid: false, reason: 'la dirección BEP20 debe comenzar con "0x"' };
+      }
+      if (address.length !== 42) {
+        return { valid: false, reason: `la dirección BEP20 debe tener 42 caracteres (tiene ${address.length})` };
+      }
+      return { valid: true };
     }
-    return false;
+
+    return { valid: false, reason: `red no soportada: ${network}` };
   }
 }

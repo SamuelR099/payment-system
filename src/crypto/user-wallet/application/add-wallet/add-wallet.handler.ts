@@ -1,4 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { BadRequestException } from '@nestjs/common';
 import { WalletStatus } from 'src/shared/enums/wallet-status.enum';
 import { UserWalletRepository } from '../../infrastructure/repositories/user-wallet.repository';
 import { AddWalletCommand } from './add-wallet.command';
@@ -8,18 +9,23 @@ export class AddWalletHandler implements ICommandHandler<AddWalletCommand> {
   constructor(private readonly walletRepository: UserWalletRepository) {}
 
   async execute(command: AddWalletCommand) {
-    const isValid = await this.walletRepository.validateWalletAddress(
-      command.walletAddress,
+    const trimmedAddress = command.walletAddress.trim();
+
+    const validation = await this.walletRepository.validateWalletAddress(
+      trimmedAddress,
       command.network,
     );
-    if (!isValid) {
-      throw new Error('Invalid wallet address format');
+
+    if (!validation.valid) {
+      throw new BadRequestException(
+        `Dirección inválida para ${command.network}: ${validation.reason}`,
+      );
     }
 
     const wallet = await this.walletRepository.create({
       userId: command.userId,
       network: command.network,
-      walletAddress: command.walletAddress,
+      walletAddress: trimmedAddress,
       label: command.label,
       isDefault: command.isDefault ?? false,
       status: WalletStatus.ACTIVE,
