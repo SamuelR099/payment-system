@@ -12,7 +12,7 @@ import { ReportPeriod } from 'src/reports/domain/value-objects/report-period';
 import { MediaFolder } from '../../domain/enums/media-folder.enum';
 import { Report } from '../../domain/report.model';
 import { ApproveReportAdminCommand } from './approve-report-admin.command';
-import { ReportApprovedEvent } from '../../../payment-system/payments/application/events/report-approved.event';
+import { ReportApprovedEvent } from '../../../crypto/payments/application/events/report-approved.event';
 
 @CommandHandler(ApproveReportAdminCommand)
 export class ApproveReportAdminHandler

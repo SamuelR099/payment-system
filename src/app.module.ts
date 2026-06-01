@@ -23,9 +23,9 @@ import { IdentityModule } from './identity/infrastructure/identity.module';
 import { TimesheetsModule } from './timesheets/infrastructure/timesheets.module';
 import { ProjectsModule } from './projects/infrastructure/projects.module';
 import { ReportsModule } from './reports/infrastructure/reports.module';
-import { BlockchainModule } from './payment-system/blockchain/blockchain.module';
-import { UserWalletModule } from './payment-system/user-wallet/user-wallet.module';
-import { PaymentsModule } from './payment-system/payments/payments.module';
+import { BlockchainModule } from './crypto/blockchain/blockchain.module';
+import { UserWalletModule } from './crypto/user-wallet/user-wallet.module';
+import { PaymentsModule } from './crypto/payments/payments.module';
 
 @Module({
   imports: [
