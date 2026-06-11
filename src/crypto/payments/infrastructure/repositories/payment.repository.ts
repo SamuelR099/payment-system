@@ -23,9 +23,7 @@ export class PaymentRepository {
   }
 
   async findByReportId(reportId: string) {
-    return this.paymentModel
-      .findOne({ reportId: new Types.ObjectId(reportId) })
-      .exec();
+    return this.paymentModel.findOne({ reportId }).exec();
   }
 
   async findByTxid(txid: string) {
@@ -50,7 +48,7 @@ export class PaymentRepository {
 
   async findByUserId(userId: string) {
     return this.paymentModel
-      .find({ userId: new Types.ObjectId(userId) })
+      .find({ userId })
       .sort({ createdAt: -1 })
       .exec();
   }
@@ -58,6 +56,7 @@ export class PaymentRepository {
   async findByUserIdWithFilters(
     userId?: string,
     status?: string,
+    excludeStatus?: string,
     cursor?: string,
     limit?: number,
   ) {
@@ -77,6 +76,10 @@ export class PaymentRepository {
       filter.$and.push({ status });
     }
 
+    if (excludeStatus) {
+      filter.$and.push({ status: { $ne: excludeStatus } });
+    }
+
     if (cursor) {
       filter.$and.push({ _id: { $lt: new Types.ObjectId(cursor) } });
     }
@@ -92,10 +95,15 @@ export class PaymentRepository {
       .lean()
       .exec();
 
-    const nextCursor =
-      data.length < pageSize ? null : String(data[data.length - 1]._id);
+    const mappedData = data.map((payment) => ({
+      ...payment,
+      id: String(payment._id),
+    }));
 
-    return { data, nextCursor };
+    const nextCursor =
+      mappedData.length < pageSize ? null : String(mappedData[mappedData.length - 1]._id);
+
+    return { data: mappedData, nextCursor };
   }
 
   async updateById(id: string, updateData: Partial<Payment>) {

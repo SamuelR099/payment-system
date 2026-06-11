@@ -8,10 +8,12 @@ import {
   type Timesheet as DomainTimesheet,
 } from 'src/reports/domain/report-domain.service';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
+import { UserWalletRepository } from 'src/crypto/user-wallet/infrastructure/repositories/user-wallet.repository';
 import { PdfService } from 'src/shared/pdf/pdf.service';
 import { ReportPeriod } from 'src/reports/domain/value-objects/report-period';
 import { AwsS3Service } from 'src/file-management/infrastructure/aws-s3.service';
 import { MediaFolder } from 'src/timesheets/domain/enums/media-folder.enum';
+import { WalletStatus } from 'src/shared/enums/wallet-status.enum';
 
 import { CloseMonthGenerateReportCommand } from './close-month-generate-report.command';
 import { DomainError } from 'src/shared/domain';
@@ -24,6 +26,7 @@ export class CloseMonthGenerateReportHandler
   constructor(
     private readonly timesheetRepository: TimesheetRepository,
     private readonly reportRepository: ReportRepository,
+    private readonly walletRepository: UserWalletRepository,
     private readonly reportDomainService: ReportDomainService,
     private readonly pdfService: PdfService,
     private readonly awsS3Service: AwsS3Service,
@@ -33,6 +36,17 @@ export class CloseMonthGenerateReportHandler
     command: CloseMonthGenerateReportCommand,
   ) {
     const { userId, month, year, file } = command;
+
+    const employeeWallets = await this.walletRepository.findByUserId(userId);
+    const hasActiveWallet = employeeWallets.some(
+    (wallet) => wallet.status === WalletStatus.ACTIVE,);
+    
+    if (!hasActiveWallet) {
+      throw new DomainError(
+        'EMPLOYEE_WALLET_REQUIRED',
+        'No puedes cerrar el mes porque no tienes una wallet registrada. Ve a Configuración → Wallets y agrega una dirección de wallet para recibir pagos.',
+      );
+    }
 
     const period = ReportPeriod.create(Number(month), Number(year));
     const { startDate, endDate } = period.getDateRange();

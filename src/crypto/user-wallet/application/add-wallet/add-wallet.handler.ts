@@ -22,16 +22,20 @@ export class AddWalletHandler implements ICommandHandler<AddWalletCommand> {
       );
     }
 
+    const existingWallets = await this.walletRepository.findByUserId(command.userId);
+    const isFirstWallet = existingWallets.length === 0;
+    const shouldBeDefault = isFirstWallet || (command.isDefault ?? false);
+
     const wallet = await this.walletRepository.create({
       userId: command.userId,
       network: command.network,
       walletAddress: trimmedAddress,
       label: command.label,
-      isDefault: command.isDefault ?? false,
+      isDefault: shouldBeDefault,
       status: WalletStatus.ACTIVE,
     });
 
-    if (command.isDefault && wallet) {
+    if (shouldBeDefault && wallet) {
       await this.walletRepository.updateDefaultStatus(
         command.userId,
         command.network,

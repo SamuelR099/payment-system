@@ -13,39 +13,63 @@ export class UserWalletRepository {
   ) {}
 
   async create(walletData: Partial<UserWallet>) {
-    const wallet = new this.userWalletModel(walletData);
-    return wallet.save();
+    const wallet = await this.userWalletModel.create(walletData);
+    return { ...wallet.toObject(), id: String(wallet._id) };
   }
 
   async findById(id: string) {
-    return this.userWalletModel.findById(id).exec();
+    const wallet = await this.userWalletModel.findById(id).lean().exec();
+    return wallet ? { ...wallet, id: String(wallet._id) } : null;
   }
 
   async findByUserId(userId: string) {
-    return this.userWalletModel
-      .find({ userId: new Types.ObjectId(userId) })
+    const userIdStr = String(userId);
+    const query: any = {
+      $or: [{ userId: userIdStr }],
+    };
+    if (Types.ObjectId.isValid(userIdStr)) {
+      query.$or.push({ userId: new Types.ObjectId(userIdStr) });
+    }
+    const wallets = await this.userWalletModel.find(query).lean().exec();
+    return wallets.map((wallet) => ({ ...wallet, id: String(wallet._id) }));
+  }
+
+  async findByUserIds(userIds: string[]) {
+    const objectIds = userIds
+      .filter((id) => Types.ObjectId.isValid(id))
+      .map((id) => new Types.ObjectId(id));
+    if (objectIds.length === 0) return [];
+    const wallets = await this.userWalletModel
+      .find({ userId: { $in: objectIds }, isDefault: true, status: WalletStatus.ACTIVE })
+      .select('userId')
+      .lean()
       .exec();
+    return wallets.map((wallet) => ({ ...wallet, id: String(wallet._id) }));
   }
 
   async findDefaultWallet(userId: string, network: BlockchainNetwork) {
-    return this.userWalletModel
+    const wallet = await this.userWalletModel
       .findOne({
         userId: new Types.ObjectId(userId),
         network,
         isDefault: true,
         status: WalletStatus.ACTIVE,
       })
+      .lean()
       .exec();
+    return wallet ? { ...wallet, id: String(wallet._id) } : null;
   }
 
   async findDefaultWalletByUserId(userId: string) {
-    return this.userWalletModel
+    const wallet = await this.userWalletModel
       .findOne({
         userId: new Types.ObjectId(userId),
         isDefault: true,
         status: WalletStatus.ACTIVE,
       })
+      .lean()
       .exec();
+    return wallet ? { ...wallet, id: String(wallet._id) } : null;
   }
 
   async updateDefaultStatus(userId: string, network: BlockchainNetwork, excludeWalletId: string) {
@@ -64,11 +88,12 @@ export class UserWalletRepository {
   async updateById(id: string, updateData: Partial<UserWallet>) {
     const updated = await this.userWalletModel
       .findByIdAndUpdate(id, updateData, { new: true })
+      .lean()
       .exec();
     if (!updated) {
       throw new NotFoundException(`Wallet '${id}' not found`);
     }
-    return updated;
+    return { ...updated, id: String(updated._id) };
   }
 
   async deleteById(id: string) {

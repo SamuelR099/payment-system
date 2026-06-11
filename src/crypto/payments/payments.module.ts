@@ -20,6 +20,7 @@ import { VerifyPaymentHandler } from './application/verify-payment/verify-paymen
 import { BlockchainModule } from '../blockchain/blockchain.module';
 import { UserWalletModule } from '../user-wallet/user-wallet.module';
 import { ReportsModule } from '../../reports/infrastructure/reports.module';
+import { IdentityModule } from '../../identity/infrastructure/identity.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ReportsModule } from '../../reports/infrastructure/reports.module';
     forwardRef(() => BlockchainModule),
     forwardRef(() => UserWalletModule),
     forwardRef(() => ReportsModule),
+    IdentityModule,
   ],
   controllers: [PaymentsController],
   providers: [

@@ -6,6 +6,7 @@ import { FileManagementModule } from '../../file-management/file-management.modu
 import { ReportsModule } from 'src/reports/infrastructure/reports.module';
 import { PdfModule } from 'src/shared/pdf/pdf.module';
 import { IdentityModule } from 'src/identity/infrastructure/identity.module';
+import { UserWalletModule } from 'src/crypto/user-wallet/user-wallet.module';
 
 import { Timesheet, TimesheetSchema } from './schemas/timesheet.schema';
 import { TimesheetRepository } from './repositories/timesheet.repository';
@@ -33,6 +34,7 @@ import { CloseMonthGenerateReportHandler } from '../application/close-month-gene
     forwardRef(() => ReportsModule),
     PdfModule,
     IdentityModule,
+    UserWalletModule,
   ],
   controllers: [TimesheetsController],
   providers: [

@@ -4,6 +4,7 @@ export class GetPaymentsQuery {
   readonly userId: string;
   readonly userRole: UserRole;
   readonly status?: string;
+  readonly excludeStatus?: string;
   readonly cursor?: string;
   readonly limit?: number;
 

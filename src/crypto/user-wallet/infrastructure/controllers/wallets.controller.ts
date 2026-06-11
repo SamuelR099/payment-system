@@ -49,6 +49,12 @@ export class WalletsController {
     return this.queryBus.execute(new GetUserWalletsQuery(req.user.userId));
   }
 
+  @Get('user/:userId')
+  @Roles([UserRole.ADMIN])
+  async getUserWalletsById(@Param('userId') userId: string) {
+    return this.queryBus.execute(new GetUserWalletsQuery(userId));
+  }
+
   @Patch(':id')
   @Roles([UserRole.EMPLOYEE, UserRole.ADMIN])
   async updateWallet(

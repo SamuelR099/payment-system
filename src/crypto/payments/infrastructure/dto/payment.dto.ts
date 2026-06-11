@@ -8,6 +8,10 @@ export class GetPaymentsDto {
   status?: string;
 
   @IsOptional()
+  @IsString()
+  excludeStatus?: string;
+
+  @IsOptional()
   @IsObjectId()
   cursor?: string;
 

@@ -1,10 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, UpdateQuery } from 'mongoose';
+import { Model, Types, UpdateQuery } from 'mongoose';
 
 import { User, UserDocument } from '../schemas/user.schema';
 
-/** Can be used to select only the specified fields from a query result */
 type UserSelect = { [key in keyof UserDocument]?: boolean };
 
 @Injectable()
@@ -56,7 +55,12 @@ export class UserRepository {
     return this.userModel
       .find({ _id: { $in: userIds } })
       .select('profile.firstName profile.lastName')
-      .lean()
+      .lean<
+        {
+          _id: Types.ObjectId;
+          profile: { firstName: string; lastName: string };
+        }[]
+      >()
       .exec();
   }
 }

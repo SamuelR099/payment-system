@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, UpdateQuery } from 'mongoose';
 
 import { Report, ReportDocument } from '../schemas/report.schema';
-import { UserRepository } from 'src/identity/infrastructure/repositories/user.repository';
 
 export type SearchReportParams = {
   terms?: string;
@@ -18,8 +17,7 @@ export class ReportRepository {
   constructor(
     @InjectModel(Report.name)
     private readonly reportModel: Model<ReportDocument>,
-    private readonly userRepository: UserRepository,
-  ) { }
+  ) {}
 
   async findById(reportId: string, failIfNotFound = false) {
     const report = await this.reportModel.findById(reportId).exec();
@@ -46,7 +44,9 @@ export class ReportRepository {
   }
 
   async deleteById(reportId: string) {
-    const deletedReport = await this.reportModel.findByIdAndDelete(reportId).exec();
+    const deletedReport = await this.reportModel
+      .findByIdAndDelete(reportId)
+      .exec();
     if (!deletedReport) {
       throw new NotFoundException(`Report not found for deletion.`);
     }
@@ -75,31 +75,15 @@ export class ReportRepository {
 
     const pageSize = limit ?? this.DEFAULT_PAGE_SIZE;
     const data = await query.limit(pageSize).lean().exec();
-    const nextCursor =
-      data.length < pageSize ? null : data[data.length - 1]._id;
+    const nextCursor: string | null =
+      data.length < pageSize ? null : String(data[data.length - 1]._id);
 
-    const userIds = [...new Set(data.map((r) => String(r.userId)))];
-    const users = await this.userRepository.findByIds(userIds);
+    const mappedData = data.map(report => ({
+      ...report,
+      id: String(report._id),
+    }));
 
-    const userMap = new Map(
-      users.map((u) => [
-        String(u._id),
-        {
-          firstName: (u as any).profile?.firstName ?? '',
-          lastName: (u as any).profile?.lastName ?? '',
-        },
-      ]),
-    );
-
-    const enrichedData = data.map((report) => {
-      const user = userMap.get(String(report.userId));
-      return Object.assign({}, report, {
-        firstName: user?.firstName ?? '',
-        lastName: user?.lastName ?? '',
-      });
-    });
-
-    return { data: enrichedData, nextCursor };
+    return { data: mappedData, nextCursor };
   }
 
   async findByIds(reportIds: string[]) {
