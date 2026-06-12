@@ -21,7 +21,7 @@ import {
   import { GetPendingPaymentsQuery } from '../../application/get-pending-payments/get-pending-payments.query';
   import { DeletePaymentCommand } from '../../application/delete-payment/delete-payment.command';
   import { VerifyPaymentCommand } from '../../application/verify-payment/verify-payment.command';
-  
+
   import { CreatePaymentCommand } from '../../application/create-payment/create-payment.command';
 
   @Controller('payments')
@@ -46,8 +46,8 @@ import {
 
     @Get('pending')
     @Roles([UserRole.ADMIN, UserRole.SUPER_ADMIN])
-    async getPendingPayments() {
-      return this.queryBus.execute(new GetPendingPaymentsQuery());
+    async getPendingPayments(@Req() req: any) {
+      return this.queryBus.execute(new GetPendingPaymentsQuery(req.user.network));
     }
 
     @Get(':id')

@@ -64,3 +64,8 @@ export class User {
 export type UserDocument = User & Document;
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.index({ email: 1 }, { unique: true, sparse: true });
+UserSchema.index({ phone: 1 }, { sparse: true });
+UserSchema.index({ role: 1, createdAt: -1 });
+UserSchema.index({ 'profile.firstName': 1, 'profile.lastName': 1 });

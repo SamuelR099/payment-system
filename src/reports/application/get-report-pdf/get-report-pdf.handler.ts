@@ -20,7 +20,6 @@ export class GetReportPdfHandler implements IQueryHandler<GetReportPdfQuery> {
       );
     }
 
-    // Generar URL firmada de S3 (válida por 1 hora por defecto)
     const signedUrl = await this.awsS3Service.getSignedUrl(
       report.pdfPath,
       3600,

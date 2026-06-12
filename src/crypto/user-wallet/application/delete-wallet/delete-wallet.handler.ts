@@ -9,14 +9,14 @@ export class DeleteWalletHandler implements ICommandHandler<DeleteWalletCommand>
   constructor(private readonly walletRepository: UserWalletRepository) {}
 
   async execute(command: DeleteWalletCommand) {
-    const wallet = await this.walletRepository.findById(command.walletId);
+    const walletDoc = await this.walletRepository.findById(command.walletId);
 
-    if (!wallet) {
+    if (!walletDoc) {
       throw new NotFoundException('Wallet not found');
     }
 
     const isAdmin = command.userRole === UserRole.ADMIN || command.userRole === UserRole.SUPER_ADMIN;
-    if (!isAdmin && wallet.userId.toString() !== command.userId) {
+    if (!isAdmin && walletDoc.userId.toString() !== command.userId) {
       throw new ForbiddenException('You do not have access to this wallet');
     }
 

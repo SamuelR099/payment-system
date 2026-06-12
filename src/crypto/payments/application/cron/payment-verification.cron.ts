@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PaymentRepository } from '../../infrastructure/repositories/payment.repository';
 import { PaymentStatus } from 'src/shared/enums/payment-status.enum';
@@ -6,10 +7,7 @@ import { BlockchainNetwork } from 'src/shared/enums/blockchain-network.enum';
 import { BlockchainProviderFactory } from '../../../blockchain/infrastructure/factories/blockchain-provider.factory';
 import { ReportRepository } from '../../../../reports/infrastructure/repositories/report.repository';
 import { PaymentDocument } from '../../infrastructure/schemas/payment.schema';
-import {
-  PAYMENT_MINIMUM_CONFIRMATIONS,
-  PAYMENT_TOLERANCE_PERCENT,
-} from '../../domain/payment.constants';
+import { ReportStatus } from 'src/reports/domain/enums/report-status.enum';
 
 @Injectable()
 export class PaymentVerificationCron {
@@ -19,6 +17,7 @@ export class PaymentVerificationCron {
     private readonly paymentRepository: PaymentRepository,
     private readonly reportRepository: ReportRepository,
     private readonly blockchainProviderFactory: BlockchainProviderFactory,
+    private readonly configService: ConfigService,
   ) {}
 
   @Cron(CronExpression.EVERY_5_MINUTES)
@@ -46,6 +45,9 @@ export class PaymentVerificationCron {
   }
 
   private async verifyBlockchainPayments() {
+    const tolerancePercent = this.configService.get<number>('payment.tolerancePercent') ?? 1;
+    const minimumConfirmations = this.configService.get<number>('payment.minimumConfirmations') ?? 2;
+
     const pendingPayments = await this.paymentRepository.findPendingPayments();
 
     const paymentsByNetwork = pendingPayments.reduce(
@@ -64,6 +66,8 @@ export class PaymentVerificationCron {
       await this.verifyPaymentsForNetwork(
         network as BlockchainNetwork,
         payments,
+        tolerancePercent,
+        minimumConfirmations,
       );
     }
   }
@@ -71,6 +75,8 @@ export class PaymentVerificationCron {
   private async verifyPaymentsForNetwork(
     network: BlockchainNetwork,
     payments: PaymentDocument[],
+    tolerancePercent: number,
+    minimumConfirmations: number,
   ) {
     const provider = this.blockchainProviderFactory.getProvider(network);
 
@@ -105,7 +111,7 @@ export class PaymentVerificationCron {
             transaction,
             candidate.walletAddress,
             candidate.amountExpected,
-            PAYMENT_TOLERANCE_PERCENT,
+            tolerancePercent,
           );
 
           if (!isValid) {
@@ -114,7 +120,7 @@ export class PaymentVerificationCron {
 
           const hasEnoughConfirmations = provider.hasEnoughConfirmations(
             transaction,
-            PAYMENT_MINIMUM_CONFIRMATIONS,
+            minimumConfirmations,
           );
 
           if (!hasEnoughConfirmations) {
@@ -141,7 +147,7 @@ export class PaymentVerificationCron {
           );
 
           await this.reportRepository.update(candidate.reportId.toString(), {
-            status: 'PAID',
+            status: ReportStatus.PAID,
             paidAt: new Date(),
             paymentId: candidate.id,
           });

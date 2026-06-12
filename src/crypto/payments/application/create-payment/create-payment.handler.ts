@@ -1,11 +1,11 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { ConfigService } from '@nestjs/config';
 import { NotFoundException, ConflictException } from '@nestjs/common';
 import { PaymentRepository } from '../../infrastructure/repositories/payment.repository';
 import { ReportRepository } from 'src/reports/infrastructure/repositories/report.repository';
 import { UserWalletRepository } from 'src/crypto/user-wallet/infrastructure/repositories/user-wallet.repository';
 import { CreatePaymentCommand } from './create-payment.command';
 import { PaymentStatus } from 'src/shared/enums/payment-status.enum';
-import { PAYMENT_EXPIRATION_DAYS } from '../../domain/payment.constants';
 
 @CommandHandler(CreatePaymentCommand)
 export class CreatePaymentHandler implements ICommandHandler<CreatePaymentCommand> {
@@ -13,6 +13,7 @@ export class CreatePaymentHandler implements ICommandHandler<CreatePaymentComman
     private readonly paymentRepository: PaymentRepository,
     private readonly reportRepository: ReportRepository,
     private readonly walletRepository: UserWalletRepository,
+    private readonly configService: ConfigService,
   ) {}
 
   async execute(command: CreatePaymentCommand) {
@@ -31,8 +32,9 @@ export class CreatePaymentHandler implements ICommandHandler<CreatePaymentComman
       throw new NotFoundException('Wallet not found');
     }
 
+    const expirationDays = this.configService.get<number>('payment.expirationDays') ?? 30;
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + PAYMENT_EXPIRATION_DAYS);
+    expiresAt.setDate(expiresAt.getDate() + expirationDays);
 
     const payment = await this.paymentRepository.create({
       userId: String(report.userId),

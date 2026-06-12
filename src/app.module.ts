@@ -11,6 +11,7 @@ import corsConfig from './config/cors.config';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 import mailConfig from './config/mail.config';
+import paymentConfig from './config/payment.config';
 import recaptchaConfig from './config/recaptcha.config';
 
 import { AppController } from './app.controller';
@@ -36,6 +37,7 @@ import { PaymentsModule } from './crypto/payments/payments.module';
         databaseConfig,
         jwtConfig,
         mailConfig,
+        paymentConfig,
         recaptchaConfig,
       ],
     }),

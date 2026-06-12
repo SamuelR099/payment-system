@@ -47,3 +47,6 @@ export const TimesheetSchema = SchemaFactory.createForClass(Timesheet);
 // Indexes for better performance
 TimesheetSchema.index({ userId: 1, date: -1 });
 TimesheetSchema.index({ userId: 1, createdAt: -1 });
+TimesheetSchema.index({ userId: 1, project: 1, date: -1 });
+TimesheetSchema.index({ signed: 1, date: -1 });
+TimesheetSchema.index({ date: -1, createdAt: -1 });

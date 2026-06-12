@@ -1,3 +1,3 @@
 export class GetReportPdfQuery {
-  constructor(public readonly reportId: string) {}
+  constructor(readonly reportId: string) {}
 }

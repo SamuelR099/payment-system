@@ -1,10 +1,15 @@
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { DomainError } from 'src/shared/domain';
-import { PAYMENT_EXPIRATION_DAYS } from './payment.constants';
 
+@Injectable()
 export class PaymentDomainService {
+  constructor(private readonly configService: ConfigService) {}
+
   calculateExpirationDate(fromDate: Date = new Date()): Date {
+    const expirationDays = this.configService.get<number>('payment.expirationDays') ?? 30;
     const expiresAt = new Date(fromDate);
-    expiresAt.setDate(expiresAt.getDate() + PAYMENT_EXPIRATION_DAYS);
+    expiresAt.setDate(expiresAt.getDate() + expirationDays);
     return expiresAt;
   }
 
