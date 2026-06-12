@@ -36,8 +36,12 @@ export class ReportsController {
   ) { }
 
   @Get('/')
-  async getReports(@Query() query: GetReportsDto) {
-    return this.queryBus.execute(new SearchReportQuery(query));
+  async getReports(@Query() query: GetReportsDto, @Request() req: any) {
+    return this.queryBus.execute(new SearchReportQuery({
+      ...query,
+      userId: req.user.userId,
+      userRole: req.user.role,
+    }));
   }
 
   @Get('/:id')
