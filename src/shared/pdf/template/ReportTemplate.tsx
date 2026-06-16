@@ -24,8 +24,12 @@ interface ReportTemplateProps {
   supervisorSignatureDate?: string;
 }
 
-const formatNumber = (num: number, decimals = 2) => {
-  return num.toFixed(decimals).replace('.', ',');
+const formatHours = (num: number) => {
+  return num.toFixed(0);
+};
+
+const formatCurrency = (num: number) => {
+  return num.toFixed(2).replace('.', ',');
 };
 
 const ReportTemplate: React.FC<ReportTemplateProps> = ({
@@ -102,16 +106,18 @@ const ReportTemplate: React.FC<ReportTemplateProps> = ({
               background-color: #efefef;
               font-weight: bold;
               text-transform: uppercase;
-              font-size: 9px;
-              height: 25px;
+              font-size: 12px;
+              height: 30px;
+            }
+            td {
+              font-size: 12px;
             }
             .info-table {
               margin-bottom: 15px;
             }
             .info-table td {
               font-weight: bold;
-              font-size: 11px;
-              height: 25px;
+              height: 30px;
             }
             .certification-text {
               background-color: #efefef;
@@ -120,19 +126,21 @@ const ReportTemplate: React.FC<ReportTemplateProps> = ({
               text-align: center;
               font-weight: bold;
               text-transform: uppercase;
-              font-size: 11px;
+              font-size: 12px;
               border-bottom: none;
             }
             .timesheet-table {
               margin-bottom: 0;
             }
             .timesheet-table td {
-              height: 35px;
+              height: 40px;
             }
             .timesheet-table td:nth-child(2) {
               text-align: left;
               padding: 8px;
-              font-size: 9px;
+            }
+            .hours-cell {
+              font-size: 12px;
             }
             .summary-table-container {
               display: flex;
@@ -143,8 +151,9 @@ const ReportTemplate: React.FC<ReportTemplateProps> = ({
               width: 40.5%;
             }
             .summary-table td {
-              height: 20px;
+              height: 25px;
               padding: 4px 10px;
+              font-size: 12px;
             }
             .summary-table td:first-child {
               text-align: right;
@@ -177,6 +186,7 @@ const ReportTemplate: React.FC<ReportTemplateProps> = ({
               font-weight: bold;
               margin-bottom: 0;
               border-bottom: none;
+              font-size: 12px;
             }
             .signature-box {
               border: 1px solid #999;
@@ -206,13 +216,13 @@ const ReportTemplate: React.FC<ReportTemplateProps> = ({
               margin-bottom: 3px;
             }
             .signature-label {
-              font-size: 7px;
+              font-size: 10px;
               text-transform: uppercase;
               font-weight: bold;
               color: #333;
             }
             .name-display {
-              font-size: 11px;
+              font-size: 12px;
               font-weight: bold;
               margin-bottom: 2px;
             }
@@ -272,7 +282,7 @@ const ReportTemplate: React.FC<ReportTemplateProps> = ({
                 <td>{row.description}</td>
                 <td>{row.startTime}</td>
                 <td>{row.endTime}</td>
-                <td>{formatNumber(row.hours)}</td>
+                <td className="hours-cell">{formatHours(row.hours)}</td>
               </tr>
             ))}
           </tbody>
@@ -283,14 +293,14 @@ const ReportTemplate: React.FC<ReportTemplateProps> = ({
             <tbody>
               <tr>
                 <td>Total de Horas</td>
-                <td>{formatNumber(totalHours)}</td>
+                <td>{formatHours(totalHours)}</td>
               </tr>
               <tr>
                 <td>Costo por Hora</td>
                 <td>
                   <div className="currency-cell">
                     <span>$</span>
-                    <span>{formatNumber(hourlyRate)}</span>
+                    <span>{formatCurrency(hourlyRate)}</span>
                   </div>
                 </td>
               </tr>
@@ -299,7 +309,7 @@ const ReportTemplate: React.FC<ReportTemplateProps> = ({
                 <td>
                   <div className="currency-cell">
                     <span>$</span>
-                    <span>{formatNumber(totalAmount)}</span>
+                    <span>{formatCurrency(totalAmount)}</span>
                   </div>
                 </td>
               </tr>
