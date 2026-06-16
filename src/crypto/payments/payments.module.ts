@@ -1,4 +1,5 @@
 import { Module, forwardRef } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CqrsModule } from '@nestjs/cqrs';
 import { HttpModule } from '@nestjs/axios';
@@ -24,6 +25,7 @@ import { IdentityModule } from '../../identity/infrastructure/identity.module';
 
 @Module({
   imports: [
+    ConfigModule,
     MongooseModule.forFeature([{ name: Payment.name, schema: PaymentSchema }]),
     CqrsModule,
     HttpModule,
