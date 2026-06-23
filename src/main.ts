@@ -16,6 +16,7 @@ import {
 import { AntdValidationPipe } from './shared/validation';
 import { AppModule } from './app.module';
 import { ApiConfig } from './config/api.config';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -31,6 +32,8 @@ async function bootstrap() {
     )
     .useGlobalPipes(new AntdValidationPipe({ transform: true }))
     .enableCors(config.get('cors'));
+
+  app.use(cookieParser());
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
