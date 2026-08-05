@@ -12,7 +12,7 @@ export class GetPaymentsHandler implements IQueryHandler<GetPaymentsQuery> {
   ) {}
 
   async execute(query: GetPaymentsQuery) {
-    const isAdmin = query.userRole === UserRole.SUPERVISOR;
+    const isAdmin = query.userRole === UserRole.SUPERVISOR || query.userRole === UserRole.ADMIN;
     const targetUserId = isAdmin ? undefined : query.userId;
 
     const { data: payments, nextCursor } = await this.paymentRepository.findByUserIdWithFilters(

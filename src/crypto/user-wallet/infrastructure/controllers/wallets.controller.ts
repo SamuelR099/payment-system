@@ -43,13 +43,13 @@ export class WalletsController {
   }
 
   @Get('/')
-  @Roles([UserRole.EMPLOYEE, UserRole.SUPERVISOR])
+  @Roles([UserRole.EMPLOYEE, UserRole.SUPERVISOR, UserRole.ADMIN])
   async getWallets(@Req() req: any) {
     return this.queryBus.execute(new GetUserWalletsQuery(req.user.userId));
   }
 
   @Get('/user/:userId')
-  @Roles([UserRole.SUPERVISOR])
+  @Roles([UserRole.SUPERVISOR, UserRole.ADMIN])
   async getUserWalletsById(@Param('userId') userId: string) {
     return this.queryBus.execute(new GetUserWalletsQuery(userId));
   }
@@ -79,7 +79,7 @@ export class WalletsController {
   }
 
   @Delete('/:id')
-  @Roles([UserRole.EMPLOYEE, UserRole.SUPERVISOR])
+  @Roles([UserRole.EMPLOYEE, UserRole.SUPERVISOR, UserRole.ADMIN])
   async deleteWallet(@Req() req: any, @Param('id') id: string) {
     return this.commandBus.execute(
       new DeleteWalletCommand({

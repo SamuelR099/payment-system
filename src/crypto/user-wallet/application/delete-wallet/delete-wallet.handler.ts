@@ -15,7 +15,7 @@ export class DeleteWalletHandler implements ICommandHandler<DeleteWalletCommand>
       throw new NotFoundException('Wallet not found');
     }
 
-    const isAdmin = command.userRole === UserRole.SUPERVISOR;
+    const isAdmin = command.userRole === UserRole.SUPERVISOR || command.userRole === UserRole.ADMIN;
     if (!isAdmin && walletDoc.userId.toString() !== command.userId) {
       throw new ForbiddenException('You do not have access to this wallet');
     }
