@@ -32,7 +32,7 @@ import {
     ) {}
 
     @Get('/')
-    @Roles([UserRole.EMPLOYEE, UserRole.ADMIN])
+    @Roles([UserRole.EMPLOYEE, UserRole.SUPERVISOR])
     async getPayments(@Req() req: any, @Query() query: GetPaymentsDto) {
       return this.queryBus.execute(
         new GetPaymentsQuery({
@@ -44,13 +44,13 @@ import {
     }
 
     @Get('/pending')
-    @Roles([UserRole.ADMIN, UserRole.SUPER_ADMIN])
+    @Roles([UserRole.SUPERVISOR])
     async getPendingPayments(@Req() req: any) {
       return this.queryBus.execute(new GetPendingPaymentsQuery(req.user.network));
     }
 
     @Delete('/:id')
-    @Roles([UserRole.ADMIN, UserRole.SUPER_ADMIN])
+    @Roles([UserRole.SUPERVISOR])
     async deletePayment(@Req() req: any, @Param('id') id: string) {
       return this.commandBus.execute(
         new DeletePaymentCommand({
@@ -62,13 +62,13 @@ import {
     }
 
     @Post('/:id/verify')
-    @Roles([UserRole.ADMIN, UserRole.SUPER_ADMIN])
+    @Roles([UserRole.SUPERVISOR])
     async verifyPayment(@Param('id') id: string) {
       return this.commandBus.execute(new VerifyPaymentCommand(id));
     }
 
     @Post('/')
-    @Roles([UserRole.ADMIN, UserRole.SUPER_ADMIN])
+    @Roles([UserRole.SUPERVISOR])
     async createPayment(@Body() body: { reportId: string; walletId: string }) {
       return this.commandBus.execute(
         new CreatePaymentCommand({

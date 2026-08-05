@@ -43,19 +43,19 @@ export class WalletsController {
   }
 
   @Get('/')
-  @Roles([UserRole.EMPLOYEE, UserRole.ADMIN])
+  @Roles([UserRole.EMPLOYEE, UserRole.SUPERVISOR])
   async getWallets(@Req() req: any) {
     return this.queryBus.execute(new GetUserWalletsQuery(req.user.userId));
   }
 
   @Get('/user/:userId')
-  @Roles([UserRole.ADMIN])
+  @Roles([UserRole.SUPERVISOR])
   async getUserWalletsById(@Param('userId') userId: string) {
     return this.queryBus.execute(new GetUserWalletsQuery(userId));
   }
 
   @Patch('/:id')
-  @Roles([UserRole.EMPLOYEE, UserRole.ADMIN])
+  @Roles([UserRole.EMPLOYEE, UserRole.SUPERVISOR])
   async updateWallet(
     @Req() req: any,
     @Param('id') id: string,
@@ -71,7 +71,7 @@ export class WalletsController {
   }
 
   @Patch('/:id/default')
-  @Roles([UserRole.EMPLOYEE, UserRole.ADMIN])
+  @Roles([UserRole.EMPLOYEE, UserRole.SUPERVISOR])
   async setDefaultWallet(@Req() req: any, @Param('id') id: string) {
     return this.commandBus.execute(
       new SetDefaultWalletCommand({ walletId: id, userId: req.user.userId }),
@@ -79,7 +79,7 @@ export class WalletsController {
   }
 
   @Delete('/:id')
-  @Roles([UserRole.EMPLOYEE, UserRole.ADMIN, UserRole.SUPER_ADMIN])
+  @Roles([UserRole.EMPLOYEE, UserRole.SUPERVISOR])
   async deleteWallet(@Req() req: any, @Param('id') id: string) {
     return this.commandBus.execute(
       new DeleteWalletCommand({

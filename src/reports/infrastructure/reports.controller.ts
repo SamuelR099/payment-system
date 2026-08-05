@@ -49,7 +49,7 @@ export class ReportsController {
   }
 
   @Post('/submit')
-  @Roles([UserRole.ADMIN])
+  @Roles([UserRole.SUPERVISOR])
   async submitReport(@Body() body: { reportId: string; userId: string }) {
     return this.commandBus.execute(
       new SubmitReportCommand(body.reportId, body.userId),
@@ -57,7 +57,7 @@ export class ReportsController {
   }
 
   @Post('/:id/approve')
-  @Roles([UserRole.ADMIN])
+  @Roles([UserRole.SUPERVISOR])
   @UseInterceptors(FileInterceptor('file'))
   async approveReport(
     @Param('id') id: string,
@@ -79,7 +79,7 @@ export class ReportsController {
   }
 
   @Post('/:id/reject')
-  @Roles([UserRole.ADMIN])
+  @Roles([UserRole.SUPERVISOR])
   async rejectReport(
     @Param('id') id: string,
   ) {

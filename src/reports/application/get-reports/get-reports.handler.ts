@@ -15,7 +15,7 @@ export class GetReportsHandler implements IQueryHandler<GetReportsQuery> {
   ) {}
 
   async execute(query: GetReportsQuery) {
-    const isAdmin = query.userRole === UserRole.ADMIN || query.userRole === UserRole.SUPER_ADMIN;
+    const isAdmin = query.userRole === UserRole.SUPERVISOR;
 
     const params: SearchReportParams = {
       terms: query.terms,

@@ -15,7 +15,7 @@ export class DeletePaymentHandler implements ICommandHandler<DeletePaymentComman
       throw new NotFoundException('Payment not found');
     }
 
-    const isAdmin = command.userRole === UserRole.ADMIN || command.userRole === UserRole.SUPER_ADMIN;
+    const isAdmin = command.userRole === UserRole.SUPERVISOR;
     if (!isAdmin) {
       throw new ForbiddenException('Only administrators can delete payments');
     }
