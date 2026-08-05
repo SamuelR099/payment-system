@@ -10,7 +10,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { Request } from 'express';
 
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
@@ -18,7 +17,7 @@ import { Roles } from 'src/shared/decorators/roles.decorator';
 import { UserRole } from 'src/shared/enums/user-role.enum';
 
 import { CreateWalletDto, UpdateWalletDto } from '../dto/wallet.dto';
-import { AddWalletCommand } from '../../application/add-wallet/add-wallet.command';
+import { CreateWalletCommand } from '../../application/create-wallet/create-wallet.command';
 import { UpdateWalletCommand } from '../../application/update-wallet/update-wallet.command';
 import { SetDefaultWalletCommand } from '../../application/set-default-wallet/set-default-wallet.command';
 import { GetUserWalletsQuery } from '../../application/get-wallets/get-wallets.query';
@@ -32,30 +31,30 @@ export class WalletsController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  @Post()
+  @Post('/')
   @Roles([UserRole.EMPLOYEE])
   async createWallet(@Req() req: any, @Body() body: CreateWalletDto) {
     return this.commandBus.execute(
-      new AddWalletCommand({
+      new CreateWalletCommand({
         userId: req.user.userId,
         ...body,
       }),
     );
   }
 
-  @Get()
+  @Get('/')
   @Roles([UserRole.EMPLOYEE, UserRole.ADMIN])
   async getWallets(@Req() req: any) {
     return this.queryBus.execute(new GetUserWalletsQuery(req.user.userId));
   }
 
-  @Get('user/:userId')
+  @Get('/user/:userId')
   @Roles([UserRole.ADMIN])
   async getUserWalletsById(@Param('userId') userId: string) {
     return this.queryBus.execute(new GetUserWalletsQuery(userId));
   }
 
-  @Patch(':id')
+  @Patch('/:id')
   @Roles([UserRole.EMPLOYEE, UserRole.ADMIN])
   async updateWallet(
     @Req() req: any,
@@ -71,7 +70,7 @@ export class WalletsController {
     );
   }
 
-  @Patch(':id/default')
+  @Patch('/:id/default')
   @Roles([UserRole.EMPLOYEE, UserRole.ADMIN])
   async setDefaultWallet(@Req() req: any, @Param('id') id: string) {
     return this.commandBus.execute(
@@ -79,7 +78,7 @@ export class WalletsController {
     );
   }
 
-  @Delete(':id')
+  @Delete('/:id')
   @Roles([UserRole.EMPLOYEE, UserRole.ADMIN, UserRole.SUPER_ADMIN])
   async deleteWallet(@Req() req: any, @Param('id') id: string) {
     return this.commandBus.execute(

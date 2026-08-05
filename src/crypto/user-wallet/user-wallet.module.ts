@@ -6,7 +6,7 @@ import { UserWallet, UserWalletSchema } from './infrastructure/schemas/user-wall
 import { UserWalletRepository } from './infrastructure/repositories/user-wallet.repository';
 import { WalletsController } from './infrastructure/controllers/wallets.controller';
 
-import { AddWalletHandler } from './application/add-wallet/add-wallet.handler';
+import { CreateWalletHandler } from './application/create-wallet/create-wallet.handler';
 import { UpdateWalletHandler } from './application/update-wallet/update-wallet.handler';
 import { SetDefaultWalletHandler } from './application/set-default-wallet/set-default-wallet.handler';
 import { GetUserWalletsHandler } from './application/get-wallets/get-wallets.handler';
@@ -22,7 +22,7 @@ import { DeleteWalletHandler } from './application/delete-wallet/delete-wallet.h
   controllers: [WalletsController],
   providers: [
     UserWalletRepository,
-    AddWalletHandler,
+    CreateWalletHandler,
     UpdateWalletHandler,
     SetDefaultWalletHandler,
     GetUserWalletsHandler,

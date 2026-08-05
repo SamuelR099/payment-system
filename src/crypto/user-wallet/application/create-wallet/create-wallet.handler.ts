@@ -2,13 +2,13 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BadRequestException } from '@nestjs/common';
 import { WalletStatus } from 'src/shared/enums/wallet-status.enum';
 import { UserWalletRepository } from '../../infrastructure/repositories/user-wallet.repository';
-import { AddWalletCommand } from './add-wallet.command';
+import { CreateWalletCommand } from './create-wallet.command';
 
-@CommandHandler(AddWalletCommand)
-export class AddWalletHandler implements ICommandHandler<AddWalletCommand> {
+@CommandHandler(CreateWalletCommand)
+export class CreateWalletHandler implements ICommandHandler<CreateWalletCommand> {
   constructor(private readonly walletRepository: UserWalletRepository) {}
 
-  async execute(command: AddWalletCommand) {
+  async execute(command: CreateWalletCommand) {
     const trimmedAddress = command.walletAddress.trim();
 
     const validation = await this.walletRepository.validateWalletAddress(
