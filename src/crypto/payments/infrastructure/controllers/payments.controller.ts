@@ -17,7 +17,6 @@ import {
 
   import { GetPaymentsDto } from '../dto/payment.dto';
   import { GetPaymentsQuery } from '../../application/get-payments/get-payments.query';
-  import { GetPaymentQuery } from '../../application/get-payment/get-payment.query';
   import { GetPendingPaymentsQuery } from '../../application/get-pending-payments/get-pending-payments.query';
   import { DeletePaymentCommand } from '../../application/delete-payment/delete-payment.command';
   import { VerifyPaymentCommand } from '../../application/verify-payment/verify-payment.command';
@@ -32,7 +31,7 @@ import {
       private readonly commandBus: CommandBus,
     ) {}
 
-    @Get()
+    @Get('/')
     @Roles([UserRole.EMPLOYEE, UserRole.ADMIN])
     async getPayments(@Req() req: any, @Query() query: GetPaymentsDto) {
       return this.queryBus.execute(
@@ -44,25 +43,13 @@ import {
       );
     }
 
-    @Get('pending')
+    @Get('/pending')
     @Roles([UserRole.ADMIN, UserRole.SUPER_ADMIN])
     async getPendingPayments(@Req() req: any) {
       return this.queryBus.execute(new GetPendingPaymentsQuery(req.user.network));
     }
 
-    @Get(':id')
-    @Roles([UserRole.EMPLOYEE, UserRole.ADMIN, UserRole.SUPER_ADMIN])
-    async getPayment(@Req() req: any, @Param('id') id: string) {
-      return this.queryBus.execute(
-        new GetPaymentQuery({
-          paymentId: id,
-          userId: req.user.userId,
-          userRole: req.user.role,
-        }),
-      );
-    }
-
-    @Delete(':id')
+    @Delete('/:id')
     @Roles([UserRole.ADMIN, UserRole.SUPER_ADMIN])
     async deletePayment(@Req() req: any, @Param('id') id: string) {
       return this.commandBus.execute(
@@ -74,13 +61,13 @@ import {
       );
     }
 
-    @Post(':id/verify')
+    @Post('/:id/verify')
     @Roles([UserRole.ADMIN, UserRole.SUPER_ADMIN])
     async verifyPayment(@Param('id') id: string) {
       return this.commandBus.execute(new VerifyPaymentCommand(id));
     }
 
-    @Post()
+    @Post('/')
     @Roles([UserRole.ADMIN, UserRole.SUPER_ADMIN])
     async createPayment(@Body() body: { reportId: string; walletId: string }) {
       return this.commandBus.execute(

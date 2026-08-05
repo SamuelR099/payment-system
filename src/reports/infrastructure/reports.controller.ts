@@ -19,9 +19,8 @@ import { FILE_SIZES } from 'src/shared/enums/file-size';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { UserRole } from 'src/shared/enums/user-role.enum';
 
-import { SearchReportQuery } from '../application/search-report/search-report.query';
-import { GetReportQuery } from '../application/get-report/get-report.query';
-import { GetReportPdfQuery } from '../application/get-report-pdf/get-report-pdf.query';
+  import { GetReportsQuery } from '../application/get-reports/get-reports.query';
+  import { GetReportPdfQuery } from '../application/get-report-pdf/get-report-pdf.query';
 import { SubmitReportCommand } from '../application/submit-report/submit-report.command';
 import { ApproveReportAdminCommand } from '../application/approve-report-admin/approve-report-admin.command';
 import { RejectReportAdminCommand } from '../application/reject-report-admin/reject-report-admin.command';
@@ -37,16 +36,11 @@ export class ReportsController {
 
   @Get('/')
   async getReports(@Query() query: GetReportsDto, @Request() req: any) {
-    return this.queryBus.execute(new SearchReportQuery({
+    return this.queryBus.execute(new GetReportsQuery({
       ...query,
       userId: req.user.userId,
       userRole: req.user.role,
     }));
-  }
-
-  @Get('/:id')
-  async getReport(@Param('id') id: string) {
-    return this.queryBus.execute(new GetReportQuery(id));
   }
 
   @Get('/:id/pdf')

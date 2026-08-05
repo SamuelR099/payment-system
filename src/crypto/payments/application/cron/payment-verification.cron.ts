@@ -20,7 +20,7 @@ export class PaymentVerificationCron {
     private readonly configService: ConfigService,
   ) {}
 
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  // @Cron(CronExpression.EVERY_5_MINUTES)
   async verifyPendingPayments() {
     this.logger.log('Starting payment verification cron job');
 

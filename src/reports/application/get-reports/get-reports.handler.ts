@@ -1,5 +1,5 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { SearchReportQuery } from './search-report.query';
+import { GetReportsQuery } from './get-reports.query';
 import { UserRepository } from 'src/identity/infrastructure/repositories/user.repository';
 import {
   ReportRepository,
@@ -7,14 +7,14 @@ import {
 } from '../../infrastructure/repositories/report.repository';
 import { UserRole } from 'src/shared/enums/user-role.enum';
 
-@QueryHandler(SearchReportQuery)
-export class SearchReportHandler implements IQueryHandler<SearchReportQuery> {
+@QueryHandler(GetReportsQuery)
+export class GetReportsHandler implements IQueryHandler<GetReportsQuery> {
   constructor(
     private readonly reportRepository: ReportRepository,
     private readonly userRepository: UserRepository,
   ) {}
 
-  async execute(query: SearchReportQuery) {
+  async execute(query: GetReportsQuery) {
     const isAdmin = query.userRole === UserRole.ADMIN || query.userRole === UserRole.SUPER_ADMIN;
 
     const params: SearchReportParams = {

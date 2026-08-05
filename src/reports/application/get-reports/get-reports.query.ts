@@ -1,7 +1,7 @@
 import { ReportStatus } from '../../domain/enums/report-status.enum';
 import { UserRole } from 'src/shared/enums/user-role.enum';
 
-export class SearchReportQuery {
+export class GetReportsQuery {
   readonly terms?: string;
   readonly status?: ReportStatus;
   readonly cursor?: string;
@@ -9,7 +9,7 @@ export class SearchReportQuery {
   readonly userId: string;
   readonly userRole: UserRole;
 
-  constructor(data: SearchReportQuery) {
+  constructor(data: GetReportsQuery) {
     Object.assign(this, data);
   }
 }

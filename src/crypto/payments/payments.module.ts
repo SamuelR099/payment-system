@@ -12,7 +12,6 @@ import { CreatePaymentHandler } from './application/create-payment/create-paymen
 import { CompletePaymentHandler } from './application/complete-payment/complete-payment.handler';
 import { ExpirePaymentHandler } from './application/expire-payment/expire-payment.handler';
 import { GetPaymentsHandler } from './application/get-payments/get-payments.handler';
-import { GetPaymentHandler } from './application/get-payment/get-payment.handler';
 import { GetPendingPaymentsHandler } from './application/get-pending-payments/get-pending-payments.handler';
 import { PaymentVerificationCron } from './application/cron/payment-verification.cron';
 import { DeletePaymentHandler } from './application/delete-payment/delete-payment.handler';
@@ -42,7 +41,6 @@ import { IdentityModule } from '../../identity/infrastructure/identity.module';
     CompletePaymentHandler,
     ExpirePaymentHandler,
     GetPaymentsHandler,
-    GetPaymentHandler,
     GetPendingPaymentsHandler,
     DeletePaymentHandler,
     VerifyPaymentHandler,

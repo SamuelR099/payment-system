@@ -31,9 +31,8 @@ import { GetMonthlySummaryDto } from './dto/get-monthly-summary.dto';
 import { CreateTimesheetCommand } from '../application/create-timesheet/create-timesheet.command';
 import { UpdateTimesheetCommand } from '../application/update-timesheet/update-timesheet.command';
 import { DeleteTimesheetCommand } from '../application/delete-timesheet/delete-timesheet.command';
-import { GetTimesheetsQuery } from '../application/search-timesheets/get-timesheets.query';
-import { GetTimesheetByIdQuery } from '../application/get-timesheet/get-timesheet.query';
-import { GetMonthlySummaryQuery } from '../application/get-monthly-summary/get-monthly-summary.query';
+  import { GetTimesheetsQuery } from '../application/search-timesheets/get-timesheets.query';
+  import { GetMonthlySummaryQuery } from '../application/get-monthly-summary/get-monthly-summary.query';
 import { SignTimesheetCommand } from '../application/sign-timesheet/sign-timesheet.command';
 import { CloseMonthGenerateReportCommand } from '../application/close-month-generate-report/close-month-generate-report.command';
 
@@ -94,13 +93,6 @@ export class TimesheetsController {
         body.year,
         file,
       ),
-    );
-  }
-
-  @Get('/:id')
-  getTimesheetById(@Req() req: any, @Param('id') id: string) {
-    return this.queryBus.execute(
-      new GetTimesheetByIdQuery(id, req.user.userId),
     );
   }
 
