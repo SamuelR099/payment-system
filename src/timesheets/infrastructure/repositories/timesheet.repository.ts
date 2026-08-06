@@ -2,10 +2,16 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Timesheet, TimesheetDocument } from '../schemas/timesheet.schema';
+import { getMonthRange } from 'src/shared/utils';
 
 @Injectable()
 export class TimesheetRepository {
   private readonly DEFAULT_PAGE_SIZE = 30;
+
+  constructor(
+    @InjectModel(Timesheet.name)
+    private readonly timesheetModel: Model<TimesheetDocument>,
+  ) {}
 
   async search(params: {
     userId: string;
@@ -42,8 +48,7 @@ export class TimesheetRepository {
     if (startDate && endDate) {
       filter.$and.push({ date: { $gte: startDate, $lte: endDate } });
     } else if (month && year) {
-      const start = new Date(year, month - 1, 1, 0, 0, 0, 0);
-      const end = new Date(year, month, 0, 23, 59, 59, 999);
+      const { startDate: start, endDate: end } = getMonthRange(month, year);
       filter.$and.push({ date: { $gte: start, $lte: end } });
     }
 
@@ -75,11 +80,6 @@ export class TimesheetRepository {
       data.length < pageSize ? null : String(data[data.length - 1]._id);
     return { data, nextCursor };
   }
-
-  constructor(
-    @InjectModel(Timesheet.name)
-    private readonly timesheetModel: Model<TimesheetDocument>,
-  ) {}
 
   async create(timesheetData: any) {
     const timesheet = new this.timesheetModel(timesheetData);
@@ -155,14 +155,12 @@ export class TimesheetRepository {
   }
 
   async findByMonthAndYear(month: number, year: number) {
-    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
-    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+    const { startDate, endDate } = getMonthRange(month, year);
     return this.findByDateRange(startDate, endDate);
   }
 
   async unsignAllByPeriod(userId: string, month: number, year: number) {
-    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
-    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+    const { startDate, endDate } = getMonthRange(month, year);
     await this.timesheetModel.updateMany(
       {
         $and: [
@@ -188,8 +186,7 @@ export class TimesheetRepository {
     year: number,
     signatureImageUrl: string,
   ) {
-    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
-    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+    const { startDate, endDate } = getMonthRange(month, year);
     const now = new Date();
     await this.timesheetModel.updateMany(
       {
