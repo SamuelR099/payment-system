@@ -4,7 +4,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { CqrsModule } from '@nestjs/cqrs';
 import { HttpModule } from '@nestjs/axios';
 
-import { Payment, PaymentSchema } from './infrastructure/schemas/payment.schema';
+import {
+  Payment,
+  PaymentSchema,
+} from './infrastructure/schemas/payment.schema';
 import { PaymentRepository } from './infrastructure/repositories/payment.repository';
 import { PaymentsController } from './infrastructure/controllers/payments.controller';
 

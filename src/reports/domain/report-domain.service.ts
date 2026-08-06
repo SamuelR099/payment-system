@@ -14,6 +14,7 @@ export interface Timesheet {
 
 export interface GeneratedReport {
   userId: string;
+  supervisorId?: string;
   month: number;
   year: number;
   totalHours: number;
@@ -29,6 +30,7 @@ export class ReportDomainService {
   generateMonthlyReport(
     timesheets: Timesheet[],
     period: ReportPeriod,
+    supervisorId?: string,
   ): GeneratedReport {
     if (!timesheets || timesheets.length === 0) {
       throw new DomainError(
@@ -48,10 +50,13 @@ export class ReportDomainService {
       0,
     );
 
-    const signature = timesheets.find(t => t.signatureImageUrl)?.signatureImageUrl;
+    const signature = timesheets.find(
+      t => t.signatureImageUrl,
+    )?.signatureImageUrl;
 
     return {
       userId,
+      supervisorId,
       month: period.month,
       year: period.year,
       totalHours,

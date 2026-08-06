@@ -5,7 +5,9 @@ import { CompletePaymentCommand } from './complete-payment.command';
 import { Payment } from '../../domain/payment.model';
 
 @CommandHandler(CompletePaymentCommand)
-export class CompletePaymentHandler implements ICommandHandler<CompletePaymentCommand> {
+export class CompletePaymentHandler
+  implements ICommandHandler<CompletePaymentCommand>
+{
   constructor(private readonly paymentRepository: PaymentRepository) {}
 
   async execute(command: CompletePaymentCommand) {
@@ -16,7 +18,9 @@ export class CompletePaymentHandler implements ICommandHandler<CompletePaymentCo
 
     const payment = Payment.fromModel(paymentDoc);
 
-    const existingWithTxid = await this.paymentRepository.findByTxid(command.txid);
+    const existingWithTxid = await this.paymentRepository.findByTxid(
+      command.txid,
+    );
     if (existingWithTxid && existingWithTxid.id !== command.paymentId) {
       throw new Error('Transaction already processed');
     }
@@ -27,7 +31,10 @@ export class CompletePaymentHandler implements ICommandHandler<CompletePaymentCo
       command.rawBlockchainData,
     );
 
-    await this.paymentRepository.updateById(command.paymentId, completedPayment.getUserInfo());
+    await this.paymentRepository.updateById(
+      command.paymentId,
+      completedPayment.getUserInfo(),
+    );
 
     return completedPayment.getUserInfo();
   }

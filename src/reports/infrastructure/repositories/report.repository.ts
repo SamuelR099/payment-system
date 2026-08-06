@@ -9,6 +9,7 @@ export type SearchReportParams = {
   status?: string;
   cursor?: string;
   userId?: string;
+  supervisorId?: string;
 };
 
 @Injectable()
@@ -72,6 +73,10 @@ export class ReportRepository {
 
     if (params.userId) {
       query.merge({ userId: params.userId });
+    }
+
+    if (params.supervisorId) {
+      query.merge({ supervisorId: params.supervisorId });
     }
 
     if (params.cursor) {

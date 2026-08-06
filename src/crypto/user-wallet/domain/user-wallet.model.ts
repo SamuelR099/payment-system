@@ -89,10 +89,14 @@ export class UserWallet {
 
   isValidAddress(): boolean {
     if (this.network === BlockchainNetwork.TRC20) {
-      return this.walletAddress.startsWith('T') && this.walletAddress.length === 34;
+      return (
+        this.walletAddress.startsWith('T') && this.walletAddress.length === 34
+      );
     }
     if (this.network === BlockchainNetwork.BEP20) {
-      return this.walletAddress.startsWith('0x') && this.walletAddress.length === 42;
+      return (
+        this.walletAddress.startsWith('0x') && this.walletAddress.length === 42
+      );
     }
     return false;
   }
@@ -100,20 +104,32 @@ export class UserWallet {
   validateAddress(): { valid: boolean; reason?: string } {
     if (this.network === BlockchainNetwork.TRC20) {
       if (!this.walletAddress.startsWith('T')) {
-        return { valid: false, reason: 'la dirección TRC20 debe comenzar con "T"' };
+        return {
+          valid: false,
+          reason: 'la dirección TRC20 debe comenzar con "T"',
+        };
       }
       if (this.walletAddress.length !== 34) {
-        return { valid: false, reason: `la dirección TRC20 debe tener 34 caracteres (tiene ${this.walletAddress.length})` };
+        return {
+          valid: false,
+          reason: `la dirección TRC20 debe tener 34 caracteres (tiene ${this.walletAddress.length})`,
+        };
       }
       return { valid: true };
     }
 
     if (this.network === BlockchainNetwork.BEP20) {
       if (!this.walletAddress.startsWith('0x')) {
-        return { valid: false, reason: 'la dirección BEP20 debe comenzar con "0x"' };
+        return {
+          valid: false,
+          reason: 'la dirección BEP20 debe comenzar con "0x"',
+        };
       }
       if (this.walletAddress.length !== 42) {
-        return { valid: false, reason: `la dirección BEP20 debe tener 42 caracteres (tiene ${this.walletAddress.length})` };
+        return {
+          valid: false,
+          reason: `la dirección BEP20 debe tener 42 caracteres (tiene ${this.walletAddress.length})`,
+        };
       }
       return { valid: true };
     }
@@ -152,7 +168,10 @@ export class UserWallet {
 
     const validation = newWallet.validateAddress();
     if (!validation.valid) {
-      throw new DomainError('INVALID_ADDRESS', validation.reason ?? 'Dirección inválida');
+      throw new DomainError(
+        'INVALID_ADDRESS',
+        validation.reason ?? 'Dirección inválida',
+      );
     }
 
     return newWallet;
@@ -160,10 +179,7 @@ export class UserWallet {
 
   deactivate(): UserWallet {
     if (!this.isActive()) {
-      throw new DomainError(
-        'INVALID_STATUS',
-        'La wallet ya está inactiva.',
-      );
+      throw new DomainError('INVALID_STATUS', 'La wallet ya está inactiva.');
     }
     return new UserWallet({
       ...this,
@@ -175,10 +191,7 @@ export class UserWallet {
 
   activate(): UserWallet {
     if (this.isActive()) {
-      throw new DomainError(
-        'INVALID_STATUS',
-        'La wallet ya está activa.',
-      );
+      throw new DomainError('INVALID_STATUS', 'La wallet ya está activa.');
     }
     return new UserWallet({
       ...this,

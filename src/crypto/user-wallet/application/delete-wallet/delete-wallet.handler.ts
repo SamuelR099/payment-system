@@ -5,7 +5,9 @@ import { DeleteWalletCommand } from './delete-wallet.command';
 import { UserRole } from 'src/shared/enums/user-role.enum';
 
 @CommandHandler(DeleteWalletCommand)
-export class DeleteWalletHandler implements ICommandHandler<DeleteWalletCommand> {
+export class DeleteWalletHandler
+  implements ICommandHandler<DeleteWalletCommand>
+{
   constructor(private readonly walletRepository: UserWalletRepository) {}
 
   async execute(command: DeleteWalletCommand) {
@@ -15,7 +17,9 @@ export class DeleteWalletHandler implements ICommandHandler<DeleteWalletCommand>
       throw new NotFoundException('Wallet not found');
     }
 
-    const isAdmin = command.userRole === UserRole.SUPERVISOR || command.userRole === UserRole.ADMIN;
+    const isAdmin =
+      command.userRole === UserRole.SUPERVISOR ||
+      command.userRole === UserRole.ADMIN;
     if (!isAdmin && walletDoc.userId.toString() !== command.userId) {
       throw new ForbiddenException('You do not have access to this wallet');
     }

@@ -3,7 +3,9 @@ import { UserWalletRepository } from '../../infrastructure/repositories/user-wal
 import { GetUserWalletsQuery } from './get-wallets.query';
 
 @QueryHandler(GetUserWalletsQuery)
-export class GetUserWalletsHandler implements IQueryHandler<GetUserWalletsQuery> {
+export class GetUserWalletsHandler
+  implements IQueryHandler<GetUserWalletsQuery>
+{
   constructor(private readonly walletRepository: UserWalletRepository) {}
 
   async execute(query: GetUserWalletsQuery) {

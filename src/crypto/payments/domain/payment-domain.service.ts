@@ -7,7 +7,8 @@ export class PaymentDomainService {
   constructor(private readonly configService: ConfigService) {}
 
   calculateExpirationDate(fromDate: Date = new Date()): Date {
-    const expirationDays = this.configService.get<number>('payment.expirationDays') ?? 30;
+    const expirationDays =
+      this.configService.get<number>('payment.expirationDays') ?? 30;
     const expiresAt = new Date(fromDate);
     expiresAt.setDate(expiresAt.getDate() + expirationDays);
     return expiresAt;

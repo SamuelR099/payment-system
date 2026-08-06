@@ -15,13 +15,17 @@ export class GetReportsHandler implements IQueryHandler<GetReportsQuery> {
   ) {}
 
   async execute(query: GetReportsQuery) {
-    const isAdmin = query.userRole === UserRole.SUPERVISOR || query.userRole === UserRole.ADMIN;
+    const isAdmin =
+      query.userRole === UserRole.SUPERVISOR ||
+      query.userRole === UserRole.ADMIN;
 
     const params: SearchReportParams = {
       terms: query.terms,
       status: query.status,
       cursor: query.cursor,
       userId: isAdmin ? undefined : query.userId,
+      supervisorId:
+        query.userRole === UserRole.SUPERVISOR ? query.userId : undefined,
     };
 
     const { data: reports, nextCursor } = await this.reportRepository.search(
@@ -30,11 +34,14 @@ export class GetReportsHandler implements IQueryHandler<GetReportsQuery> {
     );
 
     if (isAdmin) {
-      const userIds = [...new Set(reports.map((report) => String(report.userId)))];
-      const users = userIds.length > 0 ? await this.userRepository.findByIds(userIds) : [];
+      const userIds = [
+        ...new Set(reports.map(report => String(report.userId))),
+      ];
+      const users =
+        userIds.length > 0 ? await this.userRepository.findByIds(userIds) : [];
 
       const userMap = new Map<string, { firstName: string; lastName: string }>(
-        users.map((user) => [
+        users.map(user => [
           String(user._id),
           {
             firstName: user.profile?.firstName ?? '',
@@ -43,12 +50,40 @@ export class GetReportsHandler implements IQueryHandler<GetReportsQuery> {
         ]),
       );
 
-      const enrichedData = reports.map((report) => {
+      const supervisorIds = [
+        ...new Set(reports.map(report => report.supervisorId).filter(Boolean)),
+      ];
+      const supervisors =
+        supervisorIds.length > 0
+          ? await this.userRepository.findByIds(supervisorIds)
+          : [];
+
+      const supervisorMap = new Map<
+        string,
+        { firstName: string; lastName: string }
+      >(
+        supervisors.map(user => [
+          String(user._id),
+          {
+            firstName: user.profile?.firstName ?? '',
+            lastName: user.profile?.lastName ?? '',
+          },
+        ]),
+      );
+
+      const enrichedData = reports.map(report => {
         const user = userMap.get(String(report.userId));
+        const supervisor = report.supervisorId
+          ? supervisorMap.get(String(report.supervisorId))
+          : undefined;
         return {
           ...report,
           firstName: user?.firstName ?? '',
           lastName: user?.lastName ?? '',
+          supervisorName:
+            supervisor && (supervisor.firstName || supervisor.lastName)
+              ? `${supervisor.firstName} ${supervisor.lastName}`.trim()
+              : undefined,
         };
       });
 

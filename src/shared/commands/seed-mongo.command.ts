@@ -4,7 +4,10 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { AppModule } from 'src/app.module';
-import { User, UserSchema } from 'src/identity/infrastructure/schemas/user.schema';
+import {
+  User,
+  UserSchema,
+} from 'src/identity/infrastructure/schemas/user.schema';
 import { UsersSeeder } from 'src/database/seeders/users.seeder';
 
 function runInitialSeeders() {
@@ -12,9 +15,7 @@ function runInitialSeeders() {
     imports: [
       AppModule,
       ConfigModule,
-      MongooseModule.forFeature([
-        { name: User.name, schema: UserSchema },
-      ]),
+      MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     ],
   }).run([UsersSeeder]);
 }

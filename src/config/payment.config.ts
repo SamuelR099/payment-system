@@ -10,7 +10,10 @@ export type PaymentConfig = {
 export default registerAs('payment', (): PaymentConfig => {
   return {
     expirationDays: validateNumberEnvVar('PAYMENT_EXPIRATION_DAYS', 30),
-    minimumConfirmations: validateNumberEnvVar('PAYMENT_MINIMUM_CONFIRMATIONS', 2),
+    minimumConfirmations: validateNumberEnvVar(
+      'PAYMENT_MINIMUM_CONFIRMATIONS',
+      2,
+    ),
     tolerancePercent: validateNumberEnvVar('PAYMENT_TOLERANCE_PERCENT', 1),
   };
 });

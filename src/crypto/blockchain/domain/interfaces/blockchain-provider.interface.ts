@@ -28,7 +28,10 @@ export interface IBlockchainProvider {
 
   normalizeAmount(rawAmount: number, decimals: number): number;
 
-  hasEnoughConfirmations(transaction: BlockchainTransaction, minimumConfirmations: number): boolean;
+  hasEnoughConfirmations(
+    transaction: BlockchainTransaction,
+    minimumConfirmations: number,
+  ): boolean;
 
   validateTransaction(
     transaction: BlockchainTransaction,

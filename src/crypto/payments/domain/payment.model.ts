@@ -145,7 +145,11 @@ export class Payment {
     return this.status === PaymentStatus.PENDING && !this.isExpired();
   }
 
-  markAsCompleted(txid: string, amountReceived: number, rawBlockchainData?: Record<string, any>): Payment {
+  markAsCompleted(
+    txid: string,
+    amountReceived: number,
+    rawBlockchainData?: Record<string, any>,
+  ): Payment {
     if (!this.canBeCompleted()) {
       throw new DomainError(
         'INVALID_STATUS',

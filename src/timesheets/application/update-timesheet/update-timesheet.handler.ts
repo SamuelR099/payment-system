@@ -6,7 +6,6 @@ import { TimesheetDomainService } from 'src/timesheets/domain/timesheet-domain.s
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { UpdateTimesheetCommand } from './update-timesheet.command';
 
-
 @CommandHandler(UpdateTimesheetCommand)
 export class UpdateTimesheetHandler
   implements ICommandHandler<UpdateTimesheetCommand>

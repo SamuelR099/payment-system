@@ -4,6 +4,7 @@ import { ReportStatus } from './enums/report-status.enum';
 export class Report {
   readonly id: string;
   readonly userId: string;
+  readonly supervisorId?: string;
   readonly month: number;
   readonly year: number;
   readonly totalHours: number;
@@ -21,6 +22,7 @@ export class Report {
   private constructor(params: {
     id: string;
     userId: string;
+    supervisorId?: string;
     month: number;
     year: number;
     totalHours: number;
@@ -37,6 +39,7 @@ export class Report {
   }) {
     this.id = params.id;
     this.userId = params.userId;
+    this.supervisorId = params.supervisorId;
     this.month = params.month;
     this.year = params.year;
     this.totalHours = params.totalHours;
@@ -55,6 +58,7 @@ export class Report {
   static create(params: {
     id: string;
     userId: string;
+    supervisorId?: string;
     month: number;
     year: number;
     totalHours: number;
@@ -67,6 +71,7 @@ export class Report {
     return new Report({
       id: params.id,
       userId: params.userId,
+      supervisorId: params.supervisorId,
       month: params.month,
       year: params.year,
       totalHours: params.totalHours,
@@ -83,6 +88,7 @@ export class Report {
     return new Report({
       id: document._id?.toString?.() ?? '',
       userId: document.userId?.toString?.() ?? '',
+      supervisorId: document.supervisorId?.toString?.(),
       month: document.month,
       year: document.year,
       totalHours: document.totalHours,
@@ -103,6 +109,7 @@ export class Report {
     return {
       id: this.id,
       userId: this.userId,
+      supervisorId: this.supervisorId,
       month: this.month,
       year: this.year,
       totalHours: this.totalHours,

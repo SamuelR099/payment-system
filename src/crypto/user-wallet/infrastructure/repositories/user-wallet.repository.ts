@@ -31,20 +31,24 @@ export class UserWalletRepository {
       query.$or.push({ userId: new Types.ObjectId(userIdStr) });
     }
     const wallets = await this.userWalletModel.find(query).lean().exec();
-    return wallets.map((wallet) => ({ ...wallet, id: String(wallet._id) }));
+    return wallets.map(wallet => ({ ...wallet, id: String(wallet._id) }));
   }
 
   async findByUserIds(userIds: string[]) {
     const objectIds = userIds
-      .filter((id) => Types.ObjectId.isValid(id))
-      .map((id) => new Types.ObjectId(id));
+      .filter(id => Types.ObjectId.isValid(id))
+      .map(id => new Types.ObjectId(id));
     if (objectIds.length === 0) return [];
     const wallets = await this.userWalletModel
-      .find({ userId: { $in: objectIds }, isDefault: true, status: WalletStatus.ACTIVE })
+      .find({
+        userId: { $in: objectIds },
+        isDefault: true,
+        status: WalletStatus.ACTIVE,
+      })
       .select('userId')
       .lean()
       .exec();
-    return wallets.map((wallet) => ({ ...wallet, id: String(wallet._id) }));
+    return wallets.map(wallet => ({ ...wallet, id: String(wallet._id) }));
   }
 
   async findDefaultWallet(userId: string, network: BlockchainNetwork) {
@@ -72,7 +76,11 @@ export class UserWalletRepository {
     return wallet ? { ...wallet, id: String(wallet._id) } : null;
   }
 
-  async updateDefaultStatus(userId: string, network: BlockchainNetwork, excludeWalletId: string) {
+  async updateDefaultStatus(
+    userId: string,
+    network: BlockchainNetwork,
+    excludeWalletId: string,
+  ) {
     await this.userWalletModel
       .updateMany(
         {
@@ -101,23 +109,38 @@ export class UserWalletRepository {
     return !!result;
   }
 
-  validateWalletAddress(address: string, network: BlockchainNetwork): { valid: boolean; reason?: string } {
+  validateWalletAddress(
+    address: string,
+    network: BlockchainNetwork,
+  ): { valid: boolean; reason?: string } {
     if (network === BlockchainNetwork.TRC20) {
       if (!address.startsWith('T')) {
-        return { valid: false, reason: 'la dirección TRC20 debe comenzar con "T"' };
+        return {
+          valid: false,
+          reason: 'la dirección TRC20 debe comenzar con "T"',
+        };
       }
       if (address.length !== 34) {
-        return { valid: false, reason: `la dirección TRC20 debe tener 34 caracteres (tiene ${address.length})` };
+        return {
+          valid: false,
+          reason: `la dirección TRC20 debe tener 34 caracteres (tiene ${address.length})`,
+        };
       }
       return { valid: true };
     }
 
     if (network === BlockchainNetwork.BEP20) {
       if (!address.startsWith('0x')) {
-        return { valid: false, reason: 'la dirección BEP20 debe comenzar con "0x"' };
+        return {
+          valid: false,
+          reason: 'la dirección BEP20 debe comenzar con "0x"',
+        };
       }
       if (address.length !== 42) {
-        return { valid: false, reason: `la dirección BEP20 debe tener 42 caracteres (tiene ${address.length})` };
+        return {
+          valid: false,
+          reason: `la dirección BEP20 debe tener 42 caracteres (tiene ${address.length})`,
+        };
       }
       return { valid: true };
     }

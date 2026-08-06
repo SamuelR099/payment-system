@@ -1,7 +1,4 @@
-import {
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { IsObjectId } from 'src/shared/validation';
 import { Type } from 'class-transformer';
 import { IsInt } from 'class-validator';

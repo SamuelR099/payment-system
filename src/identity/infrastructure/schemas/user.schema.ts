@@ -3,7 +3,7 @@ import { Document } from 'mongoose';
 import { Language, UserRole, EmployeePosition } from 'src/shared/enums';
 
 @Schema({ _id: false })
-export class Address { }
+export class Address {}
 
 @Schema({ _id: false })
 export class UserProfile {

@@ -5,7 +5,9 @@ import { DeletePaymentCommand } from './delete-payment.command';
 import { UserRole } from 'src/shared/enums/user-role.enum';
 
 @CommandHandler(DeletePaymentCommand)
-export class DeletePaymentHandler implements ICommandHandler<DeletePaymentCommand> {
+export class DeletePaymentHandler
+  implements ICommandHandler<DeletePaymentCommand>
+{
   constructor(private readonly paymentRepository: PaymentRepository) {}
 
   async execute(command: DeletePaymentCommand) {
@@ -15,7 +17,9 @@ export class DeletePaymentHandler implements ICommandHandler<DeletePaymentComman
       throw new NotFoundException('Payment not found');
     }
 
-    const isAdmin = command.userRole === UserRole.SUPERVISOR || command.userRole === UserRole.ADMIN;
+    const isAdmin =
+      command.userRole === UserRole.SUPERVISOR ||
+      command.userRole === UserRole.ADMIN;
     if (!isAdmin) {
       throw new ForbiddenException('Only administrators can delete payments');
     }

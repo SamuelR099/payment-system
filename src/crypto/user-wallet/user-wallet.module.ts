@@ -2,7 +2,10 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CqrsModule } from '@nestjs/cqrs';
 
-import { UserWallet, UserWalletSchema } from './infrastructure/schemas/user-wallet.schema';
+import {
+  UserWallet,
+  UserWalletSchema,
+} from './infrastructure/schemas/user-wallet.schema';
 import { UserWalletRepository } from './infrastructure/repositories/user-wallet.repository';
 import { WalletsController } from './infrastructure/controllers/wallets.controller';
 

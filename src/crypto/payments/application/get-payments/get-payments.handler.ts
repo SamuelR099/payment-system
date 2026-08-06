@@ -12,22 +12,28 @@ export class GetPaymentsHandler implements IQueryHandler<GetPaymentsQuery> {
   ) {}
 
   async execute(query: GetPaymentsQuery) {
-    const isAdmin = query.userRole === UserRole.SUPERVISOR || query.userRole === UserRole.ADMIN;
+    const isAdmin =
+      query.userRole === UserRole.SUPERVISOR ||
+      query.userRole === UserRole.ADMIN;
     const targetUserId = isAdmin ? undefined : query.userId;
 
-    const { data: payments, nextCursor } = await this.paymentRepository.findByUserIdWithFilters(
-      targetUserId,
-      query.status,
-      query.excludeStatus,
-      query.cursor,
-      query.limit,
-    );
+    const { data: payments, nextCursor } =
+      await this.paymentRepository.findByUserIdWithFilters(
+        targetUserId,
+        query.status,
+        query.excludeStatus,
+        query.cursor,
+        query.limit,
+      );
 
-    const userIds = [...new Set(payments.map((payment) => String(payment.userId)))];
-    const users = userIds.length > 0 ? await this.userRepository.findByIds(userIds) : [];
+    const userIds = [
+      ...new Set(payments.map(payment => String(payment.userId))),
+    ];
+    const users =
+      userIds.length > 0 ? await this.userRepository.findByIds(userIds) : [];
 
     const userMap = new Map<string, { firstName: string; lastName: string }>(
-      users.map((user) => [
+      users.map(user => [
         String(user._id),
         {
           firstName: user.profile?.firstName ?? '',
@@ -36,7 +42,7 @@ export class GetPaymentsHandler implements IQueryHandler<GetPaymentsQuery> {
       ]),
     );
 
-    const enrichedData = payments.map((payment) => {
+    const enrichedData = payments.map(payment => {
       const user = userMap.get(String(payment.userId));
       return {
         ...payment,

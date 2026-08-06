@@ -15,7 +15,8 @@ import { ApproveReportAdminCommand } from './approve-report-admin.command';
 
 @CommandHandler(ApproveReportAdminCommand)
 export class ApproveReportAdminHandler
-  implements ICommandHandler<ApproveReportAdminCommand> {
+  implements ICommandHandler<ApproveReportAdminCommand>
+{
   constructor(
     private readonly reportRepository: ReportRepository,
     private readonly awsS3Service: AwsS3Service,
@@ -27,6 +28,16 @@ export class ApproveReportAdminHandler
     const { reportId, adminId, file } = command;
 
     const reportDoc = await this.reportRepository.findById(reportId, true);
+
+    if (
+      !reportDoc.supervisorId ||
+      String(reportDoc.supervisorId) !== String(adminId)
+    ) {
+      throw new DomainError(
+        'UNAUTHORIZED',
+        'No tienes permisos para aprobar este reporte. Solo el supervisor asignado puede aprobarlo.',
+      );
+    }
 
     if (!file) {
       throw new DomainError(
@@ -45,7 +56,10 @@ export class ApproveReportAdminHandler
 
     const { id, userId, ...updateData } = approvedReport.getUserInfo();
 
-    const updatedReport = await this.reportRepository.update(reportId, updateData);
+    const updatedReport = await this.reportRepository.update(
+      reportId,
+      updateData,
+    );
 
     const period = ReportPeriod.create(reportDoc.month, reportDoc.year);
     const { startDate, endDate } = period.getDateRange();

@@ -45,8 +45,10 @@ export class PaymentVerificationCron {
   }
 
   private async verifyBlockchainPayments() {
-    const tolerancePercent = this.configService.get<number>('payment.tolerancePercent') ?? 1;
-    const minimumConfirmations = this.configService.get<number>('payment.minimumConfirmations') ?? 2;
+    const tolerancePercent =
+      this.configService.get<number>('payment.tolerancePercent') ?? 1;
+    const minimumConfirmations =
+      this.configService.get<number>('payment.minimumConfirmations') ?? 2;
 
     const pendingPayments = await this.paymentRepository.findPendingPayments();
 

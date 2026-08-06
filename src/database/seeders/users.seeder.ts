@@ -3,7 +3,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { hash } from 'bcrypt';
 import { Seeder } from 'nestjs-seeder';
-import { User, UserDocument } from 'src/identity/infrastructure/schemas/user.schema';
+import {
+  User,
+  UserDocument,
+} from 'src/identity/infrastructure/schemas/user.schema';
 import { UserRole } from 'src/shared/enums/user-role.enum';
 
 @Injectable()
@@ -55,11 +58,10 @@ export class UsersSeeder implements Seeder {
     }
 
     for (const admin of admins) {
-      await this.userModel.findOneAndUpdate(
-        { email: admin.email },
-        admin,
-        { upsert: true, new: true },
-      );
+      await this.userModel.findOneAndUpdate({ email: admin.email }, admin, {
+        upsert: true,
+        new: true,
+      });
     }
 
     return { supervisors: supervisors.length, admins: admins.length };

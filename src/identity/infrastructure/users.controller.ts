@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Patch, Post, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Query,
+  Req,
+  Res,
+} from '@nestjs/common';
 import type { Response } from 'express';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Recaptcha } from '@nestlab/google-recaptcha';
@@ -9,8 +18,10 @@ import { CreateUserCommand } from '../application/create-user/create-user.comman
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { SignInDto } from './dto/sign-in.dto';
+import { GetUsersDto } from './dto/get-users.dto';
 import { SignInCommand } from '../application/sign-in/sign-in.command';
 import { GetUserProfileQuery } from '../application/queries/get-user-profile.query';
+import { GetUsersQuery } from '../application/queries/get-users.query';
 import { UpdateUserProfileCommand } from '../application/update-user-profile/update-user-profile.command';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 
@@ -30,7 +41,10 @@ export class UsersController {
 
   @Post('/sign-in')
   @Public()
-  async signIn(@Body() body: SignInDto, @Res({ passthrough: true }) response: Response) {
+  async signIn(
+    @Body() body: SignInDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
     const result = (await this.commandBus.execute(new SignInCommand(body))) as {
       token: string;
       user: any;
@@ -44,6 +58,11 @@ export class UsersController {
     });
 
     return { user: result.user };
+  }
+
+  @Get('/')
+  async getUsers(@Query() query: GetUsersDto) {
+    return this.queryBus.execute(new GetUsersQuery(query));
   }
 
   @Get('/me')

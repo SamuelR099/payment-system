@@ -18,12 +18,24 @@ export class ReportPeriod {
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
 
-    if (!this.month || !this.year || this.month < 1 || this.month > 12 || this.year < 2000) {
+    if (
+      !this.month ||
+      !this.year ||
+      this.month < 1 ||
+      this.month > 12 ||
+      this.year < 2000
+    ) {
       throw new DomainError('INVALID_PERIOD', 'Mes o año inválido.');
     }
 
-    if (this.year > currentYear || (this.year === currentYear && this.month > currentMonth)) {
-      throw new DomainError('FUTURE_PERIOD_NOT_ALLOWED', 'No se puede procesar un periodo futuro.');
+    if (
+      this.year > currentYear ||
+      (this.year === currentYear && this.month > currentMonth)
+    ) {
+      throw new DomainError(
+        'FUTURE_PERIOD_NOT_ALLOWED',
+        'No se puede procesar un periodo futuro.',
+      );
     }
   }
 
@@ -38,7 +50,6 @@ export class ReportPeriod {
   }
 
   getDateRange(timezone: string = 'America/Puerto_Rico') {
-
     const baseDate = new Date(this.year, this.month - 1, 1);
 
     const startDate = toDate(startOfMonth(baseDate), { timeZone: timezone });

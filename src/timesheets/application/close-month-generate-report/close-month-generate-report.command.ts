@@ -5,6 +5,7 @@ export class CloseMonthGenerateReportCommand {
     readonly userId: string,
     readonly month: number,
     readonly year: number,
+    readonly supervisorId?: string,
     readonly file?: Multer.File,
   ) {}
 }

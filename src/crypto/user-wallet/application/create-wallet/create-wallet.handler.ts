@@ -5,7 +5,9 @@ import { UserWalletRepository } from '../../infrastructure/repositories/user-wal
 import { CreateWalletCommand } from './create-wallet.command';
 
 @CommandHandler(CreateWalletCommand)
-export class CreateWalletHandler implements ICommandHandler<CreateWalletCommand> {
+export class CreateWalletHandler
+  implements ICommandHandler<CreateWalletCommand>
+{
   constructor(private readonly walletRepository: UserWalletRepository) {}
 
   async execute(command: CreateWalletCommand) {
@@ -22,7 +24,9 @@ export class CreateWalletHandler implements ICommandHandler<CreateWalletCommand>
       );
     }
 
-    const existingWallets = await this.walletRepository.findByUserId(command.userId);
+    const existingWallets = await this.walletRepository.findByUserId(
+      command.userId,
+    );
     const isFirstWallet = existingWallets.length === 0;
     const shouldBeDefault = isFirstWallet || (command.isDefault ?? false);
 

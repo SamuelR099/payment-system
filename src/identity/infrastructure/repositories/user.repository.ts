@@ -63,4 +63,17 @@ export class UserRepository {
       >()
       .exec();
   }
+
+  async findByRole(role: string) {
+    return this.userModel
+      .find({ role })
+      .select('profile.firstName profile.lastName')
+      .lean<
+        {
+          _id: Types.ObjectId;
+          profile: { firstName: string; lastName: string };
+        }[]
+      >()
+      .exec();
+  }
 }

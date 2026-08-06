@@ -6,7 +6,9 @@ import { UserWallet } from '../../domain/user-wallet.model';
 import { WalletStatus } from 'src/shared/enums';
 
 @CommandHandler(UpdateWalletCommand)
-export class UpdateWalletHandler implements ICommandHandler<UpdateWalletCommand> {
+export class UpdateWalletHandler
+  implements ICommandHandler<UpdateWalletCommand>
+{
   constructor(private readonly walletRepository: UserWalletRepository) {}
 
   async execute(command: UpdateWalletCommand) {
@@ -34,6 +36,9 @@ export class UpdateWalletHandler implements ICommandHandler<UpdateWalletCommand>
       }
     }
 
-    return this.walletRepository.updateById(command.walletId, updatedWallet.getUserInfo());
+    return this.walletRepository.updateById(
+      command.walletId,
+      updatedWallet.getUserInfo(),
+    );
   }
 }

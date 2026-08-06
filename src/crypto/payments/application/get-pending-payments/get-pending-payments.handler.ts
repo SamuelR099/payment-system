@@ -3,7 +3,9 @@ import { PaymentRepository } from '../../infrastructure/repositories/payment.rep
 import { GetPendingPaymentsQuery } from './get-pending-payments.query';
 
 @QueryHandler(GetPendingPaymentsQuery)
-export class GetPendingPaymentsHandler implements IQueryHandler<GetPendingPaymentsQuery> {
+export class GetPendingPaymentsHandler
+  implements IQueryHandler<GetPendingPaymentsQuery>
+{
   constructor(private readonly paymentRepository: PaymentRepository) {}
 
   async execute(query: GetPendingPaymentsQuery) {

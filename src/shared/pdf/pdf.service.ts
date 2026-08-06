@@ -18,7 +18,7 @@ export class PdfService {
     private readonly userRepository: UserRepository,
     @Inject(forwardRef(() => ReportRepository))
     private readonly reportRepository: ReportRepository,
-  ) { }
+  ) {}
 
   async generateAndUploadReport(
     report: ReportDocument,
@@ -28,8 +28,13 @@ export class PdfService {
     const user = await this.userRepository.findById(report.userId, true);
     const professionalName = `${user.profile.firstName} ${user.profile.lastName}`;
 
-    const timesheetWithSignature = timesheetDocuments.find(ts => ts.signed && ts.signatureImageUrl);
-    const signatureUrl = report.employeeSignatureImage || timesheetWithSignature?.signatureImageUrl || user.profile.avatarUrl;
+    const timesheetWithSignature = timesheetDocuments.find(
+      ts => ts.signed && ts.signatureImageUrl,
+    );
+    const signatureUrl =
+      report.employeeSignatureImage ||
+      timesheetWithSignature?.signatureImageUrl ||
+      user.profile.avatarUrl;
 
     const signatureDate = report.employeeSignedAt
       ? report.employeeSignedAt
@@ -62,12 +67,14 @@ export class PdfService {
       hourlyRate: timesheetDocuments[0]?.hourlyRate || 0,
       totalAmount: report.totalAmount,
       professionalSignatureUrl: await this.getBase64Image(signatureUrl),
-       supervisorName: 'Raúl D. Olivero Carrucini',
-       supervisorSignatureUrl: await this.getBase64Image(report.adminSignatureImage),
-       signatureDate: (signatureDate || new Date()).toLocaleDateString('es-PR'),
-       supervisorSignatureDate: report.adminSignedAt
-         ? report.adminSignedAt.toLocaleDateString('es-PR')
-         : '',
+      supervisorName: 'Raúl D. Olivero Carrucini',
+      supervisorSignatureUrl: await this.getBase64Image(
+        report.adminSignatureImage,
+      ),
+      signatureDate: (signatureDate || new Date()).toLocaleDateString('es-PR'),
+      supervisorSignatureDate: report.adminSignedAt
+        ? report.adminSignedAt.toLocaleDateString('es-PR')
+        : '',
     };
 
     const htmlContent = renderPdfTemplate(ReportTemplate, pdfData);
@@ -112,7 +119,9 @@ export class PdfService {
       const contentType = response.headers.get('content-type') || 'image/png';
 
       if (contentType.includes('xml')) {
-        throw new Error('Received XML instead of an image. Likely an S3 access error.');
+        throw new Error(
+          'Received XML instead of an image. Likely an S3 access error.',
+        );
       }
 
       return `data:${contentType};base64,${buffer.toString('base64')}`;

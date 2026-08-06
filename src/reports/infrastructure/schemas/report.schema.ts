@@ -9,6 +9,9 @@ export class Report {
   @Prop({ required: true })
   userId: string;
 
+  @Prop({ index: true })
+  supervisorId?: string;
+
   @Prop({ required: true })
   month: number;
 

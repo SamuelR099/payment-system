@@ -5,7 +5,9 @@ import { SetDefaultWalletCommand } from './set-default-wallet.command';
 import { UserWallet } from '../../domain/user-wallet.model';
 
 @CommandHandler(SetDefaultWalletCommand)
-export class SetDefaultWalletHandler implements ICommandHandler<SetDefaultWalletCommand> {
+export class SetDefaultWalletHandler
+  implements ICommandHandler<SetDefaultWalletCommand>
+{
   constructor(private readonly walletRepository: UserWalletRepository) {}
 
   async execute(command: SetDefaultWalletCommand) {
@@ -23,6 +25,9 @@ export class SetDefaultWalletHandler implements ICommandHandler<SetDefaultWallet
       command.walletId,
     );
 
-    return this.walletRepository.updateById(command.walletId, walletAsDefault.getUserInfo());
+    return this.walletRepository.updateById(
+      command.walletId,
+      walletAsDefault.getUserInfo(),
+    );
   }
 }

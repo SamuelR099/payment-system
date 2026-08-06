@@ -8,7 +8,9 @@ import { CreatePaymentCommand } from './create-payment.command';
 import { PaymentStatus } from 'src/shared/enums/payment-status.enum';
 
 @CommandHandler(CreatePaymentCommand)
-export class CreatePaymentHandler implements ICommandHandler<CreatePaymentCommand> {
+export class CreatePaymentHandler
+  implements ICommandHandler<CreatePaymentCommand>
+{
   constructor(
     private readonly paymentRepository: PaymentRepository,
     private readonly reportRepository: ReportRepository,
@@ -17,7 +19,9 @@ export class CreatePaymentHandler implements ICommandHandler<CreatePaymentComman
   ) {}
 
   async execute(command: CreatePaymentCommand) {
-    const existingPayment = await this.paymentRepository.findByReportId(command.reportId);
+    const existingPayment = await this.paymentRepository.findByReportId(
+      command.reportId,
+    );
     if (existingPayment) {
       throw new ConflictException('Payment already exists for this report');
     }
@@ -32,7 +36,8 @@ export class CreatePaymentHandler implements ICommandHandler<CreatePaymentComman
       throw new NotFoundException('Wallet not found');
     }
 
-    const expirationDays = this.configService.get<number>('payment.expirationDays') ?? 30;
+    const expirationDays =
+      this.configService.get<number>('payment.expirationDays') ?? 30;
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + expirationDays);
 

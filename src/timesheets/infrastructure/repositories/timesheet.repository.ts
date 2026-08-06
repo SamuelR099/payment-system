@@ -18,16 +18,23 @@ export class TimesheetRepository {
     status?: string;
     terms?: string;
   }) {
-    const { userId, month, year, startDate, endDate, cursor, limit, status, terms } = params;
+    const {
+      userId,
+      month,
+      year,
+      startDate,
+      endDate,
+      cursor,
+      limit,
+      status,
+      terms,
+    } = params;
     const pageSize = limit ?? this.DEFAULT_PAGE_SIZE;
 
     const filter: any = {
       $and: [
         {
-          $or: [
-            { userId: userId },
-            { userId: new Types.ObjectId(userId) },
-          ],
+          $or: [{ userId: userId }, { userId: new Types.ObjectId(userId) }],
         },
       ],
     };
@@ -100,10 +107,7 @@ export class TimesheetRepository {
   async countByUserId(userId: string) {
     return this.timesheetModel
       .countDocuments({
-        $or: [
-          { userId: userId },
-          { userId: new Types.ObjectId(userId) },
-        ],
+        $or: [{ userId: userId }, { userId: new Types.ObjectId(userId) }],
       })
       .lean()
       .exec();
@@ -133,7 +137,9 @@ export class TimesheetRepository {
       ],
     };
     if (params.excludeTimesheetId) {
-      filter.$and.push({ _id: { $ne: new Types.ObjectId(params.excludeTimesheetId) } });
+      filter.$and.push({
+        _id: { $ne: new Types.ObjectId(params.excludeTimesheetId) },
+      });
     }
     const count = await this.timesheetModel.countDocuments(filter).exec();
     return count > 0;
@@ -161,21 +167,27 @@ export class TimesheetRepository {
       {
         $and: [
           {
-            $or: [
-              { userId: userId },
-              { userId: new Types.ObjectId(userId) },
-            ],
+            $or: [{ userId: userId }, { userId: new Types.ObjectId(userId) }],
           },
           { date: { $gte: startDate, $lte: endDate } },
         ],
       },
       {
-        $set: { signed: false, signatureImageUrl: undefined, signedAt: undefined },
+        $set: {
+          signed: false,
+          signatureImageUrl: undefined,
+          signedAt: undefined,
+        },
       },
     );
   }
 
-  async signAllByPeriod(userId: string, month: number, year: number, signatureImageUrl: string) {
+  async signAllByPeriod(
+    userId: string,
+    month: number,
+    year: number,
+    signatureImageUrl: string,
+  ) {
     const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
     const endDate = new Date(year, month, 0, 23, 59, 59, 999);
     const now = new Date();
@@ -183,10 +195,7 @@ export class TimesheetRepository {
       {
         $and: [
           {
-            $or: [
-              { userId: userId },
-              { userId: new Types.ObjectId(userId) },
-            ],
+            $or: [{ userId: userId }, { userId: new Types.ObjectId(userId) }],
           },
           { date: { $gte: startDate, $lte: endDate } },
         ],

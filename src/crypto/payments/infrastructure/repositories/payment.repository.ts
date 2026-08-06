@@ -47,10 +47,7 @@ export class PaymentRepository {
   }
 
   async findByUserId(userId: string) {
-    return this.paymentModel
-      .find({ userId })
-      .sort({ createdAt: -1 })
-      .exec();
+    return this.paymentModel.find({ userId }).sort({ createdAt: -1 }).exec();
   }
 
   async findByUserIdWithFilters(
@@ -65,10 +62,7 @@ export class PaymentRepository {
 
     if (userId) {
       filter.$and.push({
-        $or: [
-          { userId: userId },
-          { userId: new Types.ObjectId(userId) },
-        ],
+        $or: [{ userId: userId }, { userId: new Types.ObjectId(userId) }],
       });
     }
 
@@ -95,13 +89,15 @@ export class PaymentRepository {
       .lean()
       .exec();
 
-    const mappedData = data.map((payment) => ({
+    const mappedData = data.map(payment => ({
       ...payment,
       id: String(payment._id),
     }));
 
     const nextCursor =
-      mappedData.length < pageSize ? null : String(mappedData[mappedData.length - 1]._id);
+      mappedData.length < pageSize
+        ? null
+        : String(mappedData[mappedData.length - 1]._id);
 
     return { data: mappedData, nextCursor };
   }
@@ -116,11 +112,20 @@ export class PaymentRepository {
     return updated;
   }
 
-  async updateStatus(id: string, status: PaymentStatus, additionalData?: Partial<Payment>) {
+  async updateStatus(
+    id: string,
+    status: PaymentStatus,
+    additionalData?: Partial<Payment>,
+  ) {
     return this.updateById(id, { status, ...additionalData });
   }
 
-  async markAsCompleted(id: string, txid: string, amountReceived: number, rawBlockchainData: Record<string, any>) {
+  async markAsCompleted(
+    id: string,
+    txid: string,
+    amountReceived: number,
+    rawBlockchainData: Record<string, any>,
+  ) {
     return this.updateById(id, {
       status: PaymentStatus.COMPLETED,
       txid,

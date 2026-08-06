@@ -13,6 +13,10 @@ import { BlockchainProviderFactory } from './infrastructure/factories/blockchain
     BscBlockchainProvider,
     BlockchainProviderFactory,
   ],
-  exports: [BlockchainProviderFactory, TronBlockchainProvider, BscBlockchainProvider],
+  exports: [
+    BlockchainProviderFactory,
+    TronBlockchainProvider,
+    BscBlockchainProvider,
+  ],
 })
 export class BlockchainModule {}

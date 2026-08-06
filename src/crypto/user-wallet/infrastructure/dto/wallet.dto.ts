@@ -1,4 +1,10 @@
-import { IsEnum, IsNotEmpty, IsString, IsOptional, IsBoolean } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsBoolean,
+} from 'class-validator';
 import { BlockchainNetwork } from 'src/shared/enums/blockchain-network.enum';
 import { WalletStatus } from 'src/shared/enums/wallet-status.enum';
 

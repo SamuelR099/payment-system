@@ -15,6 +15,7 @@ import { SignInHandler } from '../application/sign-in/sign-in.handler';
 import { User, UserSchema } from './schemas/user.schema';
 import { UserRepository } from './repositories/user.repository';
 import { GetUserProfileHandler } from '../application/queries/get-user-profile.handler';
+import { GetUsersHandler } from '../application/queries/get-users.handler';
 import { UpdateUserProfileHandler } from '../application/update-user-profile/update-user-profile.handler';
 
 import { AuthService } from './auth.service';
@@ -38,6 +39,7 @@ import { UsersController } from './users.controller';
     UserRepository,
     SignInHandler,
     GetUserProfileHandler,
+    GetUsersHandler,
     UpdateUserProfileHandler,
   ],
   exports: [UserRepository],
