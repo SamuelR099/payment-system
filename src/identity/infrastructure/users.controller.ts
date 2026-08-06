@@ -6,9 +6,7 @@ import {
   Post,
   Query,
   Req,
-  Res,
 } from '@nestjs/common';
-import type { Response } from 'express';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Recaptcha } from '@nestlab/google-recaptcha';
 
@@ -41,23 +39,9 @@ export class UsersController {
 
   @Post('/sign-in')
   @Public()
-  async signIn(
-    @Body() body: SignInDto,
-    @Res({ passthrough: true }) response: Response,
-  ) {
-    const result = (await this.commandBus.execute(new SignInCommand(body))) as {
-      token: string;
-      user: any;
-    };
-
-    response.cookie('token', result.token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
-    });
-
-    return { user: result.user };
+  @Recaptcha()
+  signIn(@Body() body: SignInDto) {
+    return this.commandBus.execute(new SignInCommand(body));
   }
 
   @Get('/')
