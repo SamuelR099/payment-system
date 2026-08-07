@@ -26,7 +26,7 @@ export class SubmitReportHandler
 
     const submittedReport = report.submit();
 
-    const { id, userId: _, ...updateData } = submittedReport.getUserInfo();
+    const { ...updateData } = submittedReport.getUserInfo();
     await this.reportRepository.update(reportId, updateData);
   }
 }

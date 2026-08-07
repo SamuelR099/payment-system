@@ -54,7 +54,7 @@ export class ApproveReportAdminHandler
       signatureImageUrl,
     );
 
-    const { id, userId, ...updateData } = approvedReport.getUserInfo();
+    const { ...updateData } = approvedReport.getUserInfo();
 
     const updatedReport = await this.reportRepository.update(
       reportId,

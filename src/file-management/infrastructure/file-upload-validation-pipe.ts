@@ -5,7 +5,6 @@ import {
   PipeTransform,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { DomainError } from 'src/shared/domain';
 
 type FileUploadValidationPipeParams = {
   allowedTypes: RegExp;

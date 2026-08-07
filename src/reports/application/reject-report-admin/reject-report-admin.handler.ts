@@ -33,14 +33,14 @@ export class RejectReportAdminHandler
 
     const rejectedReport = report.reject();
 
-    const { id, userId, ...updateData } = rejectedReport.getUserInfo();
+    const { ...updateData } = rejectedReport.getUserInfo();
     const updatedReport = await this.reportRepository.update(
       reportId,
       updateData,
     );
 
     await this.timesheetRepository.unsignAllByPeriod(
-      userId,
+      reportDoc.userId,
       report.month,
       report.year,
     );

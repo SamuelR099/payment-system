@@ -1,4 +1,4 @@
-import { IsString, IsNumber } from 'class-validator';
+import { IsNumber } from 'class-validator';
 import { IsObjectId } from 'src/shared/validation';
 
 export class CreateReportDto {

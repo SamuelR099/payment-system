@@ -1,8 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Cron, CronExpression } from '@nestjs/schedule';
 import { PaymentRepository } from '../../infrastructure/repositories/payment.repository';
-import { PaymentStatus } from 'src/shared/enums/payment-status.enum';
 import { BlockchainNetwork } from 'src/shared/enums/blockchain-network.enum';
 import { BlockchainProviderFactory } from '../../../blockchain/infrastructure/factories/blockchain-provider.factory';
 import { ReportRepository } from '../../../../reports/infrastructure/repositories/report.repository';

@@ -3,7 +3,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { BlockchainNetwork } from 'src/shared/enums/blockchain-network.enum';
 import {
   BlockchainTransaction,
-  GetTransactionsResult,
   IBlockchainProvider,
 } from '../../domain/interfaces/blockchain-provider.interface';
 

@@ -6,7 +6,6 @@ import {
   MaxLength,
   Min,
   IsDate,
-  MaxDate,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
