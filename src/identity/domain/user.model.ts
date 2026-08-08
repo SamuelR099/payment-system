@@ -16,6 +16,7 @@ export class User {
   readonly address?: Address | object;
   readonly language?: Language;
   readonly avatarUrl?: string;
+  readonly slackUserId?: string;
   readonly role: UserRole;
   readonly wallet?: string;
   readonly hourlyRate: number;
@@ -32,6 +33,7 @@ export class User {
     address?: Address;
     language?: Language;
     avatarUrl?: string;
+    slackUserId?: string;
     role: UserRole;
     wallet?: string;
     hourlyRate: number;
@@ -47,6 +49,7 @@ export class User {
     this.address = params.address || {};
     this.language = params.language;
     this.avatarUrl = params.avatarUrl;
+    this.slackUserId = params.slackUserId;
     this.role = params.role;
     this.wallet = params.wallet;
     this.hourlyRate = params.hourlyRate;
@@ -57,7 +60,7 @@ export class User {
 
   static fromModel(
     document: ExtendedUserDocument,
-    // params: ExtendedUserParams = {},
+    // params: ExtendedParams = {},
   ): User {
     return new User({
       id: String(document._id),
@@ -68,6 +71,7 @@ export class User {
       address: document.profile.address,
       language: document.language,
       avatarUrl: document.profile.avatarUrl,
+      slackUserId: document.profile.slackUserId,
       role: document.role,
       wallet: document.wallet,
       hourlyRate: document.hourlyRate,
@@ -88,6 +92,7 @@ export class User {
         lastName: this.lastName,
         address: this.address,
         avatarUrl: this.avatarUrl,
+        slackUserId: this.slackUserId,
         position: this.position,
       },
       language: this.language,

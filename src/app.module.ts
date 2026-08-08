@@ -13,6 +13,7 @@ import jwtConfig from './config/jwt.config';
 import mailConfig from './config/mail.config';
 import paymentConfig from './config/payment.config';
 import recaptchaConfig from './config/recaptcha.config';
+import slackConfig from './config/slack.config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -20,6 +21,7 @@ import { ClientRouteBuilder } from './shared/utils';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
 import { MailModule } from './shared/mail';
+import { SlackModule } from './identity/infrastructure/slack/slack.module';
 import { IdentityModule } from './identity/infrastructure/identity.module';
 import { TimesheetsModule } from './timesheets/infrastructure/timesheets.module';
 import { ProjectsModule } from './projects/infrastructure/projects.module';
@@ -39,6 +41,7 @@ import { PaymentsModule } from './crypto/payments/payments.module';
         mailConfig,
         paymentConfig,
         recaptchaConfig,
+        slackConfig,
       ],
     }),
     GoogleRecaptchaModule.forRootAsync({
@@ -59,6 +62,7 @@ import { PaymentsModule } from './crypto/payments/payments.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => config.get('mail'),
     }),
+    SlackModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

@@ -22,6 +22,9 @@ export class UserProfile {
   @Prop()
   avatarUrl?: string;
 
+  @Prop()
+  slackUserId?: string;
+
   @Prop({
     enum: Object.values(EmployeePosition),
   })

@@ -20,6 +20,7 @@ import { UpdateUserProfileHandler } from '../application/update-user-profile/upd
 
 import { AuthService } from './auth.service';
 import { UsersController } from './users.controller';
+import { SlackModule } from './slack/slack.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { UsersController } from './users.controller';
     JwtModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    SlackModule,
   ],
   controllers: [UsersController],
   providers: [

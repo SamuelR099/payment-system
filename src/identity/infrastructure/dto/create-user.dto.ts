@@ -42,4 +42,8 @@ export class CreateUserDto {
   @IsEnum(EmployeePosition)
   @IsOptional()
   position?: EmployeePosition;
+
+  @IsString()
+  @IsOptional()
+  slackUserId?: string;
 }
