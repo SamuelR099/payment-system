@@ -14,8 +14,7 @@ import { SignInHandler } from '../application/sign-in/sign-in.handler';
 
 import { User, UserSchema } from './schemas/user.schema';
 import { UserRepository } from './repositories/user.repository';
-import { GetUserProfileHandler } from '../application/queries/get-user-profile.handler';
-import { GetUsersHandler } from '../application/queries/get-users.handler';
+import { GetUsersHandler } from '../application/get-users/get-users.handler';
 import { UpdateUserProfileHandler } from '../application/update-user-profile/update-user-profile.handler';
 
 import { AuthService } from './auth.service';
@@ -40,7 +39,6 @@ import { SlackModule } from './slack/slack.module';
     CreateUserHandler,
     UserRepository,
     SignInHandler,
-    GetUserProfileHandler,
     GetUsersHandler,
     UpdateUserProfileHandler,
   ],

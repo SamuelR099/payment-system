@@ -10,8 +10,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import { GetUsersDto } from './dto/get-users.dto';
 import { SignInCommand } from '../application/sign-in/sign-in.command';
-import { GetUserProfileQuery } from '../application/queries/get-user-profile.query';
-import { GetUsersQuery } from '../application/queries/get-users.query';
+import { GetUsersQuery } from '../application/get-users/get-users.query';
 import { UpdateUserProfileCommand } from '../application/update-user-profile/update-user-profile.command';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 
@@ -43,7 +42,7 @@ export class UsersController {
 
   @Get('/me')
   async getMe(@Req() req: { user?: { userId: string } }) {
-    return this.queryBus.execute(new GetUserProfileQuery(req.user.userId));
+    return this.queryBus.execute(new GetUsersQuery({ userId: req.user.userId }));
   }
 
   @Patch('/me')
