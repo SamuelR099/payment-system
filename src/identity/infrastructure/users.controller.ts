@@ -38,7 +38,6 @@ export class UsersController {
   }
 
   @Get('/')
-  @Roles([UserRole.ADMIN, UserRole.SUPERVISOR])
   async getUsers(@Query() query: GetUsersDto) {
     return this.queryBus.execute(new GetUsersQuery(query));
   }
