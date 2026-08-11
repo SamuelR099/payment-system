@@ -44,6 +44,7 @@ export class TimesheetsController {
   ) {}
 
   @Post('/')
+  @Roles([UserRole.EMPLOYEE])
   createTimesheet(@Req() req: any, @Body() body: CreateTimesheetDto) {
     return this.commandBus.execute(
       new CreateTimesheetCommand({
@@ -55,6 +56,7 @@ export class TimesheetsController {
   }
 
   @Get('/')
+  @Roles([UserRole.EMPLOYEE, UserRole.SUPERVISOR, UserRole.ADMIN])
   getTimesheets(@Req() req: any, @Query() query: GetTimesheetsDto) {
     return this.queryBus.execute(
       new GetTimesheetsQuery({
@@ -65,6 +67,7 @@ export class TimesheetsController {
   }
 
   @Get('/summary/monthly')
+  @Roles([UserRole.EMPLOYEE])
   getMonthlySummary(@Req() req: any, @Query() query: GetMonthlySummaryDto) {
     return this.queryBus.execute(
       new GetMonthlySummaryQuery(req.user.userId, query.month, query.year),
@@ -98,6 +101,7 @@ export class TimesheetsController {
   }
 
   @Put('/:id')
+  @Roles([UserRole.EMPLOYEE])
   updateTimesheet(
     @Req() req: any,
     @Param('id') id: string,
@@ -114,6 +118,7 @@ export class TimesheetsController {
   }
 
   @Delete('/:id')
+  @Roles([UserRole.EMPLOYEE])
   deleteTimesheet(@Req() req: any, @Param('id') id: string) {
     return this.commandBus.execute(
       new DeleteTimesheetCommand(id, req.user.userId),

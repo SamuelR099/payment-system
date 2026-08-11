@@ -3,6 +3,8 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Recaptcha } from '@nestlab/google-recaptcha';
 
 import { Public } from 'src/shared/validation';
+import { Roles } from 'src/shared/decorators/roles.decorator';
+import { UserRole } from 'src/shared/enums/user-role.enum';
 
 import { CreateUserCommand } from '../application/create-user/create-user.command';
 
@@ -36,6 +38,7 @@ export class UsersController {
   }
 
   @Get('/')
+  @Roles([UserRole.ADMIN, UserRole.SUPERVISOR])
   async getUsers(@Query() query: GetUsersDto) {
     return this.queryBus.execute(new GetUsersQuery(query));
   }

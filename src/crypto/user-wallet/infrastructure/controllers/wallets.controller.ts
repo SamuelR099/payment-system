@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -43,14 +44,11 @@ export class WalletsController {
   }
 
   @Get('/')
-  @Roles([UserRole.EMPLOYEE, UserRole.SUPERVISOR, UserRole.ADMIN])
-  async getWallets(@Req() req: any) {
-    return this.queryBus.execute(new GetUserWalletsQuery(req.user.userId));
-  }
-
-  @Get('/user/:userId')
-  @Roles([UserRole.SUPERVISOR, UserRole.ADMIN])
-  async getUserWalletsById(@Param('userId') userId: string) {
+  async getWallets(
+    @Req() req: any,
+    @Query('userId') targetUserId?: string,
+  ) {
+    const userId = targetUserId || req.user.userId;
     return this.queryBus.execute(new GetUserWalletsQuery(userId));
   }
 
@@ -79,7 +77,7 @@ export class WalletsController {
   }
 
   @Delete('/:id')
-  @Roles([UserRole.EMPLOYEE, UserRole.SUPERVISOR, UserRole.ADMIN])
+  @Roles([UserRole.EMPLOYEE, UserRole.ADMIN])
   async deleteWallet(@Req() req: any, @Param('id') id: string) {
     return this.commandBus.execute(
       new DeleteWalletCommand({
