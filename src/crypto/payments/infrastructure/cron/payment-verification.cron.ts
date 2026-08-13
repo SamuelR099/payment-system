@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PaymentRepository } from '../../infrastructure/repositories/payment.repository';
+import { PaymentRepository } from '../repositories/payment.repository';
 import { BlockchainNetwork } from 'src/shared/enums/blockchain-network.enum';
 import { BlockchainProviderFactory } from '../../../blockchain/infrastructure/factories/blockchain-provider.factory';
 import { ReportRepository } from '../../../../reports/infrastructure/repositories/report.repository';
-import { PaymentDocument } from '../../infrastructure/schemas/payment.schema';
+import { PaymentDocument } from '../schemas/payment.schema';
 import { ReportStatus } from 'src/reports/domain/enums/report-status.enum';
 
 @Injectable()
