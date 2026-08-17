@@ -1,3 +1,8 @@
+import { UserRole } from 'src/shared/enums/user-role.enum';
+
 export class GetOldReportsQuery {
-  constructor() {}
+  constructor(
+    readonly userId: string,
+    readonly userRole: UserRole,
+  ) {}
 }

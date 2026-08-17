@@ -51,8 +51,10 @@ export class ReportsController {
   }
 
   @Get('/old-pdf')
-  async getOldReports() {
-    return this.queryBus.execute(new GetOldReportsQuery());
+  async getOldReports(@Request() req: any) {
+    return this.queryBus.execute(
+      new GetOldReportsQuery(req.user.userId, req.user.role),
+    );
   }
 
   @Get('/old-pdf/:id/pdf')
@@ -90,6 +92,7 @@ export class ReportsController {
   }
 
   @Delete('/old-pdf/:id')
+  @Roles([UserRole.ADMIN, UserRole.SUPERVISOR, UserRole.EMPLOYEE])
   async deleteOldReport(@Param('id') id: string) {
     return this.commandBus.execute(new DeleteOldReportCommand(id));
   }

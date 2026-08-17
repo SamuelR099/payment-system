@@ -17,10 +17,7 @@ export class DeletePaymentHandler
       throw new NotFoundException('Payment not found');
     }
 
-    const isAdmin =
-      command.userRole === UserRole.SUPERVISOR ||
-      command.userRole === UserRole.ADMIN;
-    if (!isAdmin) {
+    if (command.userRole !== UserRole.ADMIN) {
       throw new ForbiddenException('Only administrators can delete payments');
     }
 
