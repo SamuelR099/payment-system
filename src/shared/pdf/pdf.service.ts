@@ -28,6 +28,17 @@ export class PdfService {
     const user = await this.userRepository.findById(report.userId, true);
     const professionalName = `${user.profile.firstName} ${user.profile.lastName}`;
 
+    let supervisorName = 'No asignado';
+    if (report.supervisorId) {
+      const supervisor = await this.userRepository.findById(
+        report.supervisorId,
+        false,
+      );
+      if (supervisor) {
+        supervisorName = `${supervisor.profile.firstName} ${supervisor.profile.lastName}`;
+      }
+    }
+
     const signatureUrl =
       report.employeeSignatureImage || user.profile.signatureImageUrl;
 
@@ -60,7 +71,7 @@ export class PdfService {
       hourlyRate: report.hourlyRate,
       totalAmount: report.totalAmount,
       professionalSignatureUrl: await this.getBase64Image(signatureUrl),
-      supervisorName: 'Raúl D. Olivero Carrucini',
+      supervisorName,
       supervisorSignatureUrl: await this.getBase64Image(
         report.adminSignatureImage,
       ),

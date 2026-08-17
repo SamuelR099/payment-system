@@ -63,10 +63,10 @@ export class CloseMonthGenerateReportHandler
       );
     }
 
-    const user = await this.userRepository.findById(userId, true);
-
     const period = ReportPeriod.create(Number(month), Number(year));
     const { startDate, endDate } = period.getDateRange();
+
+    const user = await this.userRepository.findById(userId, true);
 
     const alreadyExists = await this.reportRepository.findByPeriod(
       userId,

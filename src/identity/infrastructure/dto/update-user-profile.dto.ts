@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Min,
 } from 'class-validator';
 import { EmployeePosition } from 'src/shared/enums';
 
@@ -26,6 +27,7 @@ export class UpdateUserProfileDto {
 
   @IsNumber()
   @IsOptional()
+  @Min(1)
   hourlyRate?: number;
 
   @IsString()

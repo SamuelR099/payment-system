@@ -63,7 +63,6 @@ export class ReportsController {
   @UseInterceptors(FileInterceptor('file'))
   async approveReport(
     @Param('id') id: string,
-    @Body() body: { adminId?: string },
     @Request() req: any,
     @UploadedFile(
       new FileUploadValidationPipe({
@@ -74,7 +73,7 @@ export class ReportsController {
     )
     file?: Multer.File,
   ) {
-    const adminId = req.user?.userId || body.adminId;
+    const adminId = req.user.userId;
     return this.commandBus.execute(
       new ApproveReportAdminCommand({ reportId: id, adminId, file }),
     );
