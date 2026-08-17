@@ -79,7 +79,13 @@ export class TimesheetsController {
   @UseInterceptors(FileInterceptor('file'))
   closeMonthGenerateReport(
     @Req() req: any,
-    @Body() body: { month: number; year: number; supervisorId?: string },
+    @Body()
+    body: {
+      month: number;
+      year: number;
+      supervisorId?: string;
+      hourlyRate: number;
+    },
     @UploadedFile(
       new FileUploadValidationPipe({
         allowedTypes: ALLOWED_MIME_TYPES,
@@ -94,6 +100,7 @@ export class TimesheetsController {
         req.user.userId,
         body.month,
         body.year,
+        body.hourlyRate,
         body.supervisorId,
         file,
       ),

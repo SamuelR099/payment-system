@@ -5,7 +5,6 @@ export class UpdateTimesheetCommand {
   readonly project?: string;
   readonly description?: string;
   readonly hours?: number;
-  readonly hourlyRate?: number;
 
   constructor(data: UpdateTimesheetCommand) {
     Object.assign(this, data);

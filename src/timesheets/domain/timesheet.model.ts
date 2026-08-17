@@ -7,7 +7,6 @@ export interface Timesheet {
   project: string;
   description: string;
   hours: number;
-  hourlyRate: number;
   createdAt: Date;
   updatedAt: Date;
   signatureImageUrl?: string;
@@ -22,7 +21,6 @@ export class TimesheetModel {
   readonly project: string;
   readonly description: string;
   readonly hours: number;
-  readonly hourlyRate: number;
   readonly createdAt: Date;
   readonly updatedAt: Date;
   readonly signed: boolean;
@@ -36,7 +34,6 @@ export class TimesheetModel {
     project: string;
     description: string;
     hours: number;
-    hourlyRate: number;
     createdAt: Date;
     updatedAt: Date;
     signed?: boolean;
@@ -49,7 +46,6 @@ export class TimesheetModel {
     this.project = params.project;
     this.description = params.description;
     this.hours = params.hours;
-    this.hourlyRate = params.hourlyRate;
     this.createdAt = params.createdAt;
     this.updatedAt = params.updatedAt;
     this.signed = params.signed ?? false;
@@ -63,7 +59,6 @@ export class TimesheetModel {
     project: string;
     description: string;
     hours: number;
-    hourlyRate?: number;
   }) {
     if (!params.userId)
       throw new DomainError('USER_ID_REQUIRED', 'El usuario es obligatorio.');
@@ -83,7 +78,6 @@ export class TimesheetModel {
       project: params.project,
       description: params.description,
       hours: params.hours,
-      hourlyRate: params.hourlyRate ?? 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -136,7 +130,6 @@ export class TimesheetModel {
       project: data.project ?? this.project,
       description: data.description ?? this.description,
       hours: data.hours ?? this.hours,
-      hourlyRate: data.hourlyRate ?? this.hourlyRate,
       signed: false,
       signedAt: undefined,
       signatureImageUrl: undefined,
@@ -152,7 +145,6 @@ export class TimesheetModel {
       project: document.project,
       description: document.description,
       hours: document.hours,
-      hourlyRate: document.hourlyRate,
       createdAt: document.createdAt,
       updatedAt: document.updatedAt,
       signed: document.signed ?? false,
@@ -169,7 +161,6 @@ export class TimesheetModel {
       project: this.project,
       description: this.description,
       hours: this.hours,
-      hourlyRate: this.hourlyRate,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       signed: this.signed,

@@ -64,7 +64,7 @@ export class PdfService {
         };
       }),
       totalHours: report.totalHours,
-      hourlyRate: timesheetDocuments[0]?.hourlyRate || 0,
+      hourlyRate: report.hourlyRate,
       totalAmount: report.totalAmount,
       professionalSignatureUrl: await this.getBase64Image(signatureUrl),
       supervisorName: 'Raúl D. Olivero Carrucini',

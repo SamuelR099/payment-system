@@ -16,13 +16,7 @@ export class CreateTimesheetHandler
   ) {}
 
   async execute(command: CreateTimesheetCommand) {
-    const { userId, date, project, description, hours, hourlyRate } = command;
-
-    /*  if (!hourlyRate) {
-      throw new DomainError('INVALID_HOURLY_RATE', 'El hourlyRate es requerido para crear un timesheet.');
-    }
-*/
-    const effectiveHourlyRate = hourlyRate;
+    const { userId, date, project, description, hours } = command;
 
     const timesheetDomain = TimesheetModel.create({
       userId,
@@ -30,7 +24,6 @@ export class CreateTimesheetHandler
       project,
       description,
       hours,
-      hourlyRate: effectiveHourlyRate,
     });
 
     await this.timesheetDomainService.validateNoDuplicateOnDate({

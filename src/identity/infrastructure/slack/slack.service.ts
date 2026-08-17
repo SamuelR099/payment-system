@@ -35,7 +35,8 @@ export class SlackService {
       slackUserId: result.user.id,
       name: result.user.profile?.display_name || result.user.profile?.real_name,
       email: result.user.profile?.email,
-      avatarUrl: result.user.profile?.image_192 || result.user.profile?.image_72,
+      avatarUrl:
+        result.user.profile?.image_192 || result.user.profile?.image_72,
     };
   }
 }

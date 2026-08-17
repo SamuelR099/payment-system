@@ -17,7 +17,7 @@ export class GetUsersHandler implements IQueryHandler<GetUsersQuery> {
 
     if (query.role) {
       const users = await this.userRepository.findByRole(query.role);
-      return users.map((user) => ({
+      return users.map(user => ({
         id: String(user._id),
         profile: {
           firstName: user.profile?.firstName ?? '',

@@ -10,13 +10,15 @@ export class UpdateUserProfileHandler
   constructor(private readonly userRepository: UserRepository) {}
 
   async execute(command: UpdateUserProfileCommand) {
-    const { userId, firstName, lastName, email, position } = command;
+    const { userId, firstName, lastName, email, position, hourlyRate } =
+      command;
 
     const updated = await this.userRepository.update(userId, {
       email,
       'profile.firstName': firstName,
       'profile.lastName': lastName,
       'profile.position': position,
+      hourlyRate,
     });
 
     const user = User.fromModel(updated);

@@ -24,6 +24,9 @@ export class Report {
   @Prop({ required: true })
   totalAmount: number;
 
+  @Prop({ required: true })
+  hourlyRate: number;
+
   @Prop({ required: true, enum: Object.values(ReportStatus) })
   status: ReportStatus;
 

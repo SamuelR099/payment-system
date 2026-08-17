@@ -3,8 +3,6 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Recaptcha } from '@nestlab/google-recaptcha';
 
 import { Public } from 'src/shared/validation';
-import { Roles } from 'src/shared/decorators/roles.decorator';
-import { UserRole } from 'src/shared/enums/user-role.enum';
 
 import { CreateUserCommand } from '../application/create-user/create-user.command';
 
@@ -44,7 +42,9 @@ export class UsersController {
 
   @Get('/me')
   async getMe(@Req() req: { user?: { userId: string } }) {
-    return this.queryBus.execute(new GetUsersQuery({ userId: req.user.userId }));
+    return this.queryBus.execute(
+      new GetUsersQuery({ userId: req.user.userId }),
+    );
   }
 
   @Patch('/me')

@@ -4,6 +4,7 @@ export class UpdateUserProfileCommand {
   readonly lastName: string;
   readonly email?: string;
   readonly position?: string;
+  readonly hourlyRate?: number;
 
   constructor(data: UpdateUserProfileCommand) {
     Object.assign(this, data);

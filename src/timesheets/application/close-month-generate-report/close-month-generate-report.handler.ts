@@ -37,7 +37,14 @@ export class CloseMonthGenerateReportHandler
   ) {}
 
   async execute(command: CloseMonthGenerateReportCommand) {
-    const { userId, month, year, supervisorId, file } = command;
+    const { userId, month, year, hourlyRate, supervisorId, file } = command;
+
+    if (!hourlyRate || hourlyRate <= 0) {
+      throw new DomainError(
+        'INVALID_HOURLY_RATE',
+        'El costo por hora es requerido y debe ser mayor a 0 para cerrar el mes.',
+      );
+    }
 
     if (supervisorId) {
       const supervisor = await this.userRepository.findById(supervisorId);
@@ -104,7 +111,6 @@ export class CloseMonthGenerateReportHandler
       timesheetDocument => ({
         userId: String(timesheetDocument.userId),
         hours: timesheetDocument.hours,
-        hourlyRate: timesheetDocument.hourlyRate,
         month: period.month,
         year: period.year,
         signatureImageUrl: timesheetDocument.signatureImageUrl,
@@ -114,6 +120,7 @@ export class CloseMonthGenerateReportHandler
     const generatedReport = this.reportDomainService.generateMonthlyReport(
       timesheetDtos,
       period,
+      hourlyRate,
       supervisorId,
     );
 

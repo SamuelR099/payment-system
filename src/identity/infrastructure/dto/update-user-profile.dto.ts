@@ -1,4 +1,10 @@
-import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { EmployeePosition } from 'src/shared/enums';
 
 export class UpdateUserProfileDto {
@@ -17,4 +23,8 @@ export class UpdateUserProfileDto {
   @IsEnum(EmployeePosition)
   @IsOptional()
   position?: EmployeePosition;
+
+  @IsNumber()
+  @IsOptional()
+  hourlyRate?: number;
 }

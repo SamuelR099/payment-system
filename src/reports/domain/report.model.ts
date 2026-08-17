@@ -9,6 +9,7 @@ export class Report {
   readonly year: number;
   readonly totalHours: number;
   readonly totalAmount: number;
+  readonly hourlyRate: number;
   readonly status: ReportStatus;
   readonly employeeSigned: boolean;
   readonly employeeSignatureImage?: string;
@@ -27,6 +28,7 @@ export class Report {
     year: number;
     totalHours: number;
     totalAmount: number;
+    hourlyRate: number;
     status: ReportStatus;
     employeeSigned: boolean;
     employeeSignatureImage?: string;
@@ -44,6 +46,7 @@ export class Report {
     this.year = params.year;
     this.totalHours = params.totalHours;
     this.totalAmount = params.totalAmount;
+    this.hourlyRate = params.hourlyRate;
     this.status = params.status;
     this.employeeSigned = params.employeeSigned;
     this.employeeSignatureImage = params.employeeSignatureImage;
@@ -63,6 +66,7 @@ export class Report {
     year: number;
     totalHours: number;
     totalAmount: number;
+    hourlyRate: number;
     status?: ReportStatus;
     employeeSigned?: boolean;
     employeeSignatureImage?: string;
@@ -76,6 +80,7 @@ export class Report {
       year: params.year,
       totalHours: params.totalHours,
       totalAmount: params.totalAmount,
+      hourlyRate: params.hourlyRate,
       status: params.status ?? ReportStatus.DRAFT,
       employeeSigned: params.employeeSigned ?? false,
       employeeSignatureImage: params.employeeSignatureImage,
@@ -93,6 +98,7 @@ export class Report {
       year: document.year,
       totalHours: document.totalHours,
       totalAmount: document.totalAmount,
+      hourlyRate: document.hourlyRate,
       status: document.status,
       employeeSigned: document.employeeSigned ?? false,
       employeeSignatureImage: document.employeeSignatureImage,
@@ -114,6 +120,7 @@ export class Report {
       year: this.year,
       totalHours: this.totalHours,
       totalAmount: this.totalAmount,
+      hourlyRate: this.hourlyRate,
       status: this.status,
       employeeSigned: this.employeeSigned,
       employeeSignatureImage: this.employeeSignatureImage,
@@ -182,6 +189,7 @@ export class Report {
   update(params: {
     totalHours?: number;
     totalAmount?: number;
+    hourlyRate?: number;
     pdfPath?: string;
   }): Report {
     if (this.status !== ReportStatus.DRAFT && !params.pdfPath) {
@@ -194,6 +202,7 @@ export class Report {
       ...this,
       totalHours: params.totalHours ?? this.totalHours,
       totalAmount: params.totalAmount ?? this.totalAmount,
+      hourlyRate: params.hourlyRate ?? this.hourlyRate,
       pdfPath: params.pdfPath ?? this.pdfPath,
     });
   }

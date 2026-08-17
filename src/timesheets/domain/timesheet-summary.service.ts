@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { TimesheetModel } from 'src/timesheets/domain/timesheet.model';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
+import { UserRepository } from 'src/identity/infrastructure/repositories/user.repository';
 
 interface TimesheetRaw {
   id?: string;
@@ -10,7 +11,6 @@ interface TimesheetRaw {
   project?: string;
   description?: string;
   hours?: number;
-  hourlyRate?: number;
   createdAt?: string | Date;
   updatedAt?: string | Date;
 }
@@ -21,7 +21,10 @@ export interface ProjectSummary {
 }
 @Injectable()
 export class TimesheetSummaryService {
-  constructor(private readonly timesheetRepository: TimesheetRepository) {}
+  constructor(
+    private readonly timesheetRepository: TimesheetRepository,
+    private readonly userRepository: UserRepository,
+  ) {}
 
   private static readonly MAX_RESULTS = 1000;
 
@@ -32,7 +35,12 @@ export class TimesheetSummaryService {
       month,
       year,
     );
-    const totalBilledAmount = this.calculateTotalBilled(timesheetList);
+    const user = await this.userRepository.findById(userId, true);
+    const hourlyRate = user?.hourlyRate ?? 0;
+    const totalBilledAmount = this.calculateTotalBilled(
+      timesheetList,
+      hourlyRate,
+    );
     const projectSummary = this.buildProjectSummary(timesheetList);
     const averageHoursPerDay = this.calculateAverageHoursPerDay(
       totalWorkedHours,
@@ -74,10 +82,12 @@ export class TimesheetSummaryService {
     return this.timesheetRepository.getHoursMonth(userId, month, year);
   }
 
-  private calculateTotalBilled(timesheetList: TimesheetRaw[]): number {
+  private calculateTotalBilled(
+    timesheetList: TimesheetRaw[],
+    hourlyRate: number,
+  ): number {
     return timesheetList.reduce(
-      (sum, timesheet) =>
-        sum + (timesheet.hours ?? 0) * (timesheet.hourlyRate ?? 0),
+      (sum, timesheet) => sum + (timesheet.hours ?? 0) * hourlyRate,
       0,
     );
   }

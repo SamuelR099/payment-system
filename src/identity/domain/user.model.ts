@@ -94,6 +94,7 @@ export class User {
         avatarUrl: this.avatarUrl,
         slackUserId: this.slackUserId,
         position: this.position,
+        hourlyRate: this.hourlyRate,
       },
       language: this.language,
       createdAt: this.createdAt,

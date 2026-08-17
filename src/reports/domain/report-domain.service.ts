@@ -6,7 +6,6 @@ import { ReportPeriod } from './value-objects/report-period';
 export interface Timesheet {
   userId: string;
   hours: number;
-  hourlyRate: number;
   month: number;
   year: number;
   signatureImageUrl?: string;
@@ -19,6 +18,7 @@ export interface GeneratedReport {
   year: number;
   totalHours: number;
   totalAmount: number;
+  hourlyRate: number;
   status: string;
   employeeSigned?: boolean;
   employeeSignatureImage?: string;
@@ -30,6 +30,7 @@ export class ReportDomainService {
   generateMonthlyReport(
     timesheets: Timesheet[],
     period: ReportPeriod,
+    hourlyRate: number,
     supervisorId?: string,
   ): GeneratedReport {
     if (!timesheets || timesheets.length === 0) {
@@ -44,11 +45,7 @@ export class ReportDomainService {
       (sum, timesheet) => sum + (timesheet.hours ?? 0),
       0,
     );
-    const totalAmount = timesheets.reduce(
-      (sum, timesheet) =>
-        sum + (timesheet.hours ?? 0) * (timesheet.hourlyRate ?? 0),
-      0,
-    );
+    const totalAmount = totalHours * hourlyRate;
 
     const signature = timesheets.find(
       t => t.signatureImageUrl,
@@ -61,6 +58,7 @@ export class ReportDomainService {
       year: period.year,
       totalHours,
       totalAmount,
+      hourlyRate,
       status: ReportStatus.SIGNED_BY_EMPLOYEE,
       employeeSigned: !!signature,
       employeeSignatureImage: signature,

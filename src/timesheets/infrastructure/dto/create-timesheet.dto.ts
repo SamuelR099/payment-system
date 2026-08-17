@@ -30,9 +30,4 @@ export class CreateTimesheetDto {
   @Min(0.25)
   @Max(24)
   hours: number;
-
-  @IsNumber({ allowNaN: false, allowInfinity: false })
-  @IsNotEmpty()
-  @Min(0)
-  hourlyRate: number;
 }

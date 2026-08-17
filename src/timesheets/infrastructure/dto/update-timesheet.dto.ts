@@ -31,9 +31,4 @@ export class UpdateTimesheetDto {
   @Min(0.25)
   @Max(24)
   hours?: number;
-
-  @IsNumber({ allowNaN: false, allowInfinity: false })
-  @IsOptional()
-  @Min(0)
-  hourlyRate?: number;
 }
