@@ -27,7 +27,7 @@ export class CreateTimesheetDto {
 
   @IsNumber()
   @IsNotEmpty()
-  @Min(0.25)
+  @Min(1)
   @Max(24)
   hours: number;
 }

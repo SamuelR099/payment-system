@@ -28,7 +28,7 @@ export class UpdateTimesheetDto {
 
   @IsNumber()
   @IsOptional()
-  @Min(0.25)
+  @Min(1)
   @Max(24)
   hours?: number;
 }

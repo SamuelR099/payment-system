@@ -18,7 +18,7 @@ export class Timesheet {
   @Prop({ required: true, maxlength: 500 })
   description: string;
 
-  @Prop({ required: true, min: 0.25, max: 24 })
+  @Prop({ required: true, min: 1, max: 24 })
   hours: number;
 
   @Prop({ type: Date })
