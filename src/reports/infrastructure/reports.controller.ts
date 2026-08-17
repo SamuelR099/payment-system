@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Delete,
   Body,
   Param,
   Query,
@@ -24,6 +25,10 @@ import { GetReportPdfQuery } from '../application/get-report-pdf/get-report-pdf.
 import { SubmitReportCommand } from '../application/submit-report/submit-report.command';
 import { ApproveReportAdminCommand } from '../application/approve-report-admin/approve-report-admin.command';
 import { RejectReportAdminCommand } from '../application/reject-report-admin/reject-report-admin.command';
+import { UploadOldReportCommand } from '../application/upload-old-report/upload-old-report.command';
+import { DeleteOldReportCommand } from '../application/delete-old-report/delete-old-report.command';
+import { GetOldReportsQuery } from '../application/get-old-reports/get-old-reports.query';
+import { GetOldReportPdfQuery } from '../application/get-old-report-pdf/get-old-report-pdf.query';
 
 import { GetReportsDto } from './dto/get-reports.dto';
 
@@ -43,6 +48,50 @@ export class ReportsController {
         userRole: req.user.role,
       }),
     );
+  }
+
+  @Get('/old-pdf')
+  async getOldReports() {
+    return this.queryBus.execute(new GetOldReportsQuery());
+  }
+
+  @Get('/old-pdf/:id/pdf')
+  async getOldReportPdf(@Param('id') id: string) {
+    return this.queryBus.execute(new GetOldReportPdfQuery(id));
+  }
+
+  @Post('/old-pdf')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadOldReport(
+    @UploadedFile(
+      new FileUploadValidationPipe({
+        allowedTypes: /pdf/,
+        maxSizeInBytes: FILE_SIZES.ONE_HUNDRED_MB,
+      }),
+    )
+    file: Multer.File,
+    @Body()
+    body: {
+      pdfFileName: string;
+      referenceMonth: string;
+      referenceYear: string;
+    },
+    @Request() req: any,
+  ) {
+    return this.commandBus.execute(
+      new UploadOldReportCommand({
+        ...body,
+        referenceMonth: Number(body.referenceMonth),
+        referenceYear: Number(body.referenceYear),
+        file,
+        uploadedBy: req.user.userId,
+      }),
+    );
+  }
+
+  @Delete('/old-pdf/:id')
+  async deleteOldReport(@Param('id') id: string) {
+    return this.commandBus.execute(new DeleteOldReportCommand(id));
   }
 
   @Get('/:id/pdf')
