@@ -1,7 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { RejectReportAdminCommand } from './reject-report-admin.command';
 import { ReportRepository } from '../../infrastructure/repositories/report.repository';
-import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { Report } from '../../domain/report.model';
 import { DomainError } from 'src/shared/domain';
 
@@ -9,10 +8,7 @@ import { DomainError } from 'src/shared/domain';
 export class RejectReportAdminHandler
   implements ICommandHandler<RejectReportAdminCommand>
 {
-  constructor(
-    private readonly reportRepository: ReportRepository,
-    private readonly timesheetRepository: TimesheetRepository,
-  ) {}
+  constructor(private readonly reportRepository: ReportRepository) {}
 
   async execute(command: RejectReportAdminCommand) {
     const { reportId, userId: supervisorId } = command;
@@ -37,12 +33,6 @@ export class RejectReportAdminHandler
     const updatedReport = await this.reportRepository.update(
       reportId,
       updateData,
-    );
-
-    await this.timesheetRepository.unsignAllByPeriod(
-      reportDoc.userId,
-      report.month,
-      report.year,
     );
 
     return updatedReport;

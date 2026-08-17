@@ -23,6 +23,9 @@ export class UserProfile {
   avatarUrl?: string;
 
   @Prop()
+  signatureImageUrl?: string;
+
+  @Prop()
   slackUserId?: string;
 
   @Prop({

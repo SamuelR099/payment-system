@@ -53,7 +53,6 @@ export class AwsS3Service {
   }
 
   async getSignedUrl(fileName: string, expires = 3600) {
-    // Si el fileName ya es una URL completa, extraemos solo la key
     const key = fileName.includes('amazonaws.com/')
       ? fileName.split('amazonaws.com/').pop()
       : fileName;

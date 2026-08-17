@@ -5,6 +5,7 @@ export class UpdateUserProfileCommand {
   readonly email?: string;
   readonly position?: string;
   readonly hourlyRate?: number;
+  readonly signatureImageUrl?: string;
 
   constructor(data: UpdateUserProfileCommand) {
     Object.assign(this, data);

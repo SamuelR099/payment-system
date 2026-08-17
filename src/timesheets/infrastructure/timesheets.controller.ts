@@ -8,20 +8,11 @@ import {
   Put,
   Query,
   Req,
-  Request,
-  UseInterceptors,
-  UploadedFile,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { FileInterceptor } from '@nestjs/platform-express';
-import type { Multer } from 'multer';
 
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { UserRole } from 'src/shared/enums/user-role.enum';
-import { ALLOWED_MIME_TYPES } from 'src/shared/enums/file-types.enum';
-import { FILE_SIZES } from 'src/shared/enums/file-size';
-
-import { FileUploadValidationPipe } from '../../file-management/infrastructure/file-upload-validation-pipe';
 
 import { CreateTimesheetDto } from './dto/create-timesheet.dto';
 import { UpdateTimesheetDto } from './dto/update-timesheet.dto';
@@ -33,7 +24,6 @@ import { UpdateTimesheetCommand } from '../application/update-timesheet/update-t
 import { DeleteTimesheetCommand } from '../application/delete-timesheet/delete-timesheet.command';
 import { GetTimesheetsQuery } from '../application/get-timesheets/get-timesheets.query';
 import { GetMonthlySummaryQuery } from '../application/get-monthly-summary/get-monthly-summary.query';
-import { SignTimesheetCommand } from '../application/sign-timesheet/sign-timesheet.command';
 import { CloseMonthGenerateReportCommand } from '../application/close-month-generate-report/close-month-generate-report.command';
 
 @Controller('timesheets')
@@ -76,7 +66,6 @@ export class TimesheetsController {
 
   @Post('/close-month')
   @Roles([UserRole.EMPLOYEE])
-  @UseInterceptors(FileInterceptor('file'))
   closeMonthGenerateReport(
     @Req() req: any,
     @Body()
@@ -86,14 +75,6 @@ export class TimesheetsController {
       supervisorId?: string;
       hourlyRate: number;
     },
-    @UploadedFile(
-      new FileUploadValidationPipe({
-        allowedTypes: ALLOWED_MIME_TYPES,
-        maxSizeInBytes: FILE_SIZES.ONE_HUNDRED_MB,
-        isOptional: true,
-      }),
-    )
-    file?: Multer.File,
   ) {
     return this.commandBus.execute(
       new CloseMonthGenerateReportCommand(
@@ -102,7 +83,6 @@ export class TimesheetsController {
         body.year,
         body.hourlyRate,
         body.supervisorId,
-        file,
       ),
     );
   }
@@ -129,31 +109,6 @@ export class TimesheetsController {
   deleteTimesheet(@Req() req: any, @Param('id') id: string) {
     return this.commandBus.execute(
       new DeleteTimesheetCommand(id, req.user.userId),
-    );
-  }
-
-  @Post('/:id/sign')
-  @Roles([UserRole.EMPLOYEE])
-  @UseInterceptors(FileInterceptor('file'))
-  async signTimesheet(
-    @Param('id') id: string,
-    @Request() req: any,
-    @UploadedFile(
-      new FileUploadValidationPipe({
-        allowedTypes: ALLOWED_MIME_TYPES,
-        maxSizeInBytes: FILE_SIZES.ONE_HUNDRED_MB,
-        isOptional: true,
-      }),
-    )
-    file?: Multer.File,
-  ) {
-    const userId = req.user.userId;
-    return this.commandBus.execute(
-      new SignTimesheetCommand({
-        timesheetId: id,
-        userId,
-        file,
-      }),
     );
   }
 }

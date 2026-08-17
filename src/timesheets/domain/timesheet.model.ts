@@ -9,9 +9,6 @@ export interface Timesheet {
   hours: number;
   createdAt: Date;
   updatedAt: Date;
-  signatureImageUrl?: string;
-  signed?: boolean;
-  signedAt?: Date;
 }
 
 export class TimesheetModel {
@@ -23,9 +20,6 @@ export class TimesheetModel {
   readonly hours: number;
   readonly createdAt: Date;
   readonly updatedAt: Date;
-  readonly signed: boolean;
-  readonly signedAt?: Date;
-  readonly signatureImageUrl?: string;
 
   constructor(params: {
     id: string;
@@ -36,9 +30,6 @@ export class TimesheetModel {
     hours: number;
     createdAt: Date;
     updatedAt: Date;
-    signed?: boolean;
-    signedAt?: Date;
-    signatureImageUrl?: string;
   }) {
     this.id = params.id;
     this.userId = params.userId;
@@ -48,9 +39,6 @@ export class TimesheetModel {
     this.hours = params.hours;
     this.createdAt = params.createdAt;
     this.updatedAt = params.updatedAt;
-    this.signed = params.signed ?? false;
-    this.signedAt = params.signedAt;
-    this.signatureImageUrl = params.signatureImageUrl;
   }
 
   static create(params: {
@@ -83,42 +71,6 @@ export class TimesheetModel {
     });
   }
 
-  unsign(): TimesheetModel {
-    return new TimesheetModel({
-      ...this,
-      signed: false,
-      signedAt: undefined,
-      signatureImageUrl: undefined,
-      updatedAt: new Date(),
-    });
-  }
-
-  sign(signatureImageUrl?: string): TimesheetModel {
-    const now = new Date();
-
-    if (signatureImageUrl) {
-      return new TimesheetModel({
-        ...this,
-        signed: true,
-        signedAt: this.signedAt ?? now,
-        updatedAt: now,
-        signatureImageUrl: signatureImageUrl,
-      });
-    }
-
-    if (this.signed) {
-      return this;
-    }
-
-    return new TimesheetModel({
-      ...this,
-      signed: true,
-      signedAt: now,
-      updatedAt: now,
-      signatureImageUrl: undefined,
-    });
-  }
-
   update(data: Partial<Omit<Timesheet, 'id' | 'userId'>>) {
     return new TimesheetModel({
       ...this,
@@ -130,9 +82,6 @@ export class TimesheetModel {
       project: data.project ?? this.project,
       description: data.description ?? this.description,
       hours: data.hours ?? this.hours,
-      signed: false,
-      signedAt: undefined,
-      signatureImageUrl: undefined,
       updatedAt: new Date(),
     });
   }
@@ -147,9 +96,6 @@ export class TimesheetModel {
       hours: document.hours,
       createdAt: document.createdAt,
       updatedAt: document.updatedAt,
-      signed: document.signed ?? false,
-      signedAt: document.signedAt,
-      signatureImageUrl: document.signatureImageUrl,
     });
   }
 
@@ -163,9 +109,6 @@ export class TimesheetModel {
       hours: this.hours,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
-      signed: this.signed,
-      signedAt: this.signedAt,
-      signatureImageUrl: this.signatureImageUrl,
     };
   }
 

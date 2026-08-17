@@ -20,7 +20,6 @@ import { UpdateTimesheetHandler } from '../application/update-timesheet/update-t
 import { DeleteTimesheetHandler } from '../application/delete-timesheet/delete-timesheet.handler';
 import { GetTimesheetsHandler } from '../application/get-timesheets/get-timesheets.handler';
 import { GetMonthlySummaryHandler } from '../application/get-monthly-summary/get-monthly-summary.handler';
-import { SignTimesheetHandler } from '../application/sign-timesheet/sign-timesheet.handler';
 import { CloseMonthGenerateReportHandler } from '../application/close-month-generate-report/close-month-generate-report.handler';
 
 @Module({
@@ -45,7 +44,6 @@ import { CloseMonthGenerateReportHandler } from '../application/close-month-gene
     DeleteTimesheetHandler,
     GetTimesheetsHandler,
     GetMonthlySummaryHandler,
-    SignTimesheetHandler,
     CloseMonthGenerateReportHandler,
   ],
   exports: [

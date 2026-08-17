@@ -27,4 +27,8 @@ export class UpdateUserProfileDto {
   @IsNumber()
   @IsOptional()
   hourlyRate?: number;
+
+  @IsString()
+  @IsOptional()
+  signatureImageUrl?: string;
 }

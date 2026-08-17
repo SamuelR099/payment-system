@@ -1,6 +1,4 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { v4 as uuidv4 } from 'uuid';
-import type { Multer } from 'multer';
 
 import { ReportRepository } from 'src/reports/infrastructure/repositories/report.repository';
 import {
@@ -12,8 +10,6 @@ import { UserWalletRepository } from 'src/crypto/user-wallet/infrastructure/repo
 import { UserRepository } from 'src/identity/infrastructure/repositories/user.repository';
 import { PdfService } from 'src/shared/pdf/pdf.service';
 import { ReportPeriod } from 'src/reports/domain/value-objects/report-period';
-import { AwsS3Service } from 'src/file-management/infrastructure/aws-s3.service';
-import { MediaFolder } from 'src/timesheets/domain/enums/media-folder.enum';
 import { WalletStatus } from 'src/shared/enums/wallet-status.enum';
 import { UserRole } from 'src/shared/enums/user-role.enum';
 
@@ -32,12 +28,11 @@ export class CloseMonthGenerateReportHandler
     private readonly walletRepository: UserWalletRepository,
     private readonly reportDomainService: ReportDomainService,
     private readonly pdfService: PdfService,
-    private readonly awsS3Service: AwsS3Service,
     private readonly userRepository: UserRepository,
   ) {}
 
   async execute(command: CloseMonthGenerateReportCommand) {
-    const { userId, month, year, hourlyRate, supervisorId, file } = command;
+    const { userId, month, year, hourlyRate, supervisorId } = command;
 
     if (!hourlyRate || hourlyRate <= 0) {
       throw new DomainError(
@@ -68,6 +63,8 @@ export class CloseMonthGenerateReportHandler
       );
     }
 
+    const user = await this.userRepository.findById(userId, true);
+
     const period = ReportPeriod.create(Number(month), Number(year));
     const { startDate, endDate } = period.getDateRange();
 
@@ -90,16 +87,6 @@ export class CloseMonthGenerateReportHandler
       }
     }
 
-    if (file) {
-      const signatureImageUrl = await this.uploadSignatureFile(file);
-      await this.timesheetRepository.signAllByPeriod(
-        userId,
-        Number(month),
-        Number(year),
-        signatureImageUrl,
-      );
-    }
-
     const { data: timesheetDocuments } = await this.timesheetRepository.search({
       userId,
       startDate,
@@ -113,7 +100,6 @@ export class CloseMonthGenerateReportHandler
         hours: timesheetDocument.hours,
         month: period.month,
         year: period.year,
-        signatureImageUrl: timesheetDocument.signatureImageUrl,
       }),
     );
 
@@ -121,6 +107,7 @@ export class CloseMonthGenerateReportHandler
       timesheetDtos,
       period,
       hourlyRate,
+      user.profile.signatureImageUrl,
       supervisorId,
     );
 
@@ -133,12 +120,5 @@ export class CloseMonthGenerateReportHandler
     );
 
     return { reportId: createdReport.id, pdfPath: publicUrl };
-  }
-
-  private async uploadSignatureFile(file: Multer.File): Promise<string> {
-    const fileName = `${uuidv4()}_${file.originalname}`;
-    const filePath = `${MediaFolder}/${fileName}`;
-
-    return this.awsS3Service.upload(filePath, file, 'private');
   }
 }

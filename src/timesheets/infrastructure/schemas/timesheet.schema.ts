@@ -26,15 +26,6 @@ export class Timesheet {
 
   @Prop({ type: Date })
   updatedAt?: Date;
-
-  @Prop({ default: false })
-  signed?: boolean;
-
-  @Prop()
-  signedAt?: Date;
-
-  @Prop({ required: false })
-  signatureImageUrl?: string;
 }
 
 export type TimesheetDocument = Timesheet & Document;

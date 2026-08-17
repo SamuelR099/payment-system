@@ -8,7 +8,6 @@ export interface Timesheet {
   hours: number;
   month: number;
   year: number;
-  signatureImageUrl?: string;
 }
 
 export interface GeneratedReport {
@@ -31,6 +30,7 @@ export class ReportDomainService {
     timesheets: Timesheet[],
     period: ReportPeriod,
     hourlyRate: number,
+    employeeSignatureImage?: string,
     supervisorId?: string,
   ): GeneratedReport {
     if (!timesheets || timesheets.length === 0) {
@@ -47,10 +47,6 @@ export class ReportDomainService {
     );
     const totalAmount = totalHours * hourlyRate;
 
-    const signature = timesheets.find(
-      t => t.signatureImageUrl,
-    )?.signatureImageUrl;
-
     return {
       userId,
       supervisorId,
@@ -60,9 +56,9 @@ export class ReportDomainService {
       totalAmount,
       hourlyRate,
       status: ReportStatus.SIGNED_BY_EMPLOYEE,
-      employeeSigned: !!signature,
-      employeeSignatureImage: signature,
-      employeeSignedAt: signature ? new Date() : undefined,
+      employeeSigned: !!employeeSignatureImage,
+      employeeSignatureImage,
+      employeeSignedAt: employeeSignatureImage ? new Date() : undefined,
     };
   }
 }

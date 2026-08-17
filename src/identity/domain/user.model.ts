@@ -16,6 +16,7 @@ export class User {
   readonly address?: Address | object;
   readonly language?: Language;
   readonly avatarUrl?: string;
+  readonly signatureImageUrl?: string;
   readonly slackUserId?: string;
   readonly role: UserRole;
   readonly wallet?: string;
@@ -33,6 +34,7 @@ export class User {
     address?: Address;
     language?: Language;
     avatarUrl?: string;
+    signatureImageUrl?: string;
     slackUserId?: string;
     role: UserRole;
     wallet?: string;
@@ -49,6 +51,7 @@ export class User {
     this.address = params.address || {};
     this.language = params.language;
     this.avatarUrl = params.avatarUrl;
+    this.signatureImageUrl = params.signatureImageUrl;
     this.slackUserId = params.slackUserId;
     this.role = params.role;
     this.wallet = params.wallet;
@@ -71,6 +74,7 @@ export class User {
       address: document.profile.address,
       language: document.language,
       avatarUrl: document.profile.avatarUrl,
+      signatureImageUrl: document.profile.signatureImageUrl,
       slackUserId: document.profile.slackUserId,
       role: document.role,
       wallet: document.wallet,
@@ -92,6 +96,7 @@ export class User {
         lastName: this.lastName,
         address: this.address,
         avatarUrl: this.avatarUrl,
+        signatureImageUrl: this.signatureImageUrl,
         slackUserId: this.slackUserId,
         position: this.position,
         hourlyRate: this.hourlyRate,

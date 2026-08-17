@@ -28,17 +28,10 @@ export class PdfService {
     const user = await this.userRepository.findById(report.userId, true);
     const professionalName = `${user.profile.firstName} ${user.profile.lastName}`;
 
-    const timesheetWithSignature = timesheetDocuments.find(
-      ts => ts.signed && ts.signatureImageUrl,
-    );
     const signatureUrl =
-      report.employeeSignatureImage ||
-      timesheetWithSignature?.signatureImageUrl ||
-      user.profile.avatarUrl;
+      report.employeeSignatureImage || user.profile.signatureImageUrl;
 
-    const signatureDate = report.employeeSignedAt
-      ? report.employeeSignedAt
-      : timesheetWithSignature?.signedAt;
+    const signatureDate = report.employeeSignedAt || new Date();
 
     const pdfData = {
       logoUrl: undefined,

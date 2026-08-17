@@ -1,5 +1,3 @@
-import type { Multer } from 'multer';
-
 export class CloseMonthGenerateReportCommand {
   constructor(
     readonly userId: string,
@@ -7,6 +5,5 @@ export class CloseMonthGenerateReportCommand {
     readonly year: number,
     readonly hourlyRate: number,
     readonly supervisorId?: string,
-    readonly file?: Multer.File,
   ) {}
 }
