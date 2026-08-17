@@ -32,6 +32,9 @@ export class UserProfile {
     enum: Object.values(EmployeePosition),
   })
   position?: EmployeePosition;
+
+  @Prop()
+  hourlyRate?: number;
 }
 
 @Schema({ collection: 'users', timestamps: true })
@@ -62,9 +65,6 @@ export class User {
 
   @Prop()
   wallet?: string;
-
-  @Prop()
-  hourlyRate?: number;
 }
 
 export type UserDocument = User & Document;

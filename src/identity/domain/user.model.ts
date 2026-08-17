@@ -20,7 +20,7 @@ export class User {
   readonly slackUserId?: string;
   readonly role: UserRole;
   readonly wallet?: string;
-  readonly hourlyRate: number;
+  readonly hourlyRate?: number;
   readonly position?: EmployeePosition;
   readonly createdAt?: Date;
   readonly updatedAt?: Date;
@@ -38,7 +38,7 @@ export class User {
     slackUserId?: string;
     role: UserRole;
     wallet?: string;
-    hourlyRate: number;
+    hourlyRate?: number;
     position?: EmployeePosition;
     createdAt: Date;
     updatedAt: Date;
@@ -78,7 +78,7 @@ export class User {
       slackUserId: document.profile.slackUserId,
       role: document.role,
       wallet: document.wallet,
-      hourlyRate: document.hourlyRate,
+      hourlyRate: document.profile.hourlyRate,
       position: document.profile.position,
       createdAt: document.createdAt,
       updatedAt: document.updatedAt,

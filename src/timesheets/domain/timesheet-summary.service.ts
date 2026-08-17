@@ -36,7 +36,7 @@ export class TimesheetSummaryService {
       year,
     );
     const user = await this.userRepository.findById(userId, true);
-    const hourlyRate = user?.hourlyRate ?? 0;
+    const hourlyRate = user?.profile?.hourlyRate ?? 0;
     const totalBilledAmount = this.calculateTotalBilled(
       timesheetList,
       hourlyRate,

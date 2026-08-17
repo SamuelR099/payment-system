@@ -63,10 +63,10 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
         position: data.position,
         avatarUrl,
         slackUserId,
+        hourlyRate: data.hourlyRate,
       },
       role: data.role || UserRole.EMPLOYEE,
       wallet: data.wallet,
-      hourlyRate: data.hourlyRate,
     };
   }
 }

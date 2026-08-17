@@ -26,7 +26,7 @@ export class UpdateUserProfileHandler
       'profile.lastName': lastName,
       'profile.position': position,
       'profile.signatureImageUrl': signatureImageUrl,
-      hourlyRate,
+      'profile.hourlyRate': hourlyRate,
     });
 
     const user = User.fromModel(updated);
