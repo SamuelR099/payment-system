@@ -1,4 +1,5 @@
 import { DomainError } from 'src/shared/domain';
+import { parseLocalDate } from 'src/shared/utils';
 
 export interface Timesheet {
   id: string;
@@ -57,8 +58,7 @@ export class TimesheetModel {
         'DESCRIPTION_REQUIRED',
         'La descripción es obligatoria.',
       );
-    const date =
-      params.date instanceof Date ? params.date : new Date(params.date);
+    const date = parseLocalDate(params.date);
     return new TimesheetModel({
       id: '',
       userId: params.userId,
@@ -74,11 +74,7 @@ export class TimesheetModel {
   update(data: Partial<Omit<Timesheet, 'id' | 'userId'>>) {
     return new TimesheetModel({
       ...this,
-      date: data.date
-        ? data.date instanceof Date
-          ? data.date
-          : new Date(data.date)
-        : this.date,
+      date: data.date ? parseLocalDate(data.date) : this.date,
       project: data.project ?? this.project,
       description: data.description ?? this.description,
       hours: data.hours ?? this.hours,

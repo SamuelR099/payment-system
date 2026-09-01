@@ -13,11 +13,11 @@ export class GetOldReportsHandler implements IQueryHandler<GetOldReportsQuery> {
 
     const filteredReports =
       query.userRole === UserRole.EMPLOYEE
-        ? reports.filter((report) => report.uploadedBy === query.userId)
+        ? reports.filter(report => report.uploadedBy === query.userId)
         : reports;
 
     return {
-      data: filteredReports.map((report) => ({
+      data: filteredReports.map(report => ({
         id: String(report._id),
         pdfFileName: report.pdfFileName,
         referenceMonth: report.referenceMonth,
