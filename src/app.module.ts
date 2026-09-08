@@ -29,6 +29,7 @@ import { ReportsModule } from './reports/infrastructure/reports.module';
 import { BlockchainModule } from './crypto/blockchain/blockchain.module';
 import { UserWalletModule } from './crypto/user-wallet/user-wallet.module';
 import { PaymentsModule } from './crypto/payments/payments.module';
+import { DashboardModule } from './dashboard/infrastructure/dashboard.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { PaymentsModule } from './crypto/payments/payments.module';
     TimesheetsModule,
     ProjectsModule,
     ReportsModule,
+    DashboardModule,
     BlockchainModule,
     UserWalletModule,
     PaymentsModule,

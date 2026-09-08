@@ -58,29 +58,12 @@ export class PaymentRepository {
     limit?: number,
   ) {
     const pageSize = limit ?? this.DEFAULT_PAGE_SIZE;
-    const filter: any = { $and: [] };
-
-    if (userId) {
-      filter.$and.push({
-        $or: [{ userId: userId }, { userId: new Types.ObjectId(userId) }],
-      });
-    }
-
-    if (status) {
-      filter.$and.push({ status });
-    }
-
-    if (excludeStatus) {
-      filter.$and.push({ status: { $ne: excludeStatus } });
-    }
-
-    if (cursor) {
-      filter.$and.push({ _id: { $lt: new Types.ObjectId(cursor) } });
-    }
-
-    if (filter.$and.length === 0) {
-      delete filter.$and;
-    }
+    const filter = this.buildFilter({
+      userId,
+      status,
+      excludeStatus,
+      cursor,
+    });
 
     const data = await this.paymentModel
       .find(filter)
@@ -100,6 +83,31 @@ export class PaymentRepository {
         : String(mappedData[mappedData.length - 1]._id);
 
     return { data: mappedData, nextCursor };
+  }
+
+  async findLatestByUserIdWithFilters(params: {
+    userId?: string;
+    status?: string;
+    excludeStatus?: string;
+    limit: number;
+  }) {
+    const filter = this.buildFilter({
+      userId: params.userId,
+      status: params.status,
+      excludeStatus: params.excludeStatus,
+    });
+
+    const data = await this.paymentModel
+      .find(filter)
+      .sort({ _id: -1 })
+      .limit(params.limit)
+      .lean()
+      .exec();
+
+    return data.map(payment => ({
+      ...payment,
+      id: String(payment._id),
+    }));
   }
 
   async updateById(id: string, updateData: Partial<Payment>) {
@@ -155,5 +163,41 @@ export class PaymentRepository {
   async deleteById(id: string) {
     const result = await this.paymentModel.findByIdAndDelete(id).exec();
     return !!result;
+  }
+
+  private buildFilter(params: {
+    userId?: string;
+    status?: string;
+    excludeStatus?: string;
+    cursor?: string;
+  }) {
+    const filter: any = { $and: [] };
+
+    if (params.userId) {
+      filter.$and.push({
+        $or: [
+          { userId: params.userId },
+          { userId: new Types.ObjectId(params.userId) },
+        ],
+      });
+    }
+
+    if (params.status) {
+      filter.$and.push({ status: params.status });
+    }
+
+    if (params.excludeStatus) {
+      filter.$and.push({ status: { $ne: params.excludeStatus } });
+    }
+
+    if (params.cursor) {
+      filter.$and.push({ _id: { $lt: new Types.ObjectId(params.cursor) } });
+    }
+
+    if (filter.$and.length === 0) {
+      delete filter.$and;
+    }
+
+    return filter;
   }
 }

@@ -118,6 +118,59 @@ export class TimesheetRepository {
     return data.reduce((total, timesheet) => total + timesheet.hours, 0);
   }
 
+  async getTotalHoursByMonth(params: {
+    userId?: string;
+    month: number;
+    year: number;
+  }) {
+    const { startDate, endDate } = getMonthRange(params.month, params.year);
+    const rows = await this.getHoursByDateRange({
+      userId: params.userId,
+      startDate,
+      endDate,
+    });
+
+    return rows.reduce((total, row) => total + row.hours, 0);
+  }
+
+  async getHoursByDateRange(params: {
+    userId?: string;
+    startDate: Date;
+    endDate: Date;
+  }) {
+    const filter: any = {
+      date: { $gte: params.startDate, $lte: params.endDate },
+    };
+
+    if (params.userId) {
+      filter.$or = [
+        { userId: params.userId },
+        { userId: new Types.ObjectId(params.userId) },
+      ];
+    }
+
+    const rows = await this.timesheetModel
+      .aggregate<{ date: string; hours: number }>([
+        { $match: filter },
+        {
+          $group: {
+            _id: {
+              $dateToString: {
+                format: '%Y-%m-%d',
+                date: '$date',
+              },
+            },
+            hours: { $sum: '$hours' },
+          },
+        },
+        { $project: { _id: 0, date: '$_id', hours: 1 } },
+        { $sort: { date: 1 } },
+      ])
+      .exec();
+
+    return rows;
+  }
+
   async existsDuplicateOnDate(params: {
     userId: string;
     project: string;
