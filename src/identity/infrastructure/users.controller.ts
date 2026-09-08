@@ -11,6 +11,7 @@ import { SignInDto } from './dto/sign-in.dto';
 import { GetUsersDto } from './dto/get-users.dto';
 import { SignInCommand } from '../application/sign-in/sign-in.command';
 import { GetUsersQuery } from '../application/get-users/get-users.query';
+import { GetSignatureQuery } from '../application/get-signature/get-signature.query';
 import { UpdateUserProfileCommand } from '../application/update-user-profile/update-user-profile.command';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 
@@ -45,6 +46,11 @@ export class UsersController {
     return this.queryBus.execute(
       new GetUsersQuery({ userId: req.user.userId }),
     );
+  }
+
+  @Get('/me/signature')
+  async getMySignature(@Req() req: { user?: { userId: string } }) {
+    return this.queryBus.execute(new GetSignatureQuery(req.user.userId));
   }
 
   @Patch('/me')

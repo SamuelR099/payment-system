@@ -18,6 +18,7 @@ import { UserRepository } from './repositories/user.repository';
 import { GetUsersHandler } from '../application/get-users/get-users.handler';
 import { UpdateUserProfileHandler } from '../application/update-user-profile/update-user-profile.handler';
 import { UploadUserSignatureHandler } from '../application/upload-user-signature/upload-user-signature.handler';
+import { GetSignatureHandler } from '../application/get-signature/get-signature.handler';
 
 import { AuthService } from './auth.service';
 import { UsersController } from './users.controller';
@@ -46,6 +47,7 @@ import { SlackModule } from './slack/slack.module';
     GetUsersHandler,
     UpdateUserProfileHandler,
     UploadUserSignatureHandler,
+    GetSignatureHandler,
   ],
   exports: [UserRepository],
 })
