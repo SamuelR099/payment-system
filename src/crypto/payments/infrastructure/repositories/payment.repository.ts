@@ -3,11 +3,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Payment, PaymentDocument } from '../schemas/payment.schema';
 import { PaymentStatus } from 'src/shared/enums/payment-status.enum';
+import { DEFAULT_PAGE_SIZE } from 'src/shared/constants';
 
 @Injectable()
 export class PaymentRepository {
-  private readonly DEFAULT_PAGE_SIZE = 20;
-
   constructor(
     @InjectModel(Payment.name)
     private readonly paymentModel: Model<PaymentDocument>,
@@ -30,6 +29,10 @@ export class PaymentRepository {
     return this.paymentModel.findOne({ txid }).exec();
   }
 
+  async findByTxids(txids: string[]) {
+    return this.paymentModel.find({ txid: { $in: txids } }).lean().exec();
+  }
+
   async findPendingPayments() {
     return this.paymentModel
       .find({ status: PaymentStatus.PENDING })
@@ -46,10 +49,6 @@ export class PaymentRepository {
       .exec();
   }
 
-  async findByUserId(userId: string) {
-    return this.paymentModel.find({ userId }).sort({ createdAt: -1 }).exec();
-  }
-
   async findByUserIdWithFilters(
     userId?: string,
     status?: string,
@@ -57,7 +56,7 @@ export class PaymentRepository {
     cursor?: string,
     limit?: number,
   ) {
-    const pageSize = limit ?? this.DEFAULT_PAGE_SIZE;
+    const pageSize = limit ?? DEFAULT_PAGE_SIZE;
     const filter = this.buildFilter({
       userId,
       status,
@@ -68,19 +67,21 @@ export class PaymentRepository {
     const data = await this.paymentModel
       .find(filter)
       .sort({ _id: -1 })
-      .limit(pageSize)
+      .limit(pageSize + 1)
       .lean()
       .exec();
 
-    const mappedData = data.map(payment => ({
+    const hasNextPage = data.length > pageSize;
+    const pageData = hasNextPage ? data.slice(0, pageSize) : data;
+
+    const mappedData = pageData.map(payment => ({
       ...payment,
       id: String(payment._id),
     }));
 
-    const nextCursor =
-      mappedData.length < pageSize
-        ? null
-        : String(mappedData[mappedData.length - 1]._id);
+    const nextCursor = hasNextPage
+      ? String(mappedData[mappedData.length - 1]._id)
+      : null;
 
     return { data: mappedData, nextCursor };
   }
@@ -147,6 +148,15 @@ export class PaymentRepository {
     return this.updateById(id, {
       status: PaymentStatus.EXPIRED,
     });
+  }
+
+  async expirePendingBefore(date: Date) {
+    return this.paymentModel
+      .updateMany(
+        { status: PaymentStatus.PENDING, expiresAt: { $lt: date } },
+        { $set: { status: PaymentStatus.EXPIRED } },
+      )
+      .exec();
   }
 
   async markAsFailed(id: string, reason?: string) {

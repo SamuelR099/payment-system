@@ -31,3 +31,4 @@ export const OldReportSchema = SchemaFactory.createForClass(OldReport);
 
 OldReportSchema.index({ referenceYear: 1, referenceMonth: 1 });
 OldReportSchema.index({ uploadedBy: 1 });
+OldReportSchema.index({ uploadedBy: 1, _id: -1 });

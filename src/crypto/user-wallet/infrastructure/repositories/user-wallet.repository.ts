@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { UserWallet, UserWalletDocument } from '../schemas/user-wallet.schema';
 import { BlockchainNetwork } from 'src/shared/enums/blockchain-network.enum';
-import { WalletStatus } from 'src/shared/enums/wallet-status.enum';
 
 @Injectable()
 export class UserWalletRepository {
@@ -23,57 +22,11 @@ export class UserWalletRepository {
   }
 
   async findByUserId(userId: string) {
-    const userIdStr = String(userId);
-    const query: any = {
-      $or: [{ userId: userIdStr }],
-    };
-    if (Types.ObjectId.isValid(userIdStr)) {
-      query.$or.push({ userId: new Types.ObjectId(userIdStr) });
-    }
-    const wallets = await this.userWalletModel.find(query).lean().exec();
-    return wallets.map(wallet => ({ ...wallet, id: String(wallet._id) }));
-  }
-
-  async findByUserIds(userIds: string[]) {
-    const objectIds = userIds
-      .filter(id => Types.ObjectId.isValid(id))
-      .map(id => new Types.ObjectId(id));
-    if (objectIds.length === 0) return [];
     const wallets = await this.userWalletModel
-      .find({
-        userId: { $in: objectIds },
-        isDefault: true,
-        status: WalletStatus.ACTIVE,
-      })
-      .select('userId')
+      .find(this.buildUserIdFilter(userId))
       .lean()
       .exec();
     return wallets.map(wallet => ({ ...wallet, id: String(wallet._id) }));
-  }
-
-  async findDefaultWallet(userId: string, network: BlockchainNetwork) {
-    const wallet = await this.userWalletModel
-      .findOne({
-        userId: new Types.ObjectId(userId),
-        network,
-        isDefault: true,
-        status: WalletStatus.ACTIVE,
-      })
-      .lean()
-      .exec();
-    return wallet ? { ...wallet, id: String(wallet._id) } : null;
-  }
-
-  async findDefaultWalletByUserId(userId: string) {
-    const wallet = await this.userWalletModel
-      .findOne({
-        userId: new Types.ObjectId(userId),
-        isDefault: true,
-        status: WalletStatus.ACTIVE,
-      })
-      .lean()
-      .exec();
-    return wallet ? { ...wallet, id: String(wallet._id) } : null;
   }
 
   async updateDefaultStatus(
@@ -84,7 +37,7 @@ export class UserWalletRepository {
     await this.userWalletModel
       .updateMany(
         {
-          userId: new Types.ObjectId(userId),
+          ...this.buildUserIdFilter(userId),
           network,
           _id: { $ne: new Types.ObjectId(excludeWalletId) },
         },
@@ -146,5 +99,16 @@ export class UserWalletRepository {
     }
 
     return { valid: false, reason: `red no soportada: ${network}` };
+  }
+
+  private buildUserIdFilter(userId: string) {
+    const userIdStr = String(userId);
+    const filter: any = { $or: [{ userId: userIdStr }] };
+
+    if (Types.ObjectId.isValid(userIdStr)) {
+      filter.$or.push({ userId: new Types.ObjectId(userIdStr) });
+    }
+
+    return filter;
   }
 }

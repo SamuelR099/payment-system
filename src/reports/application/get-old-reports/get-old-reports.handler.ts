@@ -10,15 +10,16 @@ export class GetOldReportsHandler implements IQueryHandler<GetOldReportsQuery> {
 
   async execute(query: GetOldReportsQuery) {
     const { userId, role } = query;
-    const reports = await this.oldReportRepository.findAll();
-
-    const filteredReports =
-      role === UserRole.EMPLOYEE
-        ? reports.filter(report => report.uploadedBy === userId)
-        : reports;
+    const { data: reports, nextCursor } = await this.oldReportRepository.search(
+      {
+        uploadedBy: role === UserRole.EMPLOYEE ? userId : undefined,
+        cursor: query.cursor,
+        limit: query.limit,
+      },
+    );
 
     return {
-      data: filteredReports.map(report => ({
+      data: reports.map(report => ({
         id: String(report._id),
         pdfFileName: report.pdfFileName,
         referenceMonth: report.referenceMonth,
@@ -27,6 +28,7 @@ export class GetOldReportsHandler implements IQueryHandler<GetOldReportsQuery> {
         uploadedBy: report.uploadedBy,
         createdAt: report.createdAt,
       })),
+      nextCursor,
     };
   }
 }

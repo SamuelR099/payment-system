@@ -3,11 +3,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Timesheet, TimesheetDocument } from '../schemas/timesheet.schema';
 import { getMonthRange } from 'src/shared/utils';
+import { DEFAULT_PAGE_SIZE } from 'src/shared/constants';
 
 @Injectable()
 export class TimesheetRepository {
-  private readonly DEFAULT_PAGE_SIZE = 30;
-
   constructor(
     @InjectModel(Timesheet.name)
     private readonly timesheetModel: Model<TimesheetDocument>,
@@ -35,7 +34,7 @@ export class TimesheetRepository {
       status,
       terms,
     } = params;
-    const pageSize = limit ?? this.DEFAULT_PAGE_SIZE;
+    const pageSize = limit ?? DEFAULT_PAGE_SIZE;
 
     const filter: any = {
       $and: [
@@ -72,13 +71,16 @@ export class TimesheetRepository {
     const data = await this.timesheetModel
       .find(filter)
       .sort({ _id: -1 })
-      .limit(pageSize)
+      .limit(pageSize + 1)
       .lean()
       .exec();
 
-    const nextCursor =
-      data.length < pageSize ? null : String(data[data.length - 1]._id);
-    return { data, nextCursor };
+    const hasNextPage = data.length > pageSize;
+    const pageData = hasNextPage ? data.slice(0, pageSize) : data;
+    const nextCursor = hasNextPage
+      ? String(pageData[pageData.length - 1]._id)
+      : null;
+    return { data: pageData, nextCursor };
   }
 
   async create(timesheetData: any) {
@@ -102,20 +104,6 @@ export class TimesheetRepository {
     const result = await this.timesheetModel.findByIdAndDelete(id).exec();
     if (!result) throw new NotFoundException(`Timesheet '${id}' not found`);
     return !!result;
-  }
-
-  async countByUserId(userId: string) {
-    return this.timesheetModel
-      .countDocuments({
-        $or: [{ userId: userId }, { userId: new Types.ObjectId(userId) }],
-      })
-      .lean()
-      .exec();
-  }
-
-  async getHoursMonth(userId: string, month: number, year: number) {
-    const { data } = await this.search({ userId, month, year, limit: 1000 });
-    return data.reduce((total, timesheet) => total + timesheet.hours, 0);
   }
 
   async getTotalHoursByMonth(params: {
@@ -198,17 +186,4 @@ export class TimesheetRepository {
     return count > 0;
   }
 
-  async findByDateRange(startDate: Date, endDate: Date) {
-    return this.timesheetModel
-      .find({
-        date: { $gte: startDate, $lte: endDate },
-      })
-      .lean()
-      .exec();
-  }
-
-  async findByMonthAndYear(month: number, year: number) {
-    const { startDate, endDate } = getMonthRange(month, year);
-    return this.findByDateRange(startDate, endDate);
-  }
 }

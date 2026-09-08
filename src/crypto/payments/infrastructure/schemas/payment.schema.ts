@@ -50,7 +50,9 @@ export type PaymentDocument = Payment & Document;
 export const PaymentSchema = SchemaFactory.createForClass(Payment);
 
 PaymentSchema.index({ userId: 1, status: 1 });
+PaymentSchema.index({ userId: 1, status: 1, _id: -1 });
+PaymentSchema.index({ userId: 1, _id: -1 });
 PaymentSchema.index({ reportId: 1 }, { unique: true });
 PaymentSchema.index({ txid: 1 }, { sparse: true });
-PaymentSchema.index({ expiresAt: 1, status: 1 });
+PaymentSchema.index({ status: 1, expiresAt: 1 });
 PaymentSchema.index({ walletAddress: 1, network: 1 });

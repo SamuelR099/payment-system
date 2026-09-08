@@ -29,11 +29,7 @@ export class TimesheetSummaryService {
 
   async getMonthlySummary(userId: string, month: number, year: number) {
     const timesheetList = await this.fetchTimesheets(userId, month, year);
-    const totalWorkedHours = await this.getTotalWorkedHours(
-      userId,
-      month,
-      year,
-    );
+    const totalWorkedHours = this.calculateTotalHours(timesheetList);
     const user = await this.userRepository.findById(userId, true);
     const hourlyRate = user?.profile?.hourlyRate ?? 0;
     const totalBilledAmount = this.calculateTotalBilled(
@@ -73,12 +69,11 @@ export class TimesheetSummaryService {
     return data;
   }
 
-  private async getTotalWorkedHours(
-    userId: string,
-    month: number,
-    year: number,
-  ): Promise<number> {
-    return this.timesheetRepository.getHoursMonth(userId, month, year);
+  private calculateTotalHours(timesheetList: TimesheetRaw[]): number {
+    return timesheetList.reduce(
+      (total, timesheet) => total + (timesheet.hours ?? 0),
+      0,
+    );
   }
 
   private calculateTotalBilled(

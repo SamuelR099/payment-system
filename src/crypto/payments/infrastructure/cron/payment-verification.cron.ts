@@ -31,14 +31,9 @@ export class PaymentVerificationCron {
   }
 
   private async expireOldPayments() {
-    const pendingPayments = await this.paymentRepository.findPendingPayments();
-    const now = new Date();
-
-    for (const payment of pendingPayments) {
-      if (payment.expiresAt < now) {
-        this.logger.log(`Expiring payment ${payment.id}`);
-        await this.paymentRepository.markAsExpired(payment.id);
-      }
+    const result = await this.paymentRepository.expirePendingBefore(new Date());
+    if (result.modifiedCount > 0) {
+      this.logger.log(`Expired ${result.modifiedCount} pending payments`);
     }
   }
 
@@ -85,12 +80,17 @@ export class PaymentVerificationCron {
 
     for (const walletAddress of walletAddresses) {
       const result = await provider.getTransactions(walletAddress);
+      const txids = result.transactions.map(transaction => transaction.txid);
+      const processedPayments =
+        txids.length > 0
+          ? await this.paymentRepository.findByTxids(txids)
+          : [];
+      const processedTxids = new Set(
+        processedPayments.map(payment => payment.txid),
+      );
 
       for (const transaction of result.transactions) {
-        const existingWithTxid = await this.paymentRepository.findByTxid(
-          transaction.txid,
-        );
-        if (existingWithTxid) {
+        if (processedTxids.has(transaction.txid)) {
           this.logger.debug(
             `Transaction ${transaction.txid} already processed, skipping`,
           );

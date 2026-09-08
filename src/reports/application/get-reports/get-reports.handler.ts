@@ -20,7 +20,6 @@ export class GetReportsHandler implements IQueryHandler<GetReportsQuery> {
       query.userRole === UserRole.ADMIN;
 
     const params: SearchReportParams = {
-      terms: query.terms,
       status: query.status,
       cursor: query.cursor,
       userId: isAdmin ? undefined : query.userId,

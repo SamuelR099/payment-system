@@ -1,8 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 import { OldReport, OldReportDocument } from '../schemas/old-report.schema';
+import { DEFAULT_PAGE_SIZE } from 'src/shared/constants';
+
+export type SearchOldReportParams = {
+  uploadedBy?: string;
+  cursor?: string;
+  limit?: number;
+};
 
 @Injectable()
 export class OldReportRepository {
@@ -11,8 +18,22 @@ export class OldReportRepository {
     private readonly oldReportModel: Model<OldReportDocument>,
   ) {}
 
-  async findAll() {
-    return this.oldReportModel.find().sort({ createdAt: -1 }).lean().exec();
+  async search(params: SearchOldReportParams) {
+    const pageSize = params.limit ?? DEFAULT_PAGE_SIZE;
+    const filter = this.buildFilter(params);
+    const data = await this.oldReportModel
+      .find(filter)
+      .sort({ _id: -1 })
+      .limit(pageSize + 1)
+      .lean()
+      .exec();
+    const hasNextPage = data.length > pageSize;
+    const pageData = hasNextPage ? data.slice(0, pageSize) : data;
+    const nextCursor = hasNextPage
+      ? String(pageData[pageData.length - 1]._id)
+      : null;
+
+    return { data: pageData, nextCursor };
   }
 
   async findById(id: string, failIfNotFound = false) {
@@ -53,5 +74,23 @@ export class OldReportRepository {
       );
     }
     return deleted;
+  }
+
+  private buildFilter(params: SearchOldReportParams) {
+    const filter: any = { $and: [] };
+
+    if (params.uploadedBy) {
+      filter.$and.push({ uploadedBy: params.uploadedBy });
+    }
+
+    if (params.cursor) {
+      filter.$and.push({ _id: { $lt: new Types.ObjectId(params.cursor) } });
+    }
+
+    if (filter.$and.length === 0) {
+      delete filter.$and;
+    }
+
+    return filter;
   }
 }

@@ -3,9 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, UpdateQuery } from 'mongoose';
 
 import { Report, ReportDocument } from '../schemas/report.schema';
+import { DEFAULT_PAGE_SIZE } from 'src/shared/constants';
 
 export type SearchReportParams = {
-  terms?: string;
   status?: string;
   cursor?: string;
   userId?: string;
@@ -16,8 +16,6 @@ export type SearchReportParams = {
 
 @Injectable()
 export class ReportRepository {
-  private readonly DEFAULT_PAGE_SIZE = 20;
-
   constructor(
     @InjectModel(Report.name)
     private readonly reportModel: Model<ReportDocument>,
@@ -58,17 +56,20 @@ export class ReportRepository {
   }
 
   async search(params: SearchReportParams, limit?: number) {
-    const pageSize = limit ?? this.DEFAULT_PAGE_SIZE;
+    const pageSize = limit ?? DEFAULT_PAGE_SIZE;
     const data = await this.reportModel
       .find(this.buildFilter(params))
       .sort({ _id: -1 })
-      .limit(pageSize)
+      .limit(pageSize + 1)
       .lean()
       .exec();
-    const nextCursor: string | null =
-      data.length < pageSize ? null : String(data[data.length - 1]._id);
+    const hasNextPage = data.length > pageSize;
+    const pageData = hasNextPage ? data.slice(0, pageSize) : data;
+    const nextCursor: string | null = hasNextPage
+      ? String(pageData[pageData.length - 1]._id)
+      : null;
 
-    const mappedData = data.map(report => ({
+    const mappedData = pageData.map(report => ({
       ...report,
       id: String(report._id),
     }));
@@ -104,15 +105,6 @@ export class ReportRepository {
 
   private buildFilter(params: SearchReportParams) {
     const filter: any = { $and: [] };
-
-    if (params.terms) {
-      filter.$and.push({
-        $or: [
-          { title: { $regex: params.terms, $options: 'i' } },
-          { description: { $regex: params.terms, $options: 'i' } },
-        ],
-      });
-    }
 
     if (params.status) {
       filter.$and.push({ status: params.status });

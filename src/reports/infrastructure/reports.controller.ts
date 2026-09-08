@@ -31,6 +31,7 @@ import { GetOldReportsQuery } from '../application/get-old-reports/get-old-repor
 import { GetOldReportPdfQuery } from '../application/get-old-report-pdf/get-old-report-pdf.query';
 
 import { GetReportsDto } from './dto/get-reports.dto';
+import { GetOldReportsDto } from './dto/get-old-reports.dto';
 
 @Controller('reports')
 export class ReportsController {
@@ -51,9 +52,14 @@ export class ReportsController {
   }
 
   @Get('/old-pdf')
-  async getOldReports(@Request() req: any) {
+  async getOldReports(@Request() req: any, @Query() query: GetOldReportsDto) {
     return this.queryBus.execute(
-      new GetOldReportsQuery(req.user.userId, req.user.role),
+      new GetOldReportsQuery({
+        userId: req.user.userId,
+        role: req.user.role,
+        cursor: query.cursor,
+        limit: query.limit,
+      }),
     );
   }
 
