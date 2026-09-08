@@ -6,7 +6,6 @@ export class GetPaymentsQuery {
   readonly status?: string;
   readonly excludeStatus?: string;
   readonly cursor?: string;
-  readonly limit?: number;
 
   constructor(data: GetPaymentsQuery) {
     Object.assign(this, data);

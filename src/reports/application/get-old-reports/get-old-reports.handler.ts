@@ -14,7 +14,6 @@ export class GetOldReportsHandler implements IQueryHandler<GetOldReportsQuery> {
       {
         uploadedBy: role === UserRole.EMPLOYEE ? userId : undefined,
         cursor: query.cursor,
-        limit: query.limit,
       },
     );
 

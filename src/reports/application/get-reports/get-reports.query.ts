@@ -4,7 +4,6 @@ import { UserRole } from 'src/shared/enums/user-role.enum';
 export class GetReportsQuery {
   readonly status?: ReportStatus;
   readonly cursor?: string;
-  readonly limit?: number;
   readonly userId: string;
   readonly userRole: UserRole;
 

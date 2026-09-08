@@ -49,41 +49,31 @@ export class PaymentRepository {
       .exec();
   }
 
-  async findByUserIdWithFilters(
-    userId?: string,
-    status?: string,
-    excludeStatus?: string,
-    cursor?: string,
-    limit?: number,
-  ) {
-    const pageSize = limit ?? DEFAULT_PAGE_SIZE;
-    const filter = this.buildFilter({
-      userId,
-      status,
-      excludeStatus,
-      cursor,
+  async findByUserIdWithFilters(params: {
+    userId?: string;
+    status?: string;
+    excludeStatus?: string;
+    cursor?: string;
+  }) {
+    const query = this.paymentModel.find().sort({ _id: -1 });
+
+    this.applyFilters(query, params);
+
+    const payments = await query.limit(DEFAULT_PAGE_SIZE + 1).exec();
+
+    let nextCursor: string | null = null;
+    if (payments.length > DEFAULT_PAGE_SIZE) {
+      payments.pop();
+      const lastItem = payments[payments.length - 1];
+      nextCursor = lastItem.id;
+    }
+
+    const data = payments.map(payment => {
+      const paymentObj = payment.toObject();
+      return { ...paymentObj, id: payment.id };
     });
 
-    const data = await this.paymentModel
-      .find(filter)
-      .sort({ _id: -1 })
-      .limit(pageSize + 1)
-      .lean()
-      .exec();
-
-    const hasNextPage = data.length > pageSize;
-    const pageData = hasNextPage ? data.slice(0, pageSize) : data;
-
-    const mappedData = pageData.map(payment => ({
-      ...payment,
-      id: String(payment._id),
-    }));
-
-    const nextCursor = hasNextPage
-      ? String(mappedData[mappedData.length - 1]._id)
-      : null;
-
-    return { data: mappedData, nextCursor };
+    return { data, nextCursor };
   }
 
   async findLatestByUserIdWithFilters(params: {
@@ -92,23 +82,16 @@ export class PaymentRepository {
     excludeStatus?: string;
     limit: number;
   }) {
-    const filter = this.buildFilter({
-      userId: params.userId,
-      status: params.status,
-      excludeStatus: params.excludeStatus,
+    const query = this.paymentModel.find().sort({ _id: -1 });
+
+    this.applyFilters(query, params);
+
+    const payments = await query.limit(params.limit).exec();
+
+    return payments.map(payment => {
+      const paymentObj = payment.toObject();
+      return { ...paymentObj, id: payment.id };
     });
-
-    const data = await this.paymentModel
-      .find(filter)
-      .sort({ _id: -1 })
-      .limit(params.limit)
-      .lean()
-      .exec();
-
-    return data.map(payment => ({
-      ...payment,
-      id: String(payment._id),
-    }));
   }
 
   async updateById(id: string, updateData: Partial<Payment>) {
@@ -175,16 +158,17 @@ export class PaymentRepository {
     return !!result;
   }
 
-  private buildFilter(params: {
-    userId?: string;
-    status?: string;
-    excludeStatus?: string;
-    cursor?: string;
-  }) {
-    const filter: any = { $and: [] };
-
+  private applyFilters(
+    query: any,
+    params: {
+      userId?: string;
+      status?: string;
+      excludeStatus?: string;
+      cursor?: string;
+    },
+  ) {
     if (params.userId) {
-      filter.$and.push({
+      query.merge({
         $or: [
           { userId: params.userId },
           { userId: new Types.ObjectId(params.userId) },
@@ -193,21 +177,15 @@ export class PaymentRepository {
     }
 
     if (params.status) {
-      filter.$and.push({ status: params.status });
+      query.merge({ status: params.status });
     }
 
     if (params.excludeStatus) {
-      filter.$and.push({ status: { $ne: params.excludeStatus } });
+      query.merge({ status: { $ne: params.excludeStatus } });
     }
 
-    if (params.cursor) {
-      filter.$and.push({ _id: { $lt: new Types.ObjectId(params.cursor) } });
+    if (params.cursor && Types.ObjectId.isValid(params.cursor)) {
+      query.merge({ _id: { $lt: new Types.ObjectId(params.cursor) } });
     }
-
-    if (filter.$and.length === 0) {
-      delete filter.$and;
-    }
-
-    return filter;
   }
 }

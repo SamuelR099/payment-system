@@ -8,7 +8,6 @@ import { DEFAULT_PAGE_SIZE } from 'src/shared/constants';
 export type SearchOldReportParams = {
   uploadedBy?: string;
   cursor?: string;
-  limit?: number;
 };
 
 @Injectable()
@@ -19,21 +18,26 @@ export class OldReportRepository {
   ) {}
 
   async search(params: SearchOldReportParams) {
-    const pageSize = params.limit ?? DEFAULT_PAGE_SIZE;
-    const filter = this.buildFilter(params);
-    const data = await this.oldReportModel
-      .find(filter)
-      .sort({ _id: -1 })
-      .limit(pageSize + 1)
-      .lean()
-      .exec();
-    const hasNextPage = data.length > pageSize;
-    const pageData = hasNextPage ? data.slice(0, pageSize) : data;
-    const nextCursor = hasNextPage
-      ? String(pageData[pageData.length - 1]._id)
-      : null;
+    const query = this.oldReportModel.find().sort({ _id: -1 });
 
-    return { data: pageData, nextCursor };
+    if (params.uploadedBy) {
+      query.merge({ uploadedBy: params.uploadedBy });
+    }
+
+    if (params.cursor && Types.ObjectId.isValid(params.cursor)) {
+      query.merge({ _id: { $lt: new Types.ObjectId(params.cursor) } });
+    }
+
+    const reports = await query.limit(DEFAULT_PAGE_SIZE + 1).lean().exec();
+
+    let nextCursor: string | null = null;
+    if (reports.length > DEFAULT_PAGE_SIZE) {
+      reports.pop();
+      const lastItem = reports[reports.length - 1];
+      nextCursor = String(lastItem._id);
+    }
+
+    return { data: reports, nextCursor };
   }
 
   async findById(id: string, failIfNotFound = false) {
@@ -74,23 +78,5 @@ export class OldReportRepository {
       );
     }
     return deleted;
-  }
-
-  private buildFilter(params: SearchOldReportParams) {
-    const filter: any = { $and: [] };
-
-    if (params.uploadedBy) {
-      filter.$and.push({ uploadedBy: params.uploadedBy });
-    }
-
-    if (params.cursor) {
-      filter.$and.push({ _id: { $lt: new Types.ObjectId(params.cursor) } });
-    }
-
-    if (filter.$and.length === 0) {
-      delete filter.$and;
-    }
-
-    return filter;
   }
 }

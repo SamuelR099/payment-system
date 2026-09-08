@@ -5,7 +5,6 @@ export class GetTimesheetsQuery {
   readonly startDate?: Date;
   readonly endDate?: Date;
   readonly cursor?: string;
-  readonly limit?: number;
   readonly status?: string;
   readonly terms?: string;
 

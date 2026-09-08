@@ -27,10 +27,8 @@ export class GetReportsHandler implements IQueryHandler<GetReportsQuery> {
         query.userRole === UserRole.SUPERVISOR ? query.userId : undefined,
     };
 
-    const { data: reports, nextCursor } = await this.reportRepository.search(
-      params,
-      query.limit,
-    );
+    const { data: reports, nextCursor } =
+      await this.reportRepository.search(params);
 
     if (isAdmin) {
       const userIds = [

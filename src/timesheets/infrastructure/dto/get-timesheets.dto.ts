@@ -23,11 +23,6 @@ export class GetTimesheetsDto {
   cursor?: string;
 
   @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  limit?: number;
-
-  @IsOptional()
   @IsString()
   search?: string;
 

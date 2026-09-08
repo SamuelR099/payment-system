@@ -18,4 +18,5 @@ export type ProjectDocument = Project & Document;
 export const ProjectSchema = SchemaFactory.createForClass(Project);
 
 ProjectSchema.index({ userId: 1, createdAt: -1 });
+ProjectSchema.index({ userId: 1, _id: -1 });
 ProjectSchema.index({ userId: 1, name: 1 }, { unique: true });

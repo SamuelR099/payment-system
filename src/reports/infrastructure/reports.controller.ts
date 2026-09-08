@@ -58,7 +58,6 @@ export class ReportsController {
         userId: req.user.userId,
         role: req.user.role,
         cursor: query.cursor,
-        limit: query.limit,
       }),
     );
   }

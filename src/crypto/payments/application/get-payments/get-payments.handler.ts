@@ -18,13 +18,12 @@ export class GetPaymentsHandler implements IQueryHandler<GetPaymentsQuery> {
     const targetUserId = isAdmin ? undefined : query.userId;
 
     const { data: payments, nextCursor } =
-      await this.paymentRepository.findByUserIdWithFilters(
-        targetUserId,
-        query.status,
-        query.excludeStatus,
-        query.cursor,
-        query.limit,
-      );
+      await this.paymentRepository.findByUserIdWithFilters({
+        userId: targetUserId,
+        status: query.status,
+        excludeStatus: query.excludeStatus,
+        cursor: query.cursor,
+      });
 
     const userIds = [
       ...new Set(payments.map(payment => String(payment.userId))),

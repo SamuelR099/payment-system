@@ -36,27 +36,23 @@ export class TimesheetRepository {
     } = params;
     const pageSize = limit ?? DEFAULT_PAGE_SIZE;
 
-    const filter: any = {
-      $and: [
-        {
-          $or: [{ userId: userId }, { userId: new Types.ObjectId(userId) }],
-        },
-      ],
-    };
+    const query = this.timesheetModel
+      .find({ userId: new Types.ObjectId(userId) })
+      .sort({ _id: -1 });
 
     if (startDate && endDate) {
-      filter.$and.push({ date: { $gte: startDate, $lte: endDate } });
+      query.merge({ date: { $gte: startDate, $lte: endDate } });
     } else if (month && year) {
       const { startDate: start, endDate: end } = getMonthRange(month, year);
-      filter.$and.push({ date: { $gte: start, $lte: end } });
+      query.merge({ date: { $gte: start, $lte: end } });
     }
 
     if (status) {
-      filter.$and.push({ status });
+      query.merge({ status });
     }
 
     if (terms) {
-      filter.$and.push({
+      query.merge({
         $or: [
           { project: { $regex: terms, $options: 'i' } },
           { description: { $regex: terms, $options: 'i' } },
@@ -64,23 +60,20 @@ export class TimesheetRepository {
       });
     }
 
-    if (cursor) {
-      filter.$and.push({ _id: { $lt: new Types.ObjectId(cursor) } });
+    if (cursor && Types.ObjectId.isValid(cursor)) {
+      query.merge({ _id: { $lt: new Types.ObjectId(cursor) } });
     }
 
-    const data = await this.timesheetModel
-      .find(filter)
-      .sort({ _id: -1 })
-      .limit(pageSize + 1)
-      .lean()
-      .exec();
+    const timesheets = await query.limit(pageSize + 1).lean().exec();
 
-    const hasNextPage = data.length > pageSize;
-    const pageData = hasNextPage ? data.slice(0, pageSize) : data;
-    const nextCursor = hasNextPage
-      ? String(pageData[pageData.length - 1]._id)
-      : null;
-    return { data: pageData, nextCursor };
+    let nextCursor: string | null = null;
+    if (timesheets.length > pageSize) {
+      timesheets.pop();
+      const lastItem = timesheets[timesheets.length - 1];
+      nextCursor = String(lastItem._id);
+    }
+
+    return { data: timesheets, nextCursor };
   }
 
   async create(timesheetData: any) {

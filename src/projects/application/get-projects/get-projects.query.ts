@@ -1,3 +1,8 @@
 export class GetProjectsQuery {
-  constructor(readonly userId: string) {}
+  readonly userId: string;
+  readonly cursor?: string;
+
+  constructor(data: GetProjectsQuery) {
+    Object.assign(this, data);
+  }
 }

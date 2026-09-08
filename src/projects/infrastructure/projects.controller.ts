@@ -6,11 +6,13 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { CreateProjectDto } from './dto/create-project.dto';
+import { GetProjectsDto } from './dto/get-projects.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 
 import { CreateProjectCommand } from '../application/create-project/create-project.command';
@@ -26,8 +28,13 @@ export class ProjectsController {
   ) {}
 
   @Get('/')
-  getProjects(@Req() req: any) {
-    return this.queryBus.execute(new GetProjectsQuery(req.user.userId));
+  getProjects(@Req() req: any, @Query() query: GetProjectsDto) {
+    return this.queryBus.execute(
+      new GetProjectsQuery({
+        userId: req.user.userId,
+        cursor: query.cursor,
+      }),
+    );
   }
 
   @Post('/')

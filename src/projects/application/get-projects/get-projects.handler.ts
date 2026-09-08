@@ -7,12 +7,18 @@ export class GetProjectsHandler implements IQueryHandler<GetProjectsQuery> {
   constructor(private readonly projectRepository: ProjectRepository) {}
 
   async execute(query: GetProjectsQuery) {
-    const projects = await this.projectRepository.findAllByUser(query.userId);
+    const { data: projects, nextCursor } = await this.projectRepository.search({
+      userId: query.userId,
+      cursor: query.cursor,
+    });
 
-    return projects.map(project => ({
-      id: String(project._id),
-      name: project.name,
-      description: project.description,
-    }));
+    return {
+      data: projects.map(project => ({
+        id: String(project._id),
+        name: project.name,
+        description: project.description,
+      })),
+      nextCursor,
+    };
   }
 }

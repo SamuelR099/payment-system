@@ -14,7 +14,6 @@ export class GetTimesheetsHandler implements IQueryHandler<GetTimesheetsQuery> {
       startDate,
       endDate,
       cursor,
-      limit,
       status,
       terms,
     } = query;
@@ -25,7 +24,6 @@ export class GetTimesheetsHandler implements IQueryHandler<GetTimesheetsQuery> {
       startDate,
       endDate,
       cursor,
-      limit,
       status,
       terms,
     });

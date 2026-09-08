@@ -55,44 +55,43 @@ export class ReportRepository {
     return deletedReport;
   }
 
-  async search(params: SearchReportParams, limit?: number) {
-    const pageSize = limit ?? DEFAULT_PAGE_SIZE;
-    const data = await this.reportModel
-      .find(this.buildFilter(params))
-      .sort({ _id: -1 })
-      .limit(pageSize + 1)
-      .lean()
-      .exec();
-    const hasNextPage = data.length > pageSize;
-    const pageData = hasNextPage ? data.slice(0, pageSize) : data;
-    const nextCursor: string | null = hasNextPage
-      ? String(pageData[pageData.length - 1]._id)
-      : null;
+  async search(params: SearchReportParams) {
+    const query = this.reportModel.find().sort({ _id: -1 });
 
-    const mappedData = pageData.map(report => ({
-      ...report,
-      id: String(report._id),
-    }));
+    this.applyFilters(query, params);
 
-    return { data: mappedData, nextCursor };
+    const reports = await query.limit(DEFAULT_PAGE_SIZE + 1).exec();
+
+    let nextCursor: string | null = null;
+    if (reports.length > DEFAULT_PAGE_SIZE) {
+      reports.pop();
+      const lastItem = reports[reports.length - 1];
+      nextCursor = lastItem.id;
+    }
+
+    const data = reports.map(report => {
+      const reportObj = report.toObject();
+      return { ...reportObj, id: report.id };
+    });
+
+    return { data, nextCursor };
   }
 
   async count(params: SearchReportParams) {
-    return this.reportModel.countDocuments(this.buildFilter(params)).exec();
+    const query = this.reportModel.countDocuments();
+    this.applyFilters(query, params);
+    return query.exec();
   }
 
   async findLatest(params: SearchReportParams, limit: number) {
-    const data = await this.reportModel
-      .find(this.buildFilter(params))
-      .sort({ _id: -1 })
-      .limit(limit)
-      .lean()
-      .exec();
+    const query = this.reportModel.find().sort({ _id: -1 });
+    this.applyFilters(query, params);
+    const reports = await query.limit(limit).exec();
 
-    return data.map(report => ({
-      ...report,
-      id: String(report._id),
-    }));
+    return reports.map(report => {
+      const reportObj = report.toObject();
+      return { ...reportObj, id: report.id };
+    });
   }
 
   async findByIds(reportIds: string[]) {
@@ -103,15 +102,13 @@ export class ReportRepository {
     return this.reportModel.findOne({ userId, month, year }).exec();
   }
 
-  private buildFilter(params: SearchReportParams) {
-    const filter: any = { $and: [] };
-
+  private applyFilters(query: any, params: SearchReportParams) {
     if (params.status) {
-      filter.$and.push({ status: params.status });
+      query.merge({ status: params.status });
     }
 
     if (params.userId) {
-      filter.$and.push({
+      query.merge({
         $or: [
           { userId: params.userId },
           { userId: new Types.ObjectId(params.userId) },
@@ -120,25 +117,19 @@ export class ReportRepository {
     }
 
     if (params.supervisorId) {
-      filter.$and.push({ supervisorId: params.supervisorId });
+      query.merge({ supervisorId: params.supervisorId });
     }
 
     if (params.month) {
-      filter.$and.push({ month: params.month });
+      query.merge({ month: params.month });
     }
 
     if (params.year) {
-      filter.$and.push({ year: params.year });
+      query.merge({ year: params.year });
     }
 
-    if (params.cursor) {
-      filter.$and.push({ _id: { $lt: new Types.ObjectId(params.cursor) } });
+    if (params.cursor && Types.ObjectId.isValid(params.cursor)) {
+      query.merge({ _id: { $lt: new Types.ObjectId(params.cursor) } });
     }
-
-    if (filter.$and.length === 0) {
-      delete filter.$and;
-    }
-
-    return filter;
   }
 }
