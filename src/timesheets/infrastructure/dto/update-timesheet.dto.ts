@@ -27,8 +27,9 @@ export class UpdateTimesheetDto {
   @MaxLength(500)
   description?: string;
 
-  @IsNumber()
   @IsOptional()
+  @Transform(({ value }) => Number(value))
+  @IsNumber()
   @Min(1)
   @Max(24)
   hours?: number;

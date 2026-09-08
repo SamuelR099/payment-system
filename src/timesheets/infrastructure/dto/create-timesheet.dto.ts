@@ -27,6 +27,7 @@ export class CreateTimesheetDto {
   description: string;
 
   @IsNumber()
+  @Transform(({ value }) => Number(value))
   @IsNotEmpty()
   @Min(1)
   @Max(24)

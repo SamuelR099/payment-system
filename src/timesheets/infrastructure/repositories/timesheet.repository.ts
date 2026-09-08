@@ -53,9 +53,13 @@ export class TimesheetRepository {
 
     if (terms) {
       query.merge({
-        $or: [
-          { project: { $regex: terms, $options: 'i' } },
-          { description: { $regex: terms, $options: 'i' } },
+        $and: [
+          {
+            $or: [
+              { project: { $regex: terms, $options: 'i' } },
+              { description: { $regex: terms, $options: 'i' } },
+            ],
+          },
         ],
       });
     }
@@ -77,7 +81,10 @@ export class TimesheetRepository {
   }
 
   async create(timesheetData: any) {
-    const timesheet = new this.timesheetModel(timesheetData);
+    const timesheet = new this.timesheetModel({
+      ...timesheetData,
+      userId: new Types.ObjectId(timesheetData.userId),
+    });
     return timesheet.save();
   }
 
@@ -124,10 +131,7 @@ export class TimesheetRepository {
     };
 
     if (params.userId) {
-      filter.$or = [
-        { userId: params.userId },
-        { userId: new Types.ObjectId(params.userId) },
-      ];
+      filter.userId = new Types.ObjectId(params.userId);
     }
 
     const rows = await this.timesheetModel
@@ -159,24 +163,14 @@ export class TimesheetRepository {
     excludeTimesheetId?: string;
   }) {
     const filter: any = {
-      $and: [
-        {
-          $or: [
-            { userId: params.userId },
-            { userId: new Types.ObjectId(params.userId) },
-          ],
-        },
-        { project: params.project },
-        { date: params.date },
-      ],
+      userId: new Types.ObjectId(params.userId),
+      project: params.project,
+      date: params.date,
     };
     if (params.excludeTimesheetId) {
-      filter.$and.push({
-        _id: { $ne: new Types.ObjectId(params.excludeTimesheetId) },
-      });
+      filter._id = { $ne: new Types.ObjectId(params.excludeTimesheetId) };
     }
     const count = await this.timesheetModel.countDocuments(filter).exec();
     return count > 0;
   }
-
 }
