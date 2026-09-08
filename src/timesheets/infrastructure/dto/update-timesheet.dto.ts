@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import {
   IsDate,
   IsNotEmpty,
@@ -9,12 +9,13 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { parseLocalDate } from 'src/shared/utils';
 
 export class UpdateTimesheetDto {
-  @IsNotEmpty()
-  @Type(() => Date)
+  @IsOptional()
+  @Transform(({ value }) => parseLocalDate(value))
   @IsDate()
-  date: Date;
+  date?: Date;
 
   @IsString()
   @IsOptional()

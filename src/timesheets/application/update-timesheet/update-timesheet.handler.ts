@@ -1,7 +1,6 @@
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { DomainError } from 'src/shared/domain';
-import { TimesheetModel } from 'src/timesheets/domain/timesheet.model';
 import { TimesheetDomainService } from 'src/timesheets/domain/timesheet-domain.service';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { UpdateTimesheetCommand } from './update-timesheet.command';
@@ -19,10 +18,13 @@ export class UpdateTimesheetHandler
     const { timesheetId, userId, date, project, description, hours } = command;
 
     const foundTimesheet = await this.timesheetRepository.findById(timesheetId);
-    if (!foundTimesheet)
-      throw new DomainError('TIMESHEET_NOT_FOUND', 'No existe el timesheet.');
-    if (foundTimesheet.userId.toString() !== userId)
-      throw new DomainError('UNAUTHORIZED_TIMESHEET_ACCESS', 'No autorizado.');
+    if (!foundTimesheet) {
+      throw new NotFoundException('Timesheet not found');
+    }
+
+    if (foundTimesheet.userId.toString() !== userId) {
+      throw new ForbiddenException('You do not have access to this timesheet');
+    }
 
     const targetDate = date ?? foundTimesheet.date;
     const targetProject = project ?? foundTimesheet.project;
@@ -34,27 +36,11 @@ export class UpdateTimesheetHandler
       excludeTimesheetId: timesheetId,
     });
 
-    const updatedTimesheetDomain = TimesheetModel.fromModel(
-      foundTimesheet,
-    ).update({
+    return this.timesheetRepository.updateById(timesheetId, {
       date: targetDate,
       project: targetProject,
       description: description ?? foundTimesheet.description,
       hours: hours ?? foundTimesheet.hours,
     });
-
-    const updatedTimesheetData = updatedTimesheetDomain.getUserInfo();
-    const savedTimesheet = await this.timesheetRepository.updateById(
-      timesheetId,
-      updatedTimesheetData,
-    );
-
-    if (!savedTimesheet)
-      throw new DomainError(
-        'TIMESHEET_UPDATE_FAILED',
-        'No se pudo actualizar el timesheet.',
-      );
-
-    return savedTimesheet;
   }
 }

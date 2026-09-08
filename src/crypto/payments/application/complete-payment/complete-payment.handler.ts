@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { PaymentRepository } from '../../infrastructure/repositories/payment.repository';
 import { CompletePaymentCommand } from './complete-payment.command';
 import { Payment } from '../../domain/payment.model';
@@ -22,7 +22,7 @@ export class CompletePaymentHandler
       command.txid,
     );
     if (existingWithTxid && existingWithTxid.id !== command.paymentId) {
-      throw new Error('Transaction already processed');
+      throw new ConflictException('Transaction already processed');
     }
 
     const completedPayment = payment.markAsCompleted(

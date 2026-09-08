@@ -1,9 +1,9 @@
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { v4 as uuidv4 } from 'uuid';
 import type { Multer } from 'multer';
 
 import { AwsS3Service } from 'src/file-management/infrastructure/aws-s3.service';
-import { DomainError } from 'src/shared/domain';
 import { ReportRepository } from 'src/reports/infrastructure/repositories/report.repository';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { PdfService } from 'src/shared/pdf/pdf.service';
@@ -24,7 +24,7 @@ export class ApproveReportAdminHandler
     private readonly pdfService: PdfService,
   ) {}
 
-  async execute(command: ApproveReportAdminCommand): Promise<void> {
+  async execute(command: ApproveReportAdminCommand) {
     const { reportId, adminId, file } = command;
 
     const reportDoc = await this.reportRepository.findById(reportId, true);
@@ -33,15 +33,13 @@ export class ApproveReportAdminHandler
       !reportDoc.supervisorId ||
       String(reportDoc.supervisorId) !== String(adminId)
     ) {
-      throw new DomainError(
-        'UNAUTHORIZED',
+      throw new ForbiddenException(
         'No tienes permisos para aprobar este reporte. Solo el supervisor asignado puede aprobarlo.',
       );
     }
 
     if (!file) {
-      throw new DomainError(
-        'ADMIN_SIGNATURE_IMAGE_REQUIRED',
+      throw new BadRequestException(
         'Debes cargar tu firma para aprobar este reporte.',
       );
     }

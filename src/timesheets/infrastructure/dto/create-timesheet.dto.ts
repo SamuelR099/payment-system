@@ -7,11 +7,12 @@ import {
   Min,
   IsDate,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
+import { parseLocalDate } from 'src/shared/utils';
 
 export class CreateTimesheetDto {
   @IsNotEmpty()
-  @Type(() => Date)
+  @Transform(({ value }) => parseLocalDate(value))
   @IsDate()
   date: Date;
 

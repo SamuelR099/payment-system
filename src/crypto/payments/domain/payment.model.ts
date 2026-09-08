@@ -64,36 +64,6 @@ export class Payment {
     this.updatedAt = params.updatedAt;
   }
 
-  static create(params: {
-    id?: string;
-    userId: string;
-    reportId: string;
-    network: BlockchainNetwork;
-    walletAddress: string;
-    amountExpected: number;
-    expiresAt: Date;
-  }): Payment {
-    const now = new Date();
-    return new Payment({
-      id: params.id ?? '',
-      userId: params.userId,
-      reportId: params.reportId,
-      network: params.network,
-      walletAddress: params.walletAddress,
-      amountExpected: params.amountExpected,
-      amountReceived: 0,
-      txid: null,
-      status: PaymentStatus.PENDING,
-      confirmations: 0,
-      detectedAt: null,
-      paidAt: null,
-      expiresAt: params.expiresAt,
-      rawBlockchainData: null,
-      createdAt: now,
-      updatedAt: now,
-    });
-  }
-
   static fromModel(document: any): Payment {
     return new Payment({
       id: document._id?.toString?.() ?? '',

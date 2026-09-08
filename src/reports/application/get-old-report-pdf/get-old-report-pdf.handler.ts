@@ -14,8 +14,9 @@ export class GetOldReportPdfHandler
   ) {}
 
   async execute(query: GetOldReportPdfQuery) {
+    const { reportId } = query;
     const report = await this.oldReportRepository.findById(
-      query.reportId,
+      reportId,
       true,
     );
 

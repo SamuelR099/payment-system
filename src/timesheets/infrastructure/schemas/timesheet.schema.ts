@@ -3,9 +3,6 @@ import { Document, Types } from 'mongoose';
 
 @Schema({ collection: 'timesheets', timestamps: true })
 export class Timesheet {
-  static fromModel(): void {
-    throw new Error('Method not implemented.');
-  }
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   userId: Types.ObjectId;
 
@@ -36,5 +33,4 @@ export const TimesheetSchema = SchemaFactory.createForClass(Timesheet);
 TimesheetSchema.index({ userId: 1, date: -1 });
 TimesheetSchema.index({ userId: 1, createdAt: -1 });
 TimesheetSchema.index({ userId: 1, project: 1, date: -1 });
-TimesheetSchema.index({ signed: 1, date: -1 });
 TimesheetSchema.index({ date: -1, createdAt: -1 });

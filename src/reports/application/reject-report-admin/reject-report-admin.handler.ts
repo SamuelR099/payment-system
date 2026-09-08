@@ -1,8 +1,8 @@
+import { ForbiddenException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { RejectReportAdminCommand } from './reject-report-admin.command';
 import { ReportRepository } from '../../infrastructure/repositories/report.repository';
 import { Report } from '../../domain/report.model';
-import { DomainError } from 'src/shared/domain';
 
 @CommandHandler(RejectReportAdminCommand)
 export class RejectReportAdminHandler
@@ -19,8 +19,7 @@ export class RejectReportAdminHandler
       !reportDoc.supervisorId ||
       String(reportDoc.supervisorId) !== String(supervisorId)
     ) {
-      throw new DomainError(
-        'UNAUTHORIZED',
+      throw new ForbiddenException(
         'No tienes permisos para rechazar este reporte. Solo el supervisor asignado puede hacerlo.',
       );
     }

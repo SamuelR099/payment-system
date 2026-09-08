@@ -58,37 +58,6 @@ export class Report {
     this.pdfPath = params.pdfPath;
   }
 
-  static create(params: {
-    id: string;
-    userId: string;
-    supervisorId?: string;
-    month: number;
-    year: number;
-    totalHours: number;
-    totalAmount: number;
-    hourlyRate: number;
-    status?: ReportStatus;
-    employeeSigned?: boolean;
-    employeeSignatureImage?: string;
-    employeeSignedAt?: Date;
-  }): Report {
-    return new Report({
-      id: params.id,
-      userId: params.userId,
-      supervisorId: params.supervisorId,
-      month: params.month,
-      year: params.year,
-      totalHours: params.totalHours,
-      totalAmount: params.totalAmount,
-      hourlyRate: params.hourlyRate,
-      status: params.status ?? ReportStatus.DRAFT,
-      employeeSigned: params.employeeSigned ?? false,
-      employeeSignatureImage: params.employeeSignatureImage,
-      employeeSignedAt: params.employeeSignedAt,
-      adminSigned: false,
-    });
-  }
-
   static fromModel(document: any): Report {
     return new Report({
       id: document._id?.toString?.() ?? '',

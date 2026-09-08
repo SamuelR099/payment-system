@@ -9,11 +9,12 @@ export class GetOldReportsHandler implements IQueryHandler<GetOldReportsQuery> {
   constructor(private readonly oldReportRepository: OldReportRepository) {}
 
   async execute(query: GetOldReportsQuery) {
+    const { userId, role } = query;
     const reports = await this.oldReportRepository.findAll();
 
     const filteredReports =
-      query.userRole === UserRole.EMPLOYEE
-        ? reports.filter(report => report.uploadedBy === query.userId)
+      role === UserRole.EMPLOYEE
+        ? reports.filter(report => report.uploadedBy === userId)
         : reports;
 
     return {

@@ -1,7 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { DomainError } from 'src/shared/domain';
-import { TimesheetModel } from 'src/timesheets/domain/timesheet.model';
 import { TimesheetDomainService } from 'src/timesheets/domain/timesheet-domain.service';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { CreateTimesheetCommand } from './create-timesheet.command';
@@ -18,30 +16,18 @@ export class CreateTimesheetHandler
   async execute(command: CreateTimesheetCommand) {
     const { userId, date, project, description, hours } = command;
 
-    const timesheetDomain = TimesheetModel.create({
+    await this.timesheetDomainService.validateNoDuplicateOnDate({
+      userId,
+      project,
+      date,
+    });
+
+    return this.timesheetRepository.create({
       userId,
       date,
       project,
       description,
       hours,
     });
-
-    await this.timesheetDomainService.validateNoDuplicateOnDate({
-      userId,
-      project: timesheetDomain.project,
-      date: timesheetDomain.date,
-    });
-
-    const createdTimesheet = await this.timesheetRepository.create(
-      timesheetDomain.getUserInfo(),
-    );
-    if (!createdTimesheet) {
-      throw new DomainError(
-        'TIMESHEET_CREATION_FAILED',
-        'No se pudo crear el timesheet. Inténtalo de nuevo.',
-      );
-    }
-
-    return createdTimesheet;
   }
 }

@@ -18,7 +18,6 @@ import { CreateTimesheetDto } from './dto/create-timesheet.dto';
 import { UpdateTimesheetDto } from './dto/update-timesheet.dto';
 import { GetTimesheetsDto } from './dto/get-timesheets.dto';
 import { GetMonthlySummaryDto } from './dto/get-monthly-summary.dto';
-import { parseLocalDate } from 'src/shared/utils';
 
 import { CreateTimesheetCommand } from '../application/create-timesheet/create-timesheet.command';
 import { UpdateTimesheetCommand } from '../application/update-timesheet/update-timesheet.command';
@@ -41,7 +40,6 @@ export class TimesheetsController {
       new CreateTimesheetCommand({
         ...body,
         userId: req.user.userId,
-        date: parseLocalDate(body.date),
       }),
     );
   }
@@ -100,7 +98,6 @@ export class TimesheetsController {
         timesheetId: id,
         userId: req.user.userId,
         ...body,
-        date: parseLocalDate(body.date),
       }),
     );
   }

@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { TimesheetModel } from 'src/timesheets/domain/timesheet.model';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { UserRepository } from 'src/identity/infrastructure/repositories/user.repository';
 
@@ -110,6 +109,15 @@ export class TimesheetSummaryService {
   }
 
   private mapTimesheet(document: any) {
-    return TimesheetModel.fromModel(document).getUserInfo();
+    return {
+      id: document._id?.toString?.() ?? '',
+      userId: document.userId?.toString?.() ?? '',
+      date: document.date,
+      project: document.project,
+      description: document.description,
+      hours: document.hours,
+      createdAt: document.createdAt,
+      updatedAt: document.updatedAt,
+    };
   }
 }

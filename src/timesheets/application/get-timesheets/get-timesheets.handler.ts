@@ -1,21 +1,12 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import {
-  Timesheet,
-  TimesheetModel,
-} from 'src/timesheets/domain/timesheet.model';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { GetTimesheetsQuery } from './get-timesheets.query';
-
-export interface GetTimesheetsResult {
-  timesheets: Timesheet[];
-  nextCursor: string | null;
-}
 
 @QueryHandler(GetTimesheetsQuery)
 export class GetTimesheetsHandler implements IQueryHandler<GetTimesheetsQuery> {
   constructor(private readonly timesheetRepository: TimesheetRepository) {}
 
-  async execute(query: GetTimesheetsQuery): Promise<GetTimesheetsResult> {
+  async execute(query: GetTimesheetsQuery) {
     const {
       userId,
       month,
@@ -39,10 +30,16 @@ export class GetTimesheetsHandler implements IQueryHandler<GetTimesheetsQuery> {
       terms,
     });
 
-    const timesheets = data.map(document => {
-      const timesheet = TimesheetModel.fromModel(document);
-      return timesheet.getUserInfo();
-    });
+    const timesheets = data.map(document => ({
+      id: document._id?.toString?.() ?? '',
+      userId: document.userId?.toString?.() ?? '',
+      date: document.date,
+      project: document.project,
+      description: document.description,
+      hours: document.hours,
+      createdAt: document.createdAt,
+      updatedAt: document.updatedAt,
+    }));
 
     return { timesheets, nextCursor };
   }

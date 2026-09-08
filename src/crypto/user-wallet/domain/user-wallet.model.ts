@@ -35,28 +35,6 @@ export class UserWallet {
     this.updatedAt = params.updatedAt;
   }
 
-  static create(params: {
-    id?: string;
-    userId: string;
-    network: BlockchainNetwork;
-    walletAddress: string;
-    label?: string;
-    isDefault?: boolean;
-  }): UserWallet {
-    const now = new Date();
-    return new UserWallet({
-      id: params.id ?? '',
-      userId: params.userId,
-      network: params.network,
-      walletAddress: params.walletAddress,
-      label: params.label ?? '',
-      isDefault: params.isDefault ?? false,
-      status: WalletStatus.ACTIVE,
-      createdAt: now,
-      updatedAt: now,
-    });
-  }
-
   static fromModel(document: any): UserWallet {
     return new UserWallet({
       id: document._id?.toString?.() ?? '',
@@ -85,20 +63,6 @@ export class UserWallet {
 
   isActive(): boolean {
     return this.status === WalletStatus.ACTIVE;
-  }
-
-  isValidAddress(): boolean {
-    if (this.network === BlockchainNetwork.TRC20) {
-      return (
-        this.walletAddress.startsWith('T') && this.walletAddress.length === 34
-      );
-    }
-    if (this.network === BlockchainNetwork.BEP20) {
-      return (
-        this.walletAddress.startsWith('0x') && this.walletAddress.length === 42
-      );
-    }
-    return false;
   }
 
   validateAddress(): { valid: boolean; reason?: string } {

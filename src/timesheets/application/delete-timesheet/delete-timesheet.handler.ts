@@ -1,6 +1,6 @@
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { DomainError } from 'src/shared/domain';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { DeleteTimesheetCommand } from './delete-timesheet.command';
 
@@ -17,36 +17,15 @@ export class DeleteTimesheetHandler
       await this.timesheetRepository.findById(timesheetId);
 
     if (!existingTimesheet) {
-      throw new DomainError('TIMESHEET_NOT_FOUND', 'Timesheet not found.');
+      throw new NotFoundException('Timesheet not found');
     }
 
     if (existingTimesheet.userId.toString() !== userId) {
-      throw new DomainError(
-        'UNAUTHORIZED_TIMESHEET_ACCESS',
-        'You are not authorized to delete this timesheet.',
-      );
+      throw new ForbiddenException('You do not have access to this timesheet');
     }
 
-    try {
-      const deleted = await this.timesheetRepository.deleteById(timesheetId);
+    await this.timesheetRepository.deleteById(timesheetId);
 
-      if (!deleted) {
-        throw new DomainError(
-          'TIMESHEET_DELETE_FAILED',
-          'Failed to delete timesheet.',
-        );
-      }
-
-      return true;
-    } catch (error) {
-      if (error instanceof DomainError) {
-        throw error;
-      }
-
-      throw new DomainError(
-        'TIMESHEET_DELETE_FAILED',
-        'Failed to delete timesheet entry.',
-      );
-    }
+    return { deleted: true };
   }
 }
