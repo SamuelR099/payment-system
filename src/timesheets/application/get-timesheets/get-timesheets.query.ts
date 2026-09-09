@@ -5,7 +5,6 @@ export class GetTimesheetsQuery {
   readonly startDate?: Date;
   readonly endDate?: Date;
   readonly cursor?: string;
-  readonly status?: string;
   readonly terms?: string;
 
   constructor(data: GetTimesheetsQuery) {

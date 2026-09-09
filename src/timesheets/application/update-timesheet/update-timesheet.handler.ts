@@ -1,6 +1,7 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
+import { DomainError } from 'src/shared/domain';
 import { TimesheetDomainService } from 'src/timesheets/domain/timesheet-domain.service';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { UpdateTimesheetCommand } from './update-timesheet.command';
@@ -22,19 +23,19 @@ export class UpdateTimesheetHandler
       throw new NotFoundException('Timesheet not found');
     }
 
-    if (foundTimesheet.userId.toString() !== userId) {
-      throw new ForbiddenException('You do not have access to this timesheet');
-    }
+    this.validateOwnership(foundTimesheet.userId.toString(), userId);
 
     const targetDate = date ?? foundTimesheet.date;
     const targetProject = project ?? foundTimesheet.project;
 
-    await this.timesheetDomainService.validateNoDuplicateOnDate({
-      userId,
-      project: targetProject,
-      date: targetDate,
-      excludeTimesheetId: timesheetId,
-    });
+    if (date || project) {
+      await this.timesheetDomainService.validateNoDuplicateOnDate({
+        userId,
+        project: targetProject,
+        date: targetDate,
+        excludeTimesheetId: timesheetId,
+      });
+    }
 
     return this.timesheetRepository.updateById(timesheetId, {
       date: targetDate,
@@ -42,5 +43,14 @@ export class UpdateTimesheetHandler
       description: description ?? foundTimesheet.description,
       hours: hours ?? foundTimesheet.hours,
     });
+  }
+
+  private validateOwnership(timesheetUserId: string, userId: string) {
+    if (timesheetUserId !== userId) {
+      throw new DomainError(
+        'FORBIDDEN_TIMESHEET',
+        'You do not have access to this timesheet',
+      );
+    }
   }
 }

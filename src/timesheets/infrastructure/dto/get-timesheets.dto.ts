@@ -28,9 +28,5 @@ export class GetTimesheetsDto {
 
   @IsOptional()
   @IsString()
-  status?: string;
-
-  @IsOptional()
-  @IsString()
   terms?: string;
 }

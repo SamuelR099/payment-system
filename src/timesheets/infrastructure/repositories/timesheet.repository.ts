@@ -20,20 +20,10 @@ export class TimesheetRepository {
     endDate?: Date;
     cursor?: string;
     limit?: number;
-    status?: string;
     terms?: string;
   }) {
-    const {
-      userId,
-      month,
-      year,
-      startDate,
-      endDate,
-      cursor,
-      limit,
-      status,
-      terms,
-    } = params;
+    const { userId, month, year, startDate, endDate, cursor, limit, terms } =
+      params;
     const pageSize = limit ?? DEFAULT_PAGE_SIZE;
 
     const query = this.timesheetModel
@@ -45,10 +35,6 @@ export class TimesheetRepository {
     } else if (month && year) {
       const { startDate: start, endDate: end } = getMonthRange(month, year);
       query.merge({ date: { $gte: start, $lte: end } });
-    }
-
-    if (status) {
-      query.merge({ status });
     }
 
     if (terms) {
