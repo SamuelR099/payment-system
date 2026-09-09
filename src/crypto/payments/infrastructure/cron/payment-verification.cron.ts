@@ -82,9 +82,7 @@ export class PaymentVerificationCron {
       const result = await provider.getTransactions(walletAddress);
       const txids = result.transactions.map(transaction => transaction.txid);
       const processedPayments =
-        txids.length > 0
-          ? await this.paymentRepository.findByTxids(txids)
-          : [];
+        txids.length > 0 ? await this.paymentRepository.findByTxids(txids) : [];
       const processedTxids = new Set(
         processedPayments.map(payment => payment.txid),
       );

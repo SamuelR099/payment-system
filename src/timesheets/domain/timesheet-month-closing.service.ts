@@ -29,7 +29,10 @@ export class TimesheetMonthClosingService {
     await this.validateSupervisor(params.supervisorId);
     await this.ensureEmployeeHasActiveWallet(params.userId);
 
-    const period = ReportPeriod.create(Number(params.month), Number(params.year));
+    const period = ReportPeriod.create(
+      Number(params.month),
+      Number(params.year),
+    );
     const employee = await this.userRepository.findById(params.userId, true);
 
     await this.deleteReplaceableReportOrFail({
@@ -37,7 +40,10 @@ export class TimesheetMonthClosingService {
       period,
     });
 
-    const timesheets = await this.findTimesheetsForPeriod(params.userId, period);
+    const timesheets = await this.findTimesheetsForPeriod(
+      params.userId,
+      period,
+    );
     const reportTimesheets = timesheets.map(timesheet => ({
       userId: String(timesheet.userId),
       hours: timesheet.hours,
@@ -73,7 +79,8 @@ export class TimesheetMonthClosingService {
   }
 
   private async ensureEmployeeHasActiveWallet(userId: string) {
-    const hasActiveWallet = await this.walletRepository.existsActiveByUserId(userId);
+    const hasActiveWallet =
+      await this.walletRepository.existsActiveByUserId(userId);
     if (!hasActiveWallet) {
       throw new DomainError(
         'EMPLOYEE_WALLET_REQUIRED',

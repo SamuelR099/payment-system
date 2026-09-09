@@ -15,10 +15,7 @@ export class GetOldReportPdfHandler
 
   async execute(query: GetOldReportPdfQuery) {
     const { reportId } = query;
-    const report = await this.oldReportRepository.findById(
-      reportId,
-      true,
-    );
+    const report = await this.oldReportRepository.findById(reportId, true);
 
     const signedUrl = await this.awsS3Service.getSignedUrl(report.pdfPath);
 

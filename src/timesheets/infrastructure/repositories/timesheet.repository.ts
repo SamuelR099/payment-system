@@ -68,7 +68,10 @@ export class TimesheetRepository {
       query.merge({ _id: { $lt: new Types.ObjectId(cursor) } });
     }
 
-    const timesheets = await query.limit(pageSize + 1).lean().exec();
+    const timesheets = await query
+      .limit(pageSize + 1)
+      .lean()
+      .exec();
 
     let nextCursor: string | null = null;
     if (timesheets.length > pageSize) {

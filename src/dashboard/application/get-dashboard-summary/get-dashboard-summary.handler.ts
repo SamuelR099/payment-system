@@ -8,7 +8,9 @@ import { GetDashboardSummaryQuery } from './get-dashboard-summary.query';
 export class GetDashboardSummaryHandler
   implements IQueryHandler<GetDashboardSummaryQuery>
 {
-  constructor(private readonly dashboardSummaryService: DashboardSummaryService) {}
+  constructor(
+    private readonly dashboardSummaryService: DashboardSummaryService,
+  ) {}
 
   async execute(query: GetDashboardSummaryQuery) {
     return this.dashboardSummaryService.getEmployeeSummary(query);

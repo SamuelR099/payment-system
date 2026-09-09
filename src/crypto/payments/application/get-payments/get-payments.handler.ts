@@ -12,44 +12,51 @@ export class GetPaymentsHandler implements IQueryHandler<GetPaymentsQuery> {
   ) {}
 
   async execute(query: GetPaymentsQuery) {
-    const isAdmin =
-      query.userRole === UserRole.SUPERVISOR ||
-      query.userRole === UserRole.ADMIN;
-    const targetUserId = isAdmin ? undefined : query.userId;
-
     const { data: payments, nextCursor } =
-      await this.paymentRepository.findByUserIdWithFilters({
-        userId: targetUserId,
-        status: query.status,
-        excludeStatus: query.excludeStatus,
-        cursor: query.cursor,
-      });
+      await this.paymentRepository.findByUserIdWithFilters(
+        this.buildSearchParams(query),
+      );
 
+    const data = await this.enrichPayments(payments);
+
+    return { data, nextCursor };
+  }
+
+  private buildSearchParams(query: GetPaymentsQuery) {
+    return {
+      userId: this.getTargetUserId(query),
+      status: query.status,
+      excludeStatus: query.excludeStatus,
+      cursor: query.cursor,
+    };
+  }
+
+  private getTargetUserId(query: GetPaymentsQuery) {
+    return query.userRole === UserRole.ADMIN ? undefined : query.userId;
+  }
+
+  private async enrichPayments(payments) {
     const userIds = [
       ...new Set(payments.map(payment => String(payment.userId))),
     ];
-    const users =
-      userIds.length > 0 ? await this.userRepository.findByIds(userIds) : [];
 
-    const userMap = new Map<string, { firstName: string; lastName: string }>(
-      users.map(user => [
-        String(user._id),
-        {
-          firstName: user.profile?.firstName ?? '',
-          lastName: user.profile?.lastName ?? '',
-        },
-      ]),
-    );
+    const usersById = await this.getUsersById(userIds);
 
-    const enrichedData = payments.map(payment => {
-      const user = userMap.get(String(payment.userId));
+    return payments.map(payment => {
+      const user = usersById[String(payment.userId)];
       return {
         ...payment,
-        firstName: user?.firstName ?? '',
-        lastName: user?.lastName ?? '',
+        firstName: user?.profile?.firstName ?? '',
+        lastName: user?.profile?.lastName ?? '',
       };
     });
+  }
 
-    return { data: enrichedData, nextCursor };
+  private async getUsersById(userIds) {
+    const users = userIds.length
+      ? await this.userRepository.findByIds(userIds)
+      : [];
+
+    return Object.fromEntries(users.map(user => [String(user._id), user]));
   }
 }

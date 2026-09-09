@@ -30,7 +30,10 @@ export class PaymentRepository {
   }
 
   async findByTxids(txids: string[]) {
-    return this.paymentModel.find({ txid: { $in: txids } }).lean().exec();
+    return this.paymentModel
+      .find({ txid: { $in: txids } })
+      .lean()
+      .exec();
   }
 
   async findPendingPayments() {

@@ -28,7 +28,10 @@ export class OldReportRepository {
       query.merge({ _id: { $lt: new Types.ObjectId(params.cursor) } });
     }
 
-    const reports = await query.limit(DEFAULT_PAGE_SIZE + 1).lean().exec();
+    const reports = await query
+      .limit(DEFAULT_PAGE_SIZE + 1)
+      .lean()
+      .exec();
 
     let nextCursor: string | null = null;
     if (reports.length > DEFAULT_PAGE_SIZE) {

@@ -37,11 +37,7 @@ export class ProjectRepository {
     return { data: projects, nextCursor };
   }
 
-  async create(data: {
-    userId: string;
-    name: string;
-    description: string;
-  }) {
+  async create(data: { userId: string; name: string; description: string }) {
     const created = await this.projectModel.create({
       userId: new Types.ObjectId(data.userId),
       name: data.name,

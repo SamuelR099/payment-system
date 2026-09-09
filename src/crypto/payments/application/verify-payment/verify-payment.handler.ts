@@ -44,12 +44,11 @@ export class VerifyPaymentHandler
       payment.network,
     );
     const result = await provider.getTransactions(payment.walletAddress);
+    const txids = result.transactions.map(transaction => transaction.txid);
+    const processedTxids = await this.getProcessedTxids(txids, payment.id);
 
     for (const transaction of result.transactions) {
-      const existingWithTxid = await this.paymentRepository.findByTxid(
-        transaction.txid,
-      );
-      if (existingWithTxid) {
+      if (processedTxids.has(transaction.txid)) {
         continue;
       }
 
@@ -118,5 +117,19 @@ export class VerifyPaymentHandler
       verified: false,
       reason: 'No matching transaction found on blockchain',
     };
+  }
+
+  private async getProcessedTxids(txids: string[], paymentId: string) {
+    if (!txids.length) {
+      return new Set<string>();
+    }
+
+    const payments = await this.paymentRepository.findByTxids(txids);
+
+    return new Set(
+      payments
+        .filter(payment => String(payment._id) !== paymentId)
+        .map(payment => payment.txid),
+    );
   }
 }

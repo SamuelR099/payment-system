@@ -204,8 +204,9 @@ export class Payment {
       txid,
       amountReceived: amount,
       confirmations,
-      status: PaymentStatus.PENDING,
+      status: PaymentStatus.COMPLETED,
       detectedAt: new Date(),
+      paidAt: new Date(),
       rawBlockchainData: rawBlockchainData ?? this.rawBlockchainData,
       updatedAt: new Date(),
     });
