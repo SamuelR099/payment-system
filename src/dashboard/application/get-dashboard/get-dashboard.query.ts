@@ -1,9 +1,9 @@
-export class GetDashboardSummaryQuery {
+export class GetDashboardQuery {
   readonly userId: string;
   readonly month?: number;
   readonly year?: number;
 
-  constructor(data: GetDashboardSummaryQuery) {
+  constructor(data: GetDashboardQuery) {
     Object.assign(this, data);
   }
 }

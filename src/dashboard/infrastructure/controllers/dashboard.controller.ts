@@ -4,8 +4,8 @@ import { QueryBus } from '@nestjs/cqrs';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { UserRole } from 'src/shared/enums/user-role.enum';
 
-import { GetDashboardSummaryQuery } from '../application/get-dashboard-summary/get-dashboard-summary.query';
-import { GetDashboardSummaryDto } from './dto/get-dashboard-summary.dto';
+import { GetDashboardQuery } from '../../application/get-dashboard/get-dashboard.query';
+import { GetDashboardSummaryDto } from '../dto/get-dashboard-summary.dto';
 
 @Controller('dashboard')
 export class DashboardController {
@@ -15,7 +15,7 @@ export class DashboardController {
   @Roles([UserRole.EMPLOYEE])
   async getSummary(@Req() req: any, @Query() query: GetDashboardSummaryDto) {
     return this.queryBus.execute(
-      new GetDashboardSummaryQuery({
+      new GetDashboardQuery({
         userId: req.user.userId,
         month: query.month,
         year: query.year,

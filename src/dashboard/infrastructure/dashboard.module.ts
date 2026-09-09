@@ -6,9 +6,9 @@ import { IdentityModule } from 'src/identity/infrastructure/identity.module';
 import { ReportsModule } from 'src/reports/infrastructure/reports.module';
 import { TimesheetsModule } from 'src/timesheets/infrastructure/timesheets.module';
 
-import { GetDashboardSummaryHandler } from '../application/get-dashboard-summary/get-dashboard-summary.handler';
+import { GetDashboardHandler } from '../application/get-dashboard/get-dashboard.handler';
 import { DashboardSummaryService } from '../domain/dashboard-summary.service';
-import { DashboardController } from './dashboard.controller';
+import { DashboardController } from './controllers/dashboard.controller';
 
 @Module({
   imports: [
@@ -19,6 +19,6 @@ import { DashboardController } from './dashboard.controller';
     PaymentsModule,
   ],
   controllers: [DashboardController],
-  providers: [DashboardSummaryService, GetDashboardSummaryHandler],
+  providers: [DashboardSummaryService, GetDashboardHandler],
 })
 export class DashboardModule {}

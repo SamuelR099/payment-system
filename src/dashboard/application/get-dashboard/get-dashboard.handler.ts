@@ -2,17 +2,15 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { DashboardSummaryService } from 'src/dashboard/domain/dashboard-summary.service';
 
-import { GetDashboardSummaryQuery } from './get-dashboard-summary.query';
+import { GetDashboardQuery } from './get-dashboard.query';
 
-@QueryHandler(GetDashboardSummaryQuery)
-export class GetDashboardSummaryHandler
-  implements IQueryHandler<GetDashboardSummaryQuery>
-{
+@QueryHandler(GetDashboardQuery)
+export class GetDashboardHandler implements IQueryHandler<GetDashboardQuery> {
   constructor(
     private readonly dashboardSummaryService: DashboardSummaryService,
   ) {}
 
-  async execute(query: GetDashboardSummaryQuery) {
+  async execute(query: GetDashboardQuery) {
     return this.dashboardSummaryService.getEmployeeSummary(query);
   }
 }
