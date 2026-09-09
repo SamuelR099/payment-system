@@ -1,3 +1,11 @@
+import { UserRole } from 'src/shared/enums/user-role.enum';
+
 export class GetUserWalletsQuery {
-  constructor(readonly userId: string) {}
+  readonly userId: string;
+  readonly userRole: UserRole;
+  readonly targetUserId?: string;
+
+  constructor(data: GetUserWalletsQuery) {
+    Object.assign(this, data);
+  }
 }

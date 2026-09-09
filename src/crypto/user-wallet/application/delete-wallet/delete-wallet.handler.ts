@@ -1,5 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
+import { DomainError } from 'src/shared/domain';
 import { UserWalletRepository } from '../../infrastructure/repositories/user-wallet.repository';
 import { DeleteWalletCommand } from './delete-wallet.command';
 import { UserRole } from 'src/shared/enums/user-role.enum';
@@ -17,15 +18,25 @@ export class DeleteWalletHandler
       throw new NotFoundException('Wallet not found');
     }
 
-    const isAdmin =
-      command.userRole === UserRole.SUPERVISOR ||
-      command.userRole === UserRole.ADMIN;
-    if (!isAdmin && walletDoc.userId.toString() !== command.userId) {
-      throw new ForbiddenException('You do not have access to this wallet');
+    const isAdmin = command.userRole === UserRole.ADMIN;
+    if (!isAdmin) {
+      this.validateOwnership({
+        walletUserId: String(walletDoc.userId),
+        userId: command.userId,
+      });
     }
 
     await this.walletRepository.deleteById(command.walletId);
 
     return { deleted: true };
+  }
+
+  private validateOwnership(params: { walletUserId: string; userId: string }) {
+    if (params.walletUserId !== params.userId) {
+      throw new DomainError(
+        'FORBIDDEN_WALLET',
+        'You do not have access to this wallet',
+      );
+    }
   }
 }

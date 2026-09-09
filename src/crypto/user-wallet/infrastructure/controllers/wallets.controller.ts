@@ -45,8 +45,13 @@ export class WalletsController {
 
   @Get('/')
   async getWallets(@Req() req: any, @Query('userId') targetUserId?: string) {
-    const userId = targetUserId || req.user.userId;
-    return this.queryBus.execute(new GetUserWalletsQuery(userId));
+    return this.queryBus.execute(
+      new GetUserWalletsQuery({
+        userId: req.user.userId,
+        userRole: req.user.role,
+        targetUserId,
+      }),
+    );
   }
 
   @Patch('/:id')

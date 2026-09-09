@@ -1,4 +1,3 @@
-import { DomainError } from 'src/shared/domain';
 import { BlockchainNetwork } from 'src/shared/enums/blockchain-network.enum';
 import { WalletStatus } from 'src/shared/enums/wallet-status.enum';
 
@@ -65,49 +64,7 @@ export class UserWallet {
     return this.status === WalletStatus.ACTIVE;
   }
 
-  validateAddress(): { valid: boolean; reason?: string } {
-    if (this.network === BlockchainNetwork.TRC20) {
-      if (!this.walletAddress.startsWith('T')) {
-        return {
-          valid: false,
-          reason: 'la dirección TRC20 debe comenzar con "T"',
-        };
-      }
-      if (this.walletAddress.length !== 34) {
-        return {
-          valid: false,
-          reason: `la dirección TRC20 debe tener 34 caracteres (tiene ${this.walletAddress.length})`,
-        };
-      }
-      return { valid: true };
-    }
-
-    if (this.network === BlockchainNetwork.BEP20) {
-      if (!this.walletAddress.startsWith('0x')) {
-        return {
-          valid: false,
-          reason: 'la dirección BEP20 debe comenzar con "0x"',
-        };
-      }
-      if (this.walletAddress.length !== 42) {
-        return {
-          valid: false,
-          reason: `la dirección BEP20 debe tener 42 caracteres (tiene ${this.walletAddress.length})`,
-        };
-      }
-      return { valid: true };
-    }
-
-    return { valid: false, reason: `red no soportada: ${this.network}` };
-  }
-
   setAsDefault(): UserWallet {
-    if (!this.isActive()) {
-      throw new DomainError(
-        'INVALID_STATUS',
-        'No se puede marcar como default una wallet inactiva.',
-      );
-    }
     return new UserWallet({
       ...this,
       isDefault: true,
@@ -124,27 +81,14 @@ export class UserWallet {
   }
 
   updateAddress(walletAddress: string): UserWallet {
-    const newWallet = new UserWallet({
+    return new UserWallet({
       ...this,
       walletAddress,
       updatedAt: new Date(),
     });
-
-    const validation = newWallet.validateAddress();
-    if (!validation.valid) {
-      throw new DomainError(
-        'INVALID_ADDRESS',
-        validation.reason ?? 'Dirección inválida',
-      );
-    }
-
-    return newWallet;
   }
 
   deactivate(): UserWallet {
-    if (!this.isActive()) {
-      throw new DomainError('INVALID_STATUS', 'La wallet ya está inactiva.');
-    }
     return new UserWallet({
       ...this,
       status: WalletStatus.INACTIVE,
@@ -154,9 +98,6 @@ export class UserWallet {
   }
 
   activate(): UserWallet {
-    if (this.isActive()) {
-      throw new DomainError('INVALID_STATUS', 'La wallet ya está activa.');
-    }
     return new UserWallet({
       ...this,
       status: WalletStatus.ACTIVE,

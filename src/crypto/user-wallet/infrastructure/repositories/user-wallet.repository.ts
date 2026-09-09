@@ -72,45 +72,6 @@ export class UserWalletRepository {
     return !!result;
   }
 
-  validateWalletAddress(
-    address: string,
-    network: BlockchainNetwork,
-  ): { valid: boolean; reason?: string } {
-    if (network === BlockchainNetwork.TRC20) {
-      if (!address.startsWith('T')) {
-        return {
-          valid: false,
-          reason: 'la dirección TRC20 debe comenzar con "T"',
-        };
-      }
-      if (address.length !== 34) {
-        return {
-          valid: false,
-          reason: `la dirección TRC20 debe tener 34 caracteres (tiene ${address.length})`,
-        };
-      }
-      return { valid: true };
-    }
-
-    if (network === BlockchainNetwork.BEP20) {
-      if (!address.startsWith('0x')) {
-        return {
-          valid: false,
-          reason: 'la dirección BEP20 debe comenzar con "0x"',
-        };
-      }
-      if (address.length !== 42) {
-        return {
-          valid: false,
-          reason: `la dirección BEP20 debe tener 42 caracteres (tiene ${address.length})`,
-        };
-      }
-      return { valid: true };
-    }
-
-    return { valid: false, reason: `red no soportada: ${network}` };
-  }
-
   private buildUserIdFilter(userId: string) {
     const userIdStr = String(userId);
     const filter: any = { $or: [{ userId: userIdStr }] };
