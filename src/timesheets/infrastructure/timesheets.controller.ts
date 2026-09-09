@@ -76,13 +76,10 @@ export class TimesheetsController {
     },
   ) {
     return this.commandBus.execute(
-      new CloseMonthGenerateReportCommand(
-        req.user.userId,
-        body.month,
-        body.year,
-        body.hourlyRate,
-        body.supervisorId,
-      ),
+      new CloseMonthGenerateReportCommand({
+        userId: req.user.userId,
+        ...body,
+      }),
     );
   }
 

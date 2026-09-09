@@ -1,3 +1,11 @@
+import { UserRole } from 'src/shared/enums/user-role.enum';
+
 export class GetReportPdfQuery {
-  constructor(readonly reportId: string) {}
+  readonly reportId: string;
+  readonly userId: string;
+  readonly userRole: UserRole;
+
+  constructor(data: GetReportPdfQuery) {
+    Object.assign(this, data);
+  }
 }

@@ -80,6 +80,21 @@ export class TimesheetRepository {
     return { data: timesheets, nextCursor };
   }
 
+  async findByDateRange(params: {
+    userId: string;
+    startDate: Date;
+    endDate: Date;
+  }) {
+    return this.timesheetModel
+      .find({
+        userId: new Types.ObjectId(params.userId),
+        date: { $gte: params.startDate, $lte: params.endDate },
+      })
+      .sort({ date: 1, _id: 1 })
+      .lean()
+      .exec();
+  }
+
   async create(timesheetData: any) {
     const timesheet = new this.timesheetModel({
       ...timesheetData,

@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { UserWallet, UserWalletDocument } from '../schemas/user-wallet.schema';
 import { BlockchainNetwork } from 'src/shared/enums/blockchain-network.enum';
+import { WalletStatus } from 'src/shared/enums/wallet-status.enum';
 
 @Injectable()
 export class UserWalletRepository {
@@ -27,6 +28,15 @@ export class UserWalletRepository {
       .lean()
       .exec();
     return wallets.map(wallet => ({ ...wallet, id: String(wallet._id) }));
+  }
+
+  async existsActiveByUserId(userId: string) {
+    const exists = await this.userWalletModel.exists({
+      userId,
+      status: WalletStatus.ACTIVE,
+    });
+
+    return !!exists;
   }
 
   async updateDefaultStatus(

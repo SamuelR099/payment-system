@@ -1,6 +1,8 @@
 export class RejectReportAdminCommand {
-  constructor(
-    readonly reportId: string,
-    readonly userId: string,
-  ) {}
+  readonly reportId: string;
+  readonly userId: string;
+
+  constructor(data: RejectReportAdminCommand) {
+    Object.assign(this, data);
+  }
 }

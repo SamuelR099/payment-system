@@ -6,8 +6,6 @@ import { ReportPeriod } from './value-objects/report-period';
 export interface Timesheet {
   userId: string;
   hours: number;
-  month: number;
-  year: number;
 }
 
 export interface GeneratedReport {

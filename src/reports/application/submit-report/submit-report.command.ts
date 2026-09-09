@@ -1,6 +1,8 @@
 export class SubmitReportCommand {
-  constructor(
-    readonly reportId: string,
-    readonly userId: string,
-  ) {}
+  readonly reportId: string;
+  readonly userId: string;
+
+  constructor(data: SubmitReportCommand) {
+    Object.assign(this, data);
+  }
 }

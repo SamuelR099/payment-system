@@ -14,6 +14,7 @@ import { TimesheetsController } from './timesheets.controller';
 
 import { TimesheetDomainService } from '../domain/timesheet-domain.service';
 import { TimesheetSummaryService } from '../domain/timesheet-summary.service';
+import { TimesheetMonthClosingService } from '../domain/timesheet-month-closing.service';
 
 import { CreateTimesheetHandler } from '../application/create-timesheet/create-timesheet.handler';
 import { UpdateTimesheetHandler } from '../application/update-timesheet/update-timesheet.handler';
@@ -39,6 +40,7 @@ import { CloseMonthGenerateReportHandler } from '../application/close-month-gene
     TimesheetRepository,
     TimesheetDomainService,
     TimesheetSummaryService,
+    TimesheetMonthClosingService,
     CreateTimesheetHandler,
     UpdateTimesheetHandler,
     DeleteTimesheetHandler,
@@ -50,6 +52,7 @@ import { CloseMonthGenerateReportHandler } from '../application/close-month-gene
     TimesheetRepository,
     TimesheetDomainService,
     TimesheetSummaryService,
+    TimesheetMonthClosingService,
   ],
 })
 export class TimesheetsModule {}

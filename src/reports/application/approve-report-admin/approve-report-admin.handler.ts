@@ -61,11 +61,10 @@ export class ApproveReportAdminHandler
 
     const period = ReportPeriod.create(reportDoc.month, reportDoc.year);
     const { startDate, endDate } = period.getDateRange();
-    const { data: timesheetDocuments } = await this.timesheetRepository.search({
-      userId: reportDoc.userId,
+    const timesheetDocuments = await this.timesheetRepository.findByDateRange({
+      userId: String(reportDoc.userId),
       startDate,
       endDate,
-      limit: 1000,
     });
 
     await this.pdfService.generateAndUploadReport(
@@ -75,7 +74,7 @@ export class ApproveReportAdminHandler
     );
   }
 
-  private async uploadFile(file: Multer.File): Promise<string> {
+  private async uploadFile(file: Multer.File) {
     const fileName = `${uuidv4()}_${file.originalname}`;
     const filePath = `${MediaFolder}/${fileName}`;
 

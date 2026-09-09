@@ -65,7 +65,11 @@ export class ReportsController {
   @Get('/old-pdf/:id/pdf')
   async getOldReportPdf(@Param('id') id: string, @Request() req: any) {
     return this.queryBus.execute(
-      new GetOldReportPdfQuery(id, req.user.userId, req.user.role),
+      new GetOldReportPdfQuery({
+        reportId: id,
+        userId: req.user.userId,
+        userRole: req.user.role,
+      }),
     );
   }
 
@@ -102,20 +106,33 @@ export class ReportsController {
   @Roles([UserRole.ADMIN, UserRole.SUPERVISOR, UserRole.EMPLOYEE])
   async deleteOldReport(@Param('id') id: string, @Request() req: any) {
     return this.commandBus.execute(
-      new DeleteOldReportCommand(id, req.user.userId, req.user.role),
+      new DeleteOldReportCommand({
+        reportId: id,
+        userId: req.user.userId,
+        userRole: req.user.role,
+      }),
     );
   }
 
   @Get('/:id/pdf')
-  async getReportPdf(@Param('id') id: string) {
-    return this.queryBus.execute(new GetReportPdfQuery(id));
+  async getReportPdf(@Param('id') id: string, @Request() req: any) {
+    return this.queryBus.execute(
+      new GetReportPdfQuery({
+        reportId: id,
+        userId: req.user.userId,
+        userRole: req.user.role,
+      }),
+    );
   }
 
   @Post('/submit')
   @Roles([UserRole.SUPERVISOR])
   async submitReport(@Body() body: { reportId: string; userId: string }) {
     return this.commandBus.execute(
-      new SubmitReportCommand(body.reportId, body.userId),
+      new SubmitReportCommand({
+        reportId: body.reportId,
+        userId: body.userId,
+      }),
     );
   }
 
@@ -144,7 +161,10 @@ export class ReportsController {
   @Roles([UserRole.SUPERVISOR])
   async rejectReport(@Param('id') id: string, @Request() req: any) {
     return this.commandBus.execute(
-      new RejectReportAdminCommand(id, req.user.userId),
+      new RejectReportAdminCommand({
+        reportId: id,
+        userId: req.user.userId,
+      }),
     );
   }
 }

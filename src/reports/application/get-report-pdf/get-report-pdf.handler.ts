@@ -11,7 +11,7 @@ export class GetReportPdfHandler implements IQueryHandler<GetReportPdfQuery> {
     private readonly awsS3Service: AwsS3Service,
   ) {}
 
-  async execute(query: GetReportPdfQuery): Promise<{ url: string }> {
+  async execute(query: GetReportPdfQuery) {
     const report = await this.reportRepository.findById(query.reportId, true);
 
     if (!report?.pdfPath) {
