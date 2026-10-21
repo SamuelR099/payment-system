@@ -1,4 +1,10 @@
-export function NestedTable({ children, style = {}, ...restProps }) {
+import type { PropsWithChildren, TableHTMLAttributes } from 'react';
+
+type NestedTableProps = PropsWithChildren<
+  TableHTMLAttributes<HTMLTableElement>
+>;
+
+export function NestedTable({ children, style = {}, ...restProps }: NestedTableProps) {
   return (
     <table
       border={0}

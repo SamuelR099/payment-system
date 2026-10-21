@@ -1,6 +1,13 @@
+import type { PropsWithChildren } from 'react';
+
 import * as theme from './theme';
 
-export function Html({ lang, title, children }) {
+type HtmlProps = PropsWithChildren<{
+  lang: string;
+  title: string;
+}>;
+
+export function Html({ lang, title, children }: HtmlProps) {
   return (
     <html lang={lang}>
       <head>

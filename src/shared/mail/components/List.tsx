@@ -1,8 +1,10 @@
+import type { CSSProperties } from 'react';
+
 type ListType = 'ordered' | 'unordered';
 type ListProps = {
   type?: ListType;
   items: string[];
-  style?: Partial<React.CSSProperties>;
+  style?: Partial<CSSProperties>;
 };
 
 export function List({

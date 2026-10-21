@@ -8,6 +8,7 @@ import { ReportRepository } from 'src/reports/infrastructure/repositories/report
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { PdfService } from 'src/shared/pdf/pdf.service';
 import { ReportPeriod } from 'src/reports/domain/value-objects/report-period';
+import { UserRepository } from 'src/identity/infrastructure/repositories/user.repository';
 
 import { MediaFolder } from '../../domain/enums/media-folder.enum';
 import { Report } from '../../domain/report.model';
@@ -22,6 +23,7 @@ export class ApproveReportAdminHandler
     private readonly awsS3Service: AwsS3Service,
     private readonly timesheetRepository: TimesheetRepository,
     private readonly pdfService: PdfService,
+    private readonly userRepository: UserRepository,
   ) {}
 
   async execute(command: ApproveReportAdminCommand) {
@@ -38,13 +40,7 @@ export class ApproveReportAdminHandler
       );
     }
 
-    if (!file) {
-      throw new BadRequestException(
-        'Debes cargar tu firma para aprobar este reporte.',
-      );
-    }
-
-    const signatureImageUrl = await this.uploadFile(file);
+    const signatureImageUrl = await this.getSignatureImageUrl(adminId, file);
 
     const reportDomain = Report.fromModel(reportDoc);
     const approvedReport = reportDomain.approveByAdmin(
@@ -79,5 +75,22 @@ export class ApproveReportAdminHandler
     const filePath = `${MediaFolder}/${fileName}`;
 
     return this.awsS3Service.upload(filePath, file, 'private');
+  }
+
+  private async getSignatureImageUrl(userId: string, file?: Multer.File) {
+    if (file) {
+      return this.uploadFile(file);
+    }
+
+    const user = await this.userRepository.findById(userId, true);
+    const signatureImageUrl = user.profile?.signatureImageUrl;
+
+    if (!signatureImageUrl) {
+      throw new BadRequestException(
+        'Debes cargar tu firma para aprobar este reporte.',
+      );
+    }
+
+    return signatureImageUrl;
   }
 }

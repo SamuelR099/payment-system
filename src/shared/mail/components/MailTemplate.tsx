@@ -1,3 +1,5 @@
+import type { PropsWithChildren } from 'react';
+
 import { Html } from './Html';
 import { colors, sizes } from './theme';
 import { Paragraph } from './Paragraph';
@@ -13,7 +15,12 @@ const translations = {
   },
 };
 
-export function MailTemplate({ lang, title, children }) {
+type MailTemplateProps = PropsWithChildren<{
+  lang: keyof typeof translations;
+  title: string;
+}>;
+
+export function MailTemplate({ lang, title, children }: MailTemplateProps) {
   const t = translations[lang];
   return (
     <Html lang={lang} title={title}>

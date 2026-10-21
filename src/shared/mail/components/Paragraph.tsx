@@ -1,3 +1,15 @@
+import type {
+  CSSProperties,
+  ReactNode,
+  TableHTMLAttributes,
+} from 'react';
+
+type ParagraphProps = Partial<
+  TableHTMLAttributes<HTMLTableCellElement> & CSSProperties
+> & {
+  children?: ReactNode;
+};
+
 export function Paragraph({
   children,
   paddingBottom,
@@ -8,10 +20,7 @@ export function Paragraph({
   textAlign,
   style = {},
   ...restProps
-}: Partial<
-  React.TableHTMLAttributes<any> &
-    React.CSSProperties & { children: React.ReactNode }
->) {
+}: ParagraphProps) {
   return (
     <tr>
       <td

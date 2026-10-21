@@ -1,6 +1,12 @@
+import type { PropsWithChildren } from 'react';
+
 import { colors, fontSizes, fontFamilies } from './theme';
 
-export function ButtonLink({ href = '#', children }) {
+type ButtonLinkProps = PropsWithChildren<{
+  href?: string;
+}>;
+
+export function ButtonLink({ href = '#', children }: ButtonLinkProps) {
   return (
     <tbody>
       <tr>
