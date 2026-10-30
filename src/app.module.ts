@@ -10,7 +10,7 @@ import apiConfig from './config/api.config';
 import corsConfig from './config/cors.config';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
-import mailConfig from './config/mail.config';
+//import mailConfig from './config/mail.config';
 import paymentConfig from './config/payment.config';
 import recaptchaConfig from './config/recaptcha.config';
 import slackConfig from './config/slack.config';
@@ -39,7 +39,7 @@ import { DashboardModule } from './dashboard/infrastructure/dashboard.module';
         corsConfig,
         databaseConfig,
         jwtConfig,
-        mailConfig,
+       // mailConfig,
         paymentConfig,
         recaptchaConfig,
         slackConfig,
