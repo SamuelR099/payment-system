@@ -12,7 +12,7 @@ import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 //import mailConfig from './config/mail.config';
 import paymentConfig from './config/payment.config';
-import recaptchaConfig from './config/recaptcha.config';
+//import recaptchaConfig from './config/recaptcha.config';
 import slackConfig from './config/slack.config';
 
 import { AppController } from './app.controller';
@@ -41,7 +41,7 @@ import { DashboardModule } from './dashboard/infrastructure/dashboard.module';
         jwtConfig,
        // mailConfig,
         paymentConfig,
-        recaptchaConfig,
+        //recaptchaConfig,
         slackConfig,
       ],
     }),
