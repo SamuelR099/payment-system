@@ -1,7 +1,7 @@
 import { Injectable, forwardRef, Inject } from '@nestjs/common';
 import * as puppeteer from 'puppeteer';
 
-import { AwsS3Service } from 'src/file-management/infrastructure/aws-s3.service';
+import { GridFsService } from 'src/file-management/infrastructure/gridfs.service';
 import { ReportRepository } from 'src/reports/infrastructure/repositories/report.repository';
 import { UserRepository } from 'src/identity/infrastructure/repositories/user.repository';
 import { ReportDocument } from 'src/reports/infrastructure/schemas/report.schema';
@@ -14,7 +14,7 @@ import { renderPdfTemplate } from './utils/render-pdf-template.util';
 @Injectable()
 export class PdfService {
   constructor(
-    private readonly awsS3Service: AwsS3Service,
+    private readonly gridFsService: GridFsService,
     private readonly userRepository: UserRepository,
     @Inject(forwardRef(() => ReportRepository))
     private readonly reportRepository: ReportRepository,
@@ -85,20 +85,19 @@ export class PdfService {
 
     try {
       const pdfBuffer = await this.generatePdfFromHtml(htmlContent);
-      const s3FileName = `reports/${report._id}-${report.month}-${report.year}.pdf`;
+      const fileName = `reports/${report._id}-${report.month}-${report.year}.pdf`;
 
-      const publicUrl = await this.awsS3Service.uploadBuffer(
-        s3FileName,
+      const fileId = await this.gridFsService.uploadBuffer(
+        fileName,
         pdfBuffer,
         'application/pdf',
-        'private',
       );
 
       await this.reportRepository.update(report._id.toString(), {
-        pdfPath: s3FileName,
+        pdfPath: fileId,
       });
 
-      return publicUrl;
+      return fileId;
     } catch (error) {
       console.error('Error generating or uploading PDF:', error);
       throw error;
@@ -108,26 +107,7 @@ export class PdfService {
   private async getBase64Image(url?: string): Promise<string | undefined> {
     if (!url) return undefined;
     try {
-      let fetchUrl = url;
-      if (url.includes('amazonaws.com')) {
-        fetchUrl = await this.awsS3Service.getSignedUrl(url);
-      }
-
-      const response = await fetch(fetchUrl);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const arrayBuffer = await response.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      const contentType = response.headers.get('content-type') || 'image/png';
-
-      if (contentType.includes('xml')) {
-        throw new Error(
-          'Received XML instead of an image. Likely an S3 access error.',
-        );
-      }
-
+      const { buffer, contentType } = await this.gridFsService.getFileBuffer(url);
       return `data:${contentType};base64,${buffer.toString('base64')}`;
     } catch (e) {
       console.error('Error fetching image for PDF:', e);

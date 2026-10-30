@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { v4 as uuidv4 } from 'uuid';
 
-import { AwsS3Service } from 'src/file-management/infrastructure/aws-s3.service';
+import { GridFsService } from 'src/file-management/infrastructure/gridfs.service';
 import { UserRepository } from '../../infrastructure/repositories/user.repository';
 import { UploadUserSignatureCommand } from './upload-user-signature.command';
 
@@ -12,7 +12,7 @@ export class UploadUserSignatureHandler
   implements ICommandHandler<UploadUserSignatureCommand>
 {
   constructor(
-    private readonly awsS3Service: AwsS3Service,
+    private readonly gridFsService: GridFsService,
     private readonly userRepository: UserRepository,
   ) {}
 
@@ -22,16 +22,13 @@ export class UploadUserSignatureHandler
     const user = await this.userRepository.findById(userId, true);
 
     if (user.profile?.signatureImageUrl) {
-      const oldKey = this.extractKeyFromUrl(user.profile.signatureImageUrl);
-      if (oldKey) {
-        await this.awsS3Service.remove(oldKey);
-      }
+      await this.gridFsService.remove(user.profile.signatureImageUrl);
     }
 
     const ext = file.originalname.split('.').pop() ?? 'png';
     const fileName = `${SIGNATURE_FOLDER}/user-${userId}-${uuidv4()}.${ext}`;
 
-    const signatureUrl = await this.awsS3Service.upload(
+    const signatureUrl = await this.gridFsService.upload(
       fileName,
       file,
       'private',
@@ -44,8 +41,4 @@ export class UploadUserSignatureHandler
     return { signatureUrl };
   }
 
-  private extractKeyFromUrl(url: string): string | null {
-    if (!url.includes('amazonaws.com/')) return null;
-    return url.split('amazonaws.com/').pop() ?? null;
-  }
 }

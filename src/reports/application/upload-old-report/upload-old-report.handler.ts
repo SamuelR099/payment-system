@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { v4 as uuidv4 } from 'uuid';
 
-import { AwsS3Service } from 'src/file-management/infrastructure/aws-s3.service';
+import { GridFsService } from 'src/file-management/infrastructure/gridfs.service';
 import { OldReportRepository } from '../../infrastructure/repositories/old-report.repository';
 import { OldReportDomainService } from '../../domain/old-report-domain.service';
 import { UploadOldReportCommand } from './upload-old-report.command';
@@ -14,7 +14,7 @@ export class UploadOldReportHandler
 {
   constructor(
     private readonly oldReportRepository: OldReportRepository,
-    private readonly awsS3Service: AwsS3Service,
+    private readonly gridFsService: GridFsService,
     private readonly oldReportDomainService: OldReportDomainService,
   ) {}
 
@@ -30,7 +30,7 @@ export class UploadOldReportHandler
     const ext = file.originalname.split('.').pop() ?? 'pdf';
     const s3Key = `${OLD_REPORTS_FOLDER}/${uuidv4()}.${ext}`;
 
-    const pdfUrl = await this.awsS3Service.upload(s3Key, file, 'private');
+    const pdfUrl = await this.gridFsService.upload(s3Key, file, 'private');
 
     const oldReport = await this.oldReportRepository.create({
       pdfFileName,

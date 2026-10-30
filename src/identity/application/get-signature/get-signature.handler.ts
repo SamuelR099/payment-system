@@ -2,13 +2,13 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { GetSignatureQuery } from './get-signature.query';
 import { UserRepository } from '../../infrastructure/repositories/user.repository';
-import { AwsS3Service } from 'src/file-management/infrastructure/aws-s3.service';
+import { GridFsService } from 'src/file-management/infrastructure/gridfs.service';
 
 @QueryHandler(GetSignatureQuery)
 export class GetSignatureHandler implements IQueryHandler<GetSignatureQuery> {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly awsS3Service: AwsS3Service,
+    private readonly gridFsService: GridFsService,
   ) {}
 
   async execute(
@@ -19,7 +19,7 @@ export class GetSignatureHandler implements IQueryHandler<GetSignatureQuery> {
 
     if (!rawUrl) return { signatureUrl: null };
 
-    const signatureUrl = await this.awsS3Service.getSignedUrl(rawUrl, 3600);
+    const signatureUrl = await this.gridFsService.getSignedUrl(rawUrl, 3600);
 
     return { signatureUrl };
   }

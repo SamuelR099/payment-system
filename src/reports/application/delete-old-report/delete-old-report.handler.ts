@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { AwsS3Service } from 'src/file-management/infrastructure/aws-s3.service';
+import { GridFsService } from 'src/file-management/infrastructure/gridfs.service';
 import { OldReportRepository } from '../../infrastructure/repositories/old-report.repository';
 import { DeleteOldReportCommand } from './delete-old-report.command';
 
@@ -10,7 +10,7 @@ export class DeleteOldReportHandler
 {
   constructor(
     private readonly oldReportRepository: OldReportRepository,
-    private readonly awsS3Service: AwsS3Service,
+    private readonly gridFsService: GridFsService,
   ) {}
 
   async execute(command: DeleteOldReportCommand) {
@@ -19,13 +19,7 @@ export class DeleteOldReportHandler
     const report = await this.oldReportRepository.findById(reportId, true);
 
     if (report.pdfPath) {
-      const s3Key = report.pdfPath.includes('amazonaws.com/')
-        ? report.pdfPath.split('amazonaws.com/').pop()
-        : report.pdfPath;
-
-      if (s3Key) {
-        await this.awsS3Service.remove(s3Key);
-      }
+      await this.gridFsService.remove(report.pdfPath);
     }
 
     await this.oldReportRepository.deleteById(reportId);

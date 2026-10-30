@@ -1,14 +1,14 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetReportPdfQuery } from './get-report-pdf.query';
 import { ReportRepository } from '../../infrastructure/repositories/report.repository';
-import { AwsS3Service } from 'src/file-management/infrastructure/aws-s3.service';
+import { GridFsService } from 'src/file-management/infrastructure/gridfs.service';
 import { NotFoundException } from '@nestjs/common';
 
 @QueryHandler(GetReportPdfQuery)
 export class GetReportPdfHandler implements IQueryHandler<GetReportPdfQuery> {
   constructor(
     private readonly reportRepository: ReportRepository,
-    private readonly awsS3Service: AwsS3Service,
+    private readonly gridFsService: GridFsService,
   ) {}
 
   async execute(query: GetReportPdfQuery) {
@@ -20,7 +20,7 @@ export class GetReportPdfHandler implements IQueryHandler<GetReportPdfQuery> {
       );
     }
 
-    const signedUrl = await this.awsS3Service.getSignedUrl(
+    const signedUrl = await this.gridFsService.getSignedUrl(
       report.pdfPath,
       3600,
     );

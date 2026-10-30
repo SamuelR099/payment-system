@@ -1,6 +1,6 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { AwsS3Service } from 'src/file-management/infrastructure/aws-s3.service';
+import { GridFsService } from 'src/file-management/infrastructure/gridfs.service';
 import { OldReportRepository } from '../../infrastructure/repositories/old-report.repository';
 import { GetOldReportPdfQuery } from './get-old-report-pdf.query';
 
@@ -10,14 +10,14 @@ export class GetOldReportPdfHandler
 {
   constructor(
     private readonly oldReportRepository: OldReportRepository,
-    private readonly awsS3Service: AwsS3Service,
+    private readonly gridFsService: GridFsService,
   ) {}
 
   async execute(query: GetOldReportPdfQuery) {
     const { reportId } = query;
     const report = await this.oldReportRepository.findById(reportId, true);
 
-    const signedUrl = await this.awsS3Service.getSignedUrl(report.pdfPath);
+    const signedUrl = await this.gridFsService.getSignedUrl(report.pdfPath);
 
     return { url: signedUrl };
   }

@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { v4 as uuidv4 } from 'uuid';
 import type { Multer } from 'multer';
 
-import { AwsS3Service } from 'src/file-management/infrastructure/aws-s3.service';
+import { GridFsService } from 'src/file-management/infrastructure/gridfs.service';
 import { ReportRepository } from 'src/reports/infrastructure/repositories/report.repository';
 import { TimesheetRepository } from 'src/timesheets/infrastructure/repositories/timesheet.repository';
 import { PdfService } from 'src/shared/pdf/pdf.service';
@@ -20,7 +20,7 @@ export class ApproveReportAdminHandler
 {
   constructor(
     private readonly reportRepository: ReportRepository,
-    private readonly awsS3Service: AwsS3Service,
+    private readonly gridFsService: GridFsService,
     private readonly timesheetRepository: TimesheetRepository,
     private readonly pdfService: PdfService,
     private readonly userRepository: UserRepository,
@@ -74,7 +74,7 @@ export class ApproveReportAdminHandler
     const fileName = `${uuidv4()}_${file.originalname}`;
     const filePath = `${MediaFolder}/${fileName}`;
 
-    return this.awsS3Service.upload(filePath, file, 'private');
+    return this.gridFsService.upload(filePath, file, 'private');
   }
 
   private async getSignatureImageUrl(userId: string, file?: Multer.File) {
