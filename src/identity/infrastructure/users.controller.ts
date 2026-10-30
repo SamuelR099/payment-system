@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Patch, Post, Query, Req } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { Recaptcha } from '@nestlab/google-recaptcha';
+// import { Recaptcha } from '@nestlab/google-recaptcha';
 
 import { Public } from 'src/shared/validation';
 
@@ -24,14 +24,14 @@ export class UsersController {
 
   @Post('/sign-up')
   @Public()
-  @Recaptcha()
+  // @Recaptcha()
   async signUp(@Body() body: CreateUserDto) {
     return this.commandBus.execute(new CreateUserCommand(body));
   }
 
   @Post('/sign-in')
   @Public()
-  @Recaptcha()
+  // @Recaptcha()
   signIn(@Body() body: SignInDto) {
     return this.commandBus.execute(new SignInCommand(body));
   }
