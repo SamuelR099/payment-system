@@ -20,7 +20,7 @@ import { AppService } from './app.service';
 import { ClientRouteBuilder } from './shared/utils';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
-import { MailModule } from './shared/mail';
+//import { MailModule } from './shared/mail';
 import { SlackModule } from './identity/infrastructure/slack/slack.module';
 import { IdentityModule } from './identity/infrastructure/identity.module';
 import { TimesheetsModule } from './timesheets/infrastructure/timesheets.module';
@@ -59,11 +59,11 @@ import { DashboardModule } from './dashboard/infrastructure/dashboard.module';
     BlockchainModule,
     UserWalletModule,
     PaymentsModule,
-    MailModule.forRootAsync({
-      imports: [ConfigModule, HttpModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => config.get('mail'),
-    }),
+   // MailModule.forRootAsync({
+     // imports: [ConfigModule, HttpModule],
+      //inject: [ConfigService],
+      //useFactory: (config: ConfigService) => config.get('mail'),
+    //}),
     SlackModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
