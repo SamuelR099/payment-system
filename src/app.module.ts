@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
-import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha';
+//import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import apiConfig from './config/api.config';
@@ -45,11 +45,11 @@ import { DashboardModule } from './dashboard/infrastructure/dashboard.module';
         slackConfig,
       ],
     }),
-    GoogleRecaptchaModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => config.get('recaptcha'),
-    }),
+   // GoogleRecaptchaModule.forRootAsync({
+    //  imports: [ConfigModule],
+    //  inject: [ConfigService],
+     // useFactory: (config: ConfigService) => config.get('recaptcha'),
+   // }),
     ScheduleModule.forRoot(),
     IdentityModule,
     TimesheetsModule,
